@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Globals.cpp" />
+    <ClCompile Include="ILog.cpp">
+      <Filter>Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="ITimeKeeper.cpp">
+      <Filter>Timer</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Globals.h" />
+    <ClInclude Include="ILog.h">
+      <Filter>Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="ITimeKeeper.h">
+      <Filter>Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Logging">
+      <UniqueIdentifier>{a230c68b-3edc-4d8e-8242-886cd7415d3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utilities">
+      <UniqueIdentifier>{ac107d68-2686-449d-804b-a8a03eca667d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Timer">
+      <UniqueIdentifier>{62a6fa04-5288-4301-8255-1c8d96a7bbfe}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
