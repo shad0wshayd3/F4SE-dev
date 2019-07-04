@@ -70,10 +70,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -94,7 +94,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetPath)" "$(Fallout4Path)\Data\F4SE\plugins\$(TargetFileName)"</Command>
+      <Command>copy "$(TargetPath)" "$(Fallout4Path)\Data\F4SE\plugins\$(TargetFileName)"
+copy "$(ProjectDir)\BetaCommentEnabler.ini" "$(Fallout4Path)\Data\F4SE\plugins\BetaCommentEnabler.ini"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Installing Plugin DLL...</Message>
@@ -149,7 +150,8 @@
       <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetPath)" "$(Fallout4Path)\Data\F4SE\plugins\$(TargetFileName)"</Command>
+      <Command>copy "$(TargetPath)" "$(Fallout4Path)\Data\F4SE\plugins\$(TargetFileName)"
+copy "$(ProjectDir)\BetaCommentEnabler.ini" "$(Fallout4Path)\Data\F4SE\plugins\BetaCommentEnabler.ini"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Installing Plugin DLL...</Message>
