@@ -18,6 +18,8 @@ artifacts:
   name: Release
 deploy:
 - provider: GitHub
+  tag: v$(appveyor_build_version)
+  release: Build-v$(appveyor_build_version)
   auth_token:
     secure: s2D57W+hrwj0bss6mvAfGKG6JWqs93aHx0CSF2C7mrld0SnzG060RsuqXi82c9eI
   artifact: Release
