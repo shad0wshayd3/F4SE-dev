@@ -162,8 +162,8 @@ extern "C" {
         ITimeKeeper startupClock = ITimeKeeper();
         startupClock.Start();
 
-		g_Log.LogMessage("%s log opened (PC-64)", PLUGIN_NAME_LONG);
-		g_Log.LogMessage("This is a plugin log only and does not contain information on any other part of the game, including crashes.");
+        g_Log.LogMessage("%s log opened (PC-64)", PLUGIN_NAME_LONG);
+        g_Log.LogMessage("This is a plugin log only and does not contain information on any other part of the game, including crashes.");
 
         Info->infoVersion   = PluginInfo::kInfoVersion;
         Info->name          = PLUGIN_NAME_LONG;
@@ -172,7 +172,7 @@ extern "C" {
         g_PluginHandle      = F4SE->GetPluginHandle();
 
         if (F4SE->runtimeVersion != SUPPORTED_RUNTIME_VERSION) {
-			g_Log.LogError("Unsupported runtime version v%d.%d.%d.%d. This DLL is built for v%d.%d.%d.%d only. Plugin will be disabled.",
+            g_Log.LogError("Unsupported runtime version v%d.%d.%d.%d. This DLL is built for v%d.%d.%d.%d only. Plugin will be disabled.",
                 GET_EXE_VERSION_MAJOR (F4SE->runtimeVersion),
                 GET_EXE_VERSION_MINOR (F4SE->runtimeVersion),
                 GET_EXE_VERSION_BUILD (F4SE->runtimeVersion),
@@ -186,17 +186,17 @@ extern "C" {
         }
 
         if (!ObScript::Hook_Init()) {
-			g_Log.LogError("Failed to hook ObScript functions. Plugin will be disabled.");
+            g_Log.LogError("Failed to hook ObScript functions. Plugin will be disabled.");
             return false;
         }
 
-		g_Log.LogMessage("F4SEPlugin_Query Time: %fms", startupClock.Format(ITimeKeeper::Milli));
+        g_Log.LogMessage("F4SEPlugin_Query Time: %fms", startupClock.Format(ITimeKeeper::Milli));
         return true;
     }
 
     bool F4SEPlugin_Load(const F4SEInterface* F4SE) {
         if (!ObScript::Hook_Commit()) {
-			g_Log.LogWarning("Failed to commit ObScript functions.");
+            g_Log.LogWarning("Failed to commit ObScript functions.");
             return false;
         }
 

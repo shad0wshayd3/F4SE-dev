@@ -1,14 +1,14 @@
 #include "ITimeKeeper.h"
 #include "ILog.h"
 
-double		ITimeKeeper::s_secondsPerCount = 0;
-TIMECAPS	ITimeKeeper::s_timecaps = { 0 };
-bool		ITimeKeeper::s_setTime = false;
-UInt64		ITimeKeeper::s_lastQPC = 0;
-UInt64		ITimeKeeper::s_qpcWrapMargin = 0;
-bool		ITimeKeeper::s_hasLastQPC = false;
-UInt32		ITimeKeeper::s_qpcWrapCount = 0;
-UInt32		ITimeKeeper::s_qpcInaccurateCount = 0;
+double      ITimeKeeper::s_secondsPerCount = 0;
+TIMECAPS    ITimeKeeper::s_timecaps = { 0 };
+bool        ITimeKeeper::s_setTime = false;
+UInt64      ITimeKeeper::s_lastQPC = 0;
+UInt64      ITimeKeeper::s_qpcWrapMargin = 0;
+bool        ITimeKeeper::s_hasLastQPC = false;
+UInt32      ITimeKeeper::s_qpcWrapCount = 0;
+UInt32      ITimeKeeper::s_qpcInaccurateCount = 0;
 
 ITimeKeeper::ITimeKeeper() :m_qpcBase(0), m_tickBase(0) {
     Init();
@@ -38,8 +38,8 @@ void ITimeKeeper::Init(void) {
         //_MESSAGE("min timer period = %d", s_timecaps.wPeriodMin);
 
         s_setTime = (timeBeginPeriod(s_timecaps.wPeriodMin) == TIMERR_NOERROR);
-		if (!s_setTime)
-			MessageBox(NULL, "Error!\n!s_setTime", "ITimeKeeper", MB_OK | MB_ICONEXCLAMATION);
+        if (!s_setTime)
+            MessageBox(NULL, "Error!\n!s_setTime", "ITimeKeeper", MB_OK | MB_ICONEXCLAMATION);
             // g_Log.LogWarning("Couldn't change ITimeKeeper period!");
     }
 }

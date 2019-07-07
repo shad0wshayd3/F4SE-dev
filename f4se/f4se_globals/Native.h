@@ -43,16 +43,16 @@ extern RelocAddr <uintptr_t> ActorValueCalcVtbl;
 
 class ItemMenuDataManager {
 public:
-	DEFINE_MEMBER_FN_1(GetSelectedItem, BGSInventoryItem*, 0x001A3650, UInt32& handleID);
-	// ModdingSuccess (1), first CALL in loc_ top. 163 ref.
+    DEFINE_MEMBER_FN_1(GetSelectedItem, BGSInventoryItem*, 0x001A3650, UInt32& handleID);
+    // ModdingSuccess (1), first CALL in loc_ top. 163 ref.
 
-	DEFINE_MEMBER_FN_1(GetSelectedForm, TESForm*, 0x001A3740, UInt32& handleID);
-	// CheckStackIDFunctor (1), called twice use 1st, 3 loc_ up, 2nd CALL. 30 ref.
+    DEFINE_MEMBER_FN_1(GetSelectedForm, TESForm*, 0x001A3740, UInt32& handleID);
+    // CheckStackIDFunctor (1), called twice use 1st, 3 loc_ up, 2nd CALL. 30 ref.
 };
 
 class PipboyDataManager {
 public:
-	UInt64                  unk00[0x4A8 >> 3];
-	tArray<PipboyObject*>   itemData;
+    UInt64                  unk00[0x4A8 >> 3];
+    tArray<PipboyObject*>   itemData;
 };
 STATIC_ASSERT(sizeof(PipboyDataManager) == 0x4C0);

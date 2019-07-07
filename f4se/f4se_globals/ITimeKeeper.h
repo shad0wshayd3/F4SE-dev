@@ -10,8 +10,8 @@ public:
 
     static void     Init(void);
     static void     DeInit(void);
-    
-    void	        Start(void);
+
+    void            Start(void);
 
     double          Format(int Duration);
 
@@ -25,22 +25,22 @@ public:
     };
 
 private:
-    double	GetElapsedTime(void);
+    double  GetElapsedTime(void);
 
-    UInt64	m_qpcBase;	// QPC
-    UInt32	m_tickBase;	// timeGetTime
+    UInt64  m_qpcBase;  // QPC
+    UInt32  m_tickBase; // timeGetTime
 
-    static double	s_secondsPerCount;
-    static TIMECAPS	s_timecaps;
-    static bool		s_setTime;
+    static double   s_secondsPerCount;
+    static TIMECAPS s_timecaps;
+    static bool     s_setTime;
 
     // safe QPC stuff
-    static UInt64	GetQPC(void);
+    static UInt64   GetQPC(void);
 
-    static UInt64	s_lastQPC;
-    static UInt64	s_qpcWrapMargin;
-    static bool		s_hasLastQPC;
+    static UInt64   s_lastQPC;
+    static UInt64   s_qpcWrapMargin;
+    static bool     s_hasLastQPC;
 
-    static UInt32	s_qpcWrapCount;
-    static UInt32	s_qpcInaccurateCount;
+    static UInt32   s_qpcWrapCount;
+    static UInt32   s_qpcInaccurateCount;
 };
