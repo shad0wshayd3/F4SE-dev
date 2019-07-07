@@ -18,9 +18,6 @@
 #define TIMESTAMP "%m/%d/%Y (%I:%M)"
 #define INFO_SIZE 0x7FFF
 
-typedef bool(*_ExtractArgs)(void* paramInfo, void* scriptData, void* opcodeOffset, TESObjectREFR* thisObj, void* containingObj, void* script, void* eventList, ...);
-RelocAddr <_ExtractArgs> ExtractArgs(0x4E36B0);
-
 ILog            g_Log           = ILog(PLUGIN_NAME_SHORT);
 PluginHandle    g_PluginHandle  = kPluginHandle_Invalid;
 

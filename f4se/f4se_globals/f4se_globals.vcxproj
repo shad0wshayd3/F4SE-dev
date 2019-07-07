@@ -140,17 +140,25 @@
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="ILog.cpp" />
     <ClCompile Include="ITimeKeeper.cpp" />
+    <ClCompile Include="Native.cpp" />
     <ClCompile Include="Utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Globals.h" />
     <ClInclude Include="ILog.h" />
     <ClInclude Include="ITimeKeeper.h" />
+    <ClInclude Include="Native.h" />
     <ClInclude Include="Utilities.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\common\common_vc14.vcxproj">
       <Project>{472e19ab-def0-42df-819b-18722e8dc822}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\f4se\f4se.vcxproj">
+      <Project>{a236f69d-8ff9-4491-ac5f-45bf49448bbe}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\f4se_common\f4se_common.vcxproj">
+      <Project>{20c6411c-596f-4b85-be4e-8bc91f59d8a6}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

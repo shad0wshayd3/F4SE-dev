@@ -11,6 +11,9 @@
     <ClCompile Include="Utilities.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
+    <ClCompile Include="Native.cpp">
+      <Filter>Native</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Globals.h" />
@@ -23,6 +26,9 @@
     <ClInclude Include="Utilities.h">
       <Filter>Utilities</Filter>
     </ClInclude>
+    <ClInclude Include="Native.h">
+      <Filter>Native</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Logging">
@@ -33,6 +39,9 @@
     </Filter>
     <Filter Include="Timer">
       <UniqueIdentifier>{62a6fa04-5288-4301-8255-1c8d96a7bbfe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Native">
+      <UniqueIdentifier>{e341f022-ad9b-4e82-8126-48a6f31111c8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
