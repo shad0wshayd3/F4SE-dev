@@ -9,7 +9,7 @@ environment:
 install:
 - cmd: mkdir C:\Projects\F4SE-dev\Output\Data\F4SE\plugins
 build:
-  project: F4SE-src\f4se\f4se.sln
+  project: f4se\f4se.sln
   parallel: true
   verbosity: minimal
 test: off

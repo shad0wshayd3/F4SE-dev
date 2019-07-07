@@ -20,8 +20,8 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
-    <ProjectGuid>{C445C4ED-10F5-4446-ACC0-AF3F830CC107}</ProjectGuid>
-    <RootNamespace>f4setemplate</RootNamespace>
+    <ProjectGuid>{464cfa55-3bc8-411a-8891-f80f305065b9}</ProjectGuid>
+    <RootNamespace>BetaCommentEnabler</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -70,10 +70,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -82,10 +82,11 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\..;$(ProjectDir);$(ProjectDir)\..</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)..;$(SolutionDir)f4se_plugins</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>common/IPrefix.h</ForcedIncludeFiles>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>NotSet</SubSystem>
@@ -93,7 +94,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetPath)" "$(Fallout4Path)\Data\F4SE\plugins\$(TargetFileName)"</Command>
+      <Command>copy "$(TargetPath)" "$(Fallout4Path)\Data\F4SE\plugins\$(TargetFileName)"
+copy "$(ProjectDir)\BetaCommentEnabler.ini" "$(Fallout4Path)\Data\F4SE\plugins\BetaCommentEnabler.ini"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Installing Plugin DLL...</Message>
@@ -135,10 +137,11 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\..;$(ProjectDir);$(ProjectDir)\..</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)..;$(SolutionDir)f4se_plugins</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>common/IPrefix.h</ForcedIncludeFiles>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>NotSet</SubSystem>
@@ -147,7 +150,8 @@
       <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetPath)" "$(Fallout4Path)\Data\F4SE\plugins\$(TargetFileName)"</Command>
+      <Command>copy "$(TargetPath)" "$(Fallout4Path)\Data\F4SE\plugins\$(TargetFileName)"
+copy "$(ProjectDir)\BetaCommentEnabler.ini" "$(Fallout4Path)\Data\F4SE\plugins\BetaCommentEnabler.ini"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Installing Plugin DLL...</Message>
@@ -163,16 +167,16 @@
     <None Include="exports.def" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\F4SE-src\common\common_vc14.vcxproj">
+    <ProjectReference Include="..\..\..\common\common_vc14.vcxproj">
       <Project>{472e19ab-def0-42df-819b-18722e8dc822}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\F4SE-src\f4se\f4se\f4se.vcxproj">
+    <ProjectReference Include="..\..\f4se\f4se.vcxproj">
       <Project>{a236f69d-8ff9-4491-ac5f-45bf49448bbe}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\F4SE-src\f4se\f4se_common\f4se_common.vcxproj">
+    <ProjectReference Include="..\..\f4se_common\f4se_common.vcxproj">
       <Project>{20c6411c-596f-4b85-be4e-8bc91f59d8a6}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\f4se_globals\f4se_globals.vcxproj">
+    <ProjectReference Include="..\..\f4se_globals\f4se_globals.vcxproj">
       <Project>{c3c4b92c-5dae-4465-813a-a957c357754f}</Project>
     </ProjectReference>
   </ItemGroup>
