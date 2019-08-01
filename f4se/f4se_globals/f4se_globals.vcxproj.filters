@@ -14,6 +14,15 @@
     <ClCompile Include="Native.cpp">
       <Filter>Native</Filter>
     </ClCompile>
+    <ClCompile Include="ISettings.cpp">
+      <Filter>Settings</Filter>
+    </ClCompile>
+    <ClCompile Include="IObScript.cpp">
+      <Filter>ObScript</Filter>
+    </ClCompile>
+    <ClCompile Include="Definitions.cpp">
+      <Filter>Definitions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Globals.h" />
@@ -29,6 +38,15 @@
     <ClInclude Include="Native.h">
       <Filter>Native</Filter>
     </ClInclude>
+    <ClInclude Include="ISettings.h">
+      <Filter>Settings</Filter>
+    </ClInclude>
+    <ClInclude Include="IObScript.h">
+      <Filter>ObScript</Filter>
+    </ClInclude>
+    <ClInclude Include="Definitions.h">
+      <Filter>Definitions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Logging">
@@ -42,6 +60,15 @@
     </Filter>
     <Filter Include="Native">
       <UniqueIdentifier>{e341f022-ad9b-4e82-8126-48a6f31111c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Settings">
+      <UniqueIdentifier>{fd061c7a-3bce-401c-8f89-c70c18bd6b7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ObScript">
+      <UniqueIdentifier>{31f87b01-26d2-4070-81b8-af0a5e2de996}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Definitions">
+      <UniqueIdentifier>{e9d5da64-6510-4e29-ad17-92a15c85dd27}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

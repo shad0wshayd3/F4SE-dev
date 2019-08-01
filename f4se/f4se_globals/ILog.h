@@ -1,6 +1,4 @@
 #pragma once
-#include "common/IFileStream.h"
-#include "f4se/GameAPI.h"
 
 /**
     Reimplimentation of IDebugLog with support for multiple active classes, and less garbage.
@@ -20,8 +18,14 @@ public:
     void    LogWarning	(const char* messageText, ...);
     void    LogError	(const char* messageText, ...);
 
+    void    LogMessageNT(const char* messageText, ...);
+
 private:
-    void    Message(const char * message, bool newLine = true);
+    void    Message(const char* message, bool newLine = true);
+
+    void    MessageNT(const char* messageText, const char* messagePrefix = NULL);
+    void    MessageNT(const char* messageText, va_list args, const char* messagePrefix = NULL);
+
     void    TimestampedMessage(const char* messageText, const char* messagePrefix = NULL);
     void    TimestampedMessage(const char* messageText, va_list args, const char* messagePrefix = NULL);
 

@@ -10,6 +10,7 @@ RelocAddr <_RemoveImagespaceModifier> RemoveImagespaceModifier(0x396B30);
 RelocAddr <_CalculateDamageResist> CalculateDamageResist(0x65FAC0);
 RelocAddr <_GetXPForLevel> GetXPForLevel(0x664A10);
 RelocAddr <_ExtractArgs> ExtractArgs(0x4E36B0);
+RelocAddr <_ObScript_Parse> ObScript_Parse(0x404E7CE0);
 RelocAddr <_DoTokenReplacement_Internal> DoTokenReplacement_Internal(0xC0C70);
 
 RelocAddr <uintptr_t> ActorValueDerivedVtbl(0x2CEDBC8);

@@ -137,17 +137,23 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Definitions.cpp" />
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="ILog.cpp" />
     <ClCompile Include="ITimeKeeper.cpp" />
     <ClCompile Include="Native.cpp" />
+    <ClCompile Include="ISettings.cpp" />
+    <ClCompile Include="IObScript.cpp" />
     <ClCompile Include="Utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Definitions.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="ILog.h" />
     <ClInclude Include="ITimeKeeper.h" />
     <ClInclude Include="Native.h" />
+    <ClInclude Include="ISettings.h" />
+    <ClInclude Include="IObScript.h" />
     <ClInclude Include="Utilities.h" />
   </ItemGroup>
   <ItemGroup>

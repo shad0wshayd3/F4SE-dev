@@ -34,6 +34,9 @@ extern RelocAddr <_GetXPForLevel> GetXPForLevel;
 typedef bool(*_ExtractArgs)(void* paramInfo, void* scriptData, void* opcodeOffset, TESObjectREFR* thisObj, void* containingObj, void* script, void* eventList, ...);
 extern RelocAddr <_ExtractArgs> ExtractArgs;
 
+typedef bool (*_ObScript_Parse)(UInt32 numParams, void* paramInfo, void* lineBuf, void* scriptBuf);
+extern RelocAddr <_ObScript_Parse> ObScript_Parse;
+
 typedef void(*_DoTokenReplacement_Internal)(ExtraTextDisplayData* extraText, BSString& text);
 extern RelocAddr <_DoTokenReplacement_Internal> DoTokenReplacement_Internal;
 

@@ -1,5 +1,4 @@
 #include "ITimeKeeper.h"
-#include "ILog.h"
 
 double      ITimeKeeper::s_secondsPerCount = 0;
 TIMECAPS    ITimeKeeper::s_timecaps = { 0 };
@@ -29,18 +28,13 @@ void ITimeKeeper::Init(void) {
         s_secondsPerCount = 1.0 / countsPerSecond;
 
         s_qpcWrapMargin = (UInt64)(-((SInt64)(countsPerSecond * 60))); // detect if we've wrapped around by a delta greater than this - also limits max time
-        //_MESSAGE("s_qpcWrapMargin: %016I64X", s_qpcWrapMargin);
-        //_MESSAGE("wrap time: %fs", ((double)0xFFFFFFFFFFFFFFFF) * s_secondsPerCount);
 
         // init multimedia timer
         timeGetDevCaps(&s_timecaps, sizeof(s_timecaps));
 
-        //_MESSAGE("min timer period = %d", s_timecaps.wPeriodMin);
-
         s_setTime = (timeBeginPeriod(s_timecaps.wPeriodMin) == TIMERR_NOERROR);
         if (!s_setTime)
             MessageBox(NULL, "Error!\n!s_setTime", "ITimeKeeper", MB_OK | MB_ICONEXCLAMATION);
-            // g_Log.LogWarning("Couldn't change ITimeKeeper period!");
     }
 }
 
@@ -85,7 +79,7 @@ double ITimeKeeper::GetElapsedTime(void) {
 
 UInt64 ITimeKeeper::GetQPC(void) {
     UInt64 now;
-    QueryPerformanceCounter((LARGE_INTEGER *)&now);
+    QueryPerformanceCounter((LARGE_INTEGER*)&now);
 
     if (s_hasLastQPC) {
         UInt64 delta = now - s_lastQPC;

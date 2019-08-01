@@ -1,6 +1,5 @@
 #include "Utilities.h"
 
-#include "f4se/GameReferences.h"
 #include "f4se/GameRTTI.h"
 
 UInt16 GetLevel(Actor* actor) {

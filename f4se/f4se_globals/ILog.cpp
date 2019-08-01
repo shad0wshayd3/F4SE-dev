@@ -1,5 +1,7 @@
 #include "ILog.h"
 
+#include "common/IFileStream.h"
+
 #include <chrono>
 #include <iomanip>
 #include <ShlObj.h>
@@ -23,8 +25,8 @@ void ILog::Open(const char* logPath) {
     logFile = _fsopen(logPath, "w", _SH_DENYWR);
 
     if (!logFile) {
-        UInt32	id = 0;
-        char	name[1024];
+        UInt32 id = 0;
+        char name[1024];
 
         do {
             sprintf_s(name, sizeof(name), "%s%d", logPath, id);
@@ -37,7 +39,7 @@ void ILog::Open(const char* logPath) {
 }
 
 void ILog::OpenRelative(int folderID, const char* relativePath) {
-    char	logPath[MAX_PATH];
+    char logPath[MAX_PATH];
 
     HRESULT err = SHGetFolderPath(NULL, folderID | CSIDL_FLAG_CREATE, NULL, SHGFP_TYPE_CURRENT, logPath);
     if (!SUCCEEDED(err)) {
@@ -78,6 +80,12 @@ void ILog::LogError(const char* messageText, ...) {
     va_end(args);
 }
 
+void ILog::LogMessageNT(const char* messageText, ...) {
+    va_list args; va_start(args, messageText);
+    MessageNT(messageText, args);
+    va_end(args);
+}
+
 // ------------------------------------------------------------------------------------------------
 // Internal Functions
 // ------------------------------------------------------------------------------------------------
@@ -108,6 +116,22 @@ void ILog::TimestampedMessage(const char* messageText, va_list args, const char*
     char formatBuf[8192];
     vsprintf_s(formatBuf, sizeof(formatBuf), messageText, args);
     TimestampedMessage(formatBuf, messagePrefix);
+}
+
+void ILog::MessageNT(const char* messageText, const char* messagePrefix) {
+    std::stringstream MessageStream;
+
+    if (messagePrefix)
+        MessageStream << messagePrefix;
+
+    MessageStream << messageText;
+    Message(MessageStream.str().c_str());
+}
+
+void ILog::MessageNT(const char* messageText, va_list args, const char* messagePrefix) {
+    char formatBuf[8192];
+    vsprintf_s(formatBuf, sizeof(formatBuf), messageText, args);
+    MessageNT(formatBuf, messagePrefix);
 }
 
 void ILog::SeekCursor(int position) {
@@ -141,7 +165,7 @@ void ILog::PrintText(const char* buf) {
     }
 
     const char* traverse = buf;
-    char		data;
+    char data;
 
     while (data = *traverse++) {
         if (data == '\t')
