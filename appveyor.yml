@@ -1,7 +1,7 @@
 version: 1.10.138.{build}
 skip_tags: true
-skip_commits:
-  message: /no-build:/
+only_commits:
+  message: /build:/
 image: Visual Studio 2019
 configuration: Release
 platform: x64
