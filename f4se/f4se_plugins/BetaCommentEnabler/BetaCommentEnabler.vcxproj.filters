@@ -2,11 +2,22 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClInclude Include="Config.h" />
+    <ClInclude Include="ObScript.h">
+      <Filter>ObScript</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ObScript.cpp">
+      <Filter>ObScript</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="ObScript">
+      <UniqueIdentifier>{db643732-463c-4756-9c44-92807bd77492}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

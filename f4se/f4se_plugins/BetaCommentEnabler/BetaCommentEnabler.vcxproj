@@ -159,9 +159,11 @@ copy "$(ProjectDir)\BetaCommentEnabler.ini" "$(Fallout4Path)\Data\F4SE\plugins\B
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Config.h" />
+    <ClInclude Include="ObScript.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ObScript.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />
