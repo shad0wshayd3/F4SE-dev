@@ -1,7 +1,7 @@
 <VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
   <TemplateData>
     <Name>F4SE Plugin Template</Name>
-    <Description>For F4SE v0.6.17, Fallout 4 v1.10.138.0</Description>
+    <Description>Template for 1.10.138</Description>
     <ProjectType>VC</ProjectType>
     <ProjectSubType>
     </ProjectSubType>
@@ -14,11 +14,11 @@
     <Icon>__TemplateIcon.ico</Icon>
   </TemplateData>
   <TemplateContent>
-    <Project TargetFileName="$projectname$.vcxproj" File="f4se_template.vcxproj" ReplaceParameters="true">
+    <Project TargetFileName="$projectname$.vcxproj" File="TemplatePlugin.vcxproj" ReplaceParameters="true">
+      <ProjectItem ReplaceParameters="true" TargetFileName="$projectname$.vcxproj.filters">TemplatePlugin.vcxproj.filters</ProjectItem>
       <ProjectItem ReplaceParameters="true" TargetFileName="main.cpp">main.cpp</ProjectItem>
-      <ProjectItem ReplaceParameters="true" TargetFileName="$projectname$.vcxproj.filters">f4se_template.vcxproj.filters</ProjectItem>
-      <ProjectItem ReplaceParameters="true" TargetFileName="exports.def">exports.def</ProjectItem>
       <ProjectItem ReplaceParameters="true" TargetFileName="Config.h">Config.h</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="exports.def">exports.def</ProjectItem>
     </Project>
   </TemplateContent>
 </VSTemplate>

@@ -1,4 +1,5 @@
-#include "config.h"
+#include "Config.h"
+
 #include "f4se_globals/Globals.h"
 
 #include "f4se/PluginAPI.h"

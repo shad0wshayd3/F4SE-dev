@@ -20,8 +20,8 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
-    <ProjectGuid>{$guid1$}</ProjectGuid>
-    <RootNamespace>$safeprojectname$</RootNamespace>
+    <ProjectGuid>{66a31b83-c4d9-4b38-991c-465a46721266}</ProjectGuid>
+    <RootNamespace>TemplatePlugin</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -163,16 +163,16 @@
     <None Include="exports.def" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\common\common_vc14.vcxproj">
+    <ProjectReference Include="..\..\..\common\common_vc14.vcxproj">
       <Project>{472e19ab-def0-42df-819b-18722e8dc822}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\f4se\f4se.vcxproj">
+    <ProjectReference Include="..\..\f4se\f4se.vcxproj">
       <Project>{a236f69d-8ff9-4491-ac5f-45bf49448bbe}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\f4se_common\f4se_common.vcxproj">
+    <ProjectReference Include="..\..\f4se_common\f4se_common.vcxproj">
       <Project>{20c6411c-596f-4b85-be4e-8bc91f59d8a6}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\f4se_globals\f4se_globals.vcxproj">
+    <ProjectReference Include="..\..\f4se_globals\f4se_globals.vcxproj">
       <Project>{c3c4b92c-5dae-4465-813a-a957c357754f}</Project>
     </ProjectReference>
   </ItemGroup>
