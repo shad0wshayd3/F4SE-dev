@@ -2,7 +2,7 @@ version: 1.10.138.{build}
 skip_tags: true
 only_commits:
   message: /build:/
-image: Visual Studio 2019 Preview
+image: Visual Studio 2019
 configuration: Release
 platform: x64
 clone_folder: C:\Projects\F4SE-dev
