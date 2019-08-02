@@ -251,7 +251,7 @@ namespace Perks {
         }
 
         if (perk->numRanks != result.size())
-            g_Log.LogWarning("Perk Chain containing Form 0x%08X is broken!", searchPerk->formID);
+            _LOGWARNING("Perk Chain containing Form 0x%08X is broken!", searchPerk->formID);
 
         std::sort(result.begin(), result.end(), &RankSorter);
         return result;

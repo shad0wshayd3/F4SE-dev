@@ -70,6 +70,8 @@ private:
 
 };
 
+extern IObScript g_ObScript;
+
 // ------------------------------------------------------------------------------------------------
 // Params
 // ------------------------------------------------------------------------------------------------
@@ -166,12 +168,12 @@ enum ObScriptParamType {
 };
 
 static ObScriptParam kParams_OneInt[1] = {
-    {   "int", kType_Integer, 0 },
+    {   "int",      kType_Integer,  0 },
 };
 
 static ObScriptParam kParams_TwoInts[2] = {
-    {   "int", kType_Integer, 0 },
-    {   "int", kType_Integer, 0 }
+    {   "int",      kType_Integer,  0 },
+    {   "int",      kType_Integer,  0 }
 };
 
 static ObScriptParam kParams_OneString[1] = {
@@ -184,14 +186,14 @@ static ObScriptParam kParams_TwoStrings[2] = {
 };
 
 static ObScriptParam kParams_OneFloat[1] = {
-    {   "float",	kType_Float,	0 }
+    {   "float",    kType_Float,    0 }
 };
 
 static ObScriptParam kParams_TwoFloats[2] = {
-    {   "float",	kType_Float,	0 },
-    {   "float",	kType_Float,	0 }
+    {   "float",    kType_Float,    0 },
+    {   "float",    kType_Float,    0 }
 };
 
 static ObScriptParam kParams_OneActorValue[1] = {
-    {   "Actor Value", kType_ActorValue, 0 }
+    {   "Actor Value",  kType_ActorValue,   0 }
 };

@@ -171,7 +171,7 @@ public:
 		Ref();
 		Ref(const char * buf);
 		Ref(const wchar_t * buf);
-		
+
 		void Release();
 
 		bool operator==(const char * lhs) const;
@@ -294,7 +294,7 @@ public:
 			for(UInt32 i = numEntries; i < capacity; i++)
 				delete &entries[i];
 		}
-		
+
 		T * newBlock = (T *)Heap_Allocate(sizeof(T) * numEntries);						// Create a new block
 		memmove_s(newBlock, sizeof(T) * numEntries, entries, sizeof(T) * numEntries);	// Move the old memory to the new block
 		if(numEntries > capacity) {														// Fill in new remaining entries
@@ -314,12 +314,12 @@ public:
 			if(!Grow(nGrow))
 				return false;
 		}
- 
+
 		entries[count] = entry;
 		count++;
 		return true;
 	};
- 
+
 	bool Insert(UInt32 index, const T & entry)
 	{
 		if(!entries)
@@ -331,13 +331,13 @@ public:
 			if(!Grow(nGrow))
 				return false;
 		}
- 
+
 		if(index != lastSize)  // Not inserting onto the end, need to move everything down
 		{
 			UInt32 remaining = count - index;
 			memmove_s(&entries[index + 1], sizeof(T) * remaining, &entries[index], sizeof(T) * remaining); // Move the rest up
 		}
-		
+
 		entries[index] = entry;
 		count++;
 		return true;
@@ -347,7 +347,7 @@ public:
 	{
 		if(!entries || index >= count)
 			return false;
- 
+
 		// This might not be right for pointer types...
 		(&entries[index])->~T();
 
@@ -356,17 +356,17 @@ public:
 			memmove_s(&entries[index], sizeof(T) * remaining, &entries[index + 1], sizeof(T) * remaining); // Move the rest up
 		}
 		count--;
- 
+
 		if(capacity > count + nShrink)
 			Shrink();
- 
+
 		return true;
 	}
 
 	bool Shrink()
 	{
 		if(!entries || count == capacity) return false;
- 
+
 		try {
 			UInt32 newSize = count;
 			T * oldArray = entries;
@@ -380,7 +380,7 @@ public:
 		catch(...) {
 			return false;
 		}
- 
+
 		return false;
 	}
 
@@ -392,7 +392,7 @@ public:
 			capacity = numEntries;
 			return true;
 		}
- 
+
 		try {
 			UInt32 oldSize = capacity;
 			UInt32 newSize = oldSize + numEntries;
@@ -405,7 +405,7 @@ public:
 
 			if(oldArray)
 				Heap_Free(oldArray); // Free the old block
- 
+
 			for(UInt32 i = oldSize; i < newSize; i++) // Allocate the rest of the free blocks
 				new (&entries[i]) T;
 
@@ -414,7 +414,7 @@ public:
 		catch(...) {
 			return false;
 		}
- 
+
 		return false;
 	}
 
@@ -457,11 +457,11 @@ class tList
 	enum {
 		eListCount = -3,
 		eListEnd = -2,
-		eListInvalid = -1,		
+		eListInvalid = -1,
 	};
 	struct _Node
 	{
-		
+
 		T *		item;	// 00
 		_Node*	next;	// 04
 
@@ -509,7 +509,7 @@ private:
 
 		if (node)
 			while (node->next) node = node->next;
-		
+
 		return node;
 	}
 
@@ -616,7 +616,7 @@ public:
 		}
 		T * Get() { return (m_cur) ? m_cur->Item() : NULL; }
 	};
-	
+
 	const Iterator Begin() const { return Iterator(Head()); }
 
 	void Insert(T * item)
@@ -640,7 +640,7 @@ public:
 	void Push(T * item)
 	{
 		_Node * tail = Tail();
-		
+
 		// add new node if we aren't empty
 		if (tail->item)
 		{
@@ -750,7 +750,7 @@ public:
 	template <class Op>
 	T * Find(Op& op) const
 	{
-		const _Node* pCur = Head(); 
+		const _Node* pCur = Head();
 
 		bool bFound = false;
 		while (pCur && !bFound)
@@ -772,7 +772,7 @@ public:
 	{
 		Iterator curIt = (prev.End()) ? Begin() : ++prev;
 		bool bFound = false;
-		
+
 		while(!curIt.End() && !bFound) {
 			const T * pCur = *curIt;
 			if (pCur) {
@@ -780,14 +780,15 @@ public:
 			}
 			if (!bFound) {
 				++curIt;
-			}	
+			}
 		}
 		return curIt;
 	}
 
 	const _Node* FindString(char* str, Iterator prev) const
 	{
-		return Find(StringFinder_CI(str), prev);
+		// Unused, fixes C2065/C3861.
+		// return Find(StringFinder_CI(str), prev);
 	}
 
 	template <class Op>
@@ -816,7 +817,7 @@ public:
 		FreeNodes(AcceptAll());
 	}
 
-	T * RemoveNth(SInt32 n) 
+	T * RemoveNth(SInt32 n)
 	{
 		T* pRemoved = NULL;
 		if (n == 0) {
@@ -830,7 +831,7 @@ public:
 		return pRemoved;
 	};
 
-	T * ReplaceNth(SInt32 n, T* item) 
+	T * ReplaceNth(SInt32 n, T* item)
 	{
 		T* pReplaced = NULL;
 		NodePos nodePos = GetNthNode(n);
@@ -879,7 +880,7 @@ public:
 	{
 		return Find(AcceptEqual(item)) != NULL;
 	}
-	
+
 	void	Dump(void)
 	{
 		_MESSAGE("tList:");
@@ -1100,7 +1101,7 @@ class tHashSet
 		_Entry * oldEntries = m_entries;
 		_Entry * newEntries = (_Entry*)Heap_Allocate(newSize * sizeof(_Entry));
 		ASSERT(newEntries);
-		
+
 		m_entries = newEntries;
 		m_size = m_freeCount = m_freeOffset = newSize;
 
@@ -1210,8 +1211,9 @@ public:
 		m_freeCount = m_freeOffset = m_size;
 	}
 
+	// T& -> T, causes C2664 on c++17 or higher.
 	template <typename T>
-	void ForEach(T& functor)
+	void ForEach(T functor)
 	{
 		if (!m_entries)
 			return;

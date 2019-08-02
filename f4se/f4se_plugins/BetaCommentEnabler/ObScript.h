@@ -9,5 +9,5 @@ namespace ObScript {
     bool Hook_Commit();
     bool InitializeBetaComment();
 
-    DEFINE_CMD_FULL(BetaComment, bc, Log information about a reference to file, 0, kParams_OneString);
+    DEFINE_CMD_FULL(BetaComment, bc, Log comments about a reference to file, 0, kParams_OneString);
 }

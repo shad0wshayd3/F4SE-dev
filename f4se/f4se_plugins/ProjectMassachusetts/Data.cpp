@@ -60,10 +60,10 @@ float GameSettings::GetFloat(std::string settingName) {
 
 bool DataManager::Init() {
     m_pluginName = g_Settings.GetString("sPlugin:General", DEFAULT_PLUGIN_NAME);
-    g_Log.LogMessage("Using Game Plugin: %s", m_pluginName.c_str());
+    _LOGMESSAGE("Using Game Plugin: %s", m_pluginName.c_str());
 
     if (GetGamePlugin()) {
-        g_Log.LogMessage("Found Game Plugin.");
+        _LOGMESSAGE("Found Game Plugin.");
 
         /* Vanilla Actor Values */ {
         Strength                = LookupTypeByID(0x2C2,     ActorValueInfo);
@@ -157,7 +157,7 @@ bool DataManager::Init() {
         }
     }
     else {
-        g_Log.LogError("Game Plugin is not loaded.");
+        _LOGERROR("Game Plugin is not loaded.");
         return false;
     }
 
@@ -185,9 +185,9 @@ TESForm* DataManager::LookupFormFromPlugin(UInt32 FormID) {
 }
 
 void DataManager::DoSelfCheck() {
-    g_Log.LogMessage("Perfoming data self check...");
-    g_Log.LogMessage("(If the game crashes, that's a pretty good indication that a form is incorrect.)");
-    g_Log.LogMessageNT("");
+    _LOGMESSAGE("Perfoming data self check...");
+    _LOGMESSAGE("(If the game crashes, that's a pretty good indication that a form is incorrect.)");
+    _LOGMESSAGENT("");
 
     ITimeKeeper CheckTimer = ITimeKeeper();
     CheckTimer.Start();
@@ -246,6 +246,6 @@ void DataManager::DoSelfCheck() {
     CheckForm(PerksQuest,               80, GetEditorID());
     CheckForm(DoctorsBag,               48, GetFullName());
 
-    g_Log.LogMessage("Self Check Finished. Time: %fms", CheckTimer.Format(ITimeKeeper::Milli));
+    _LOGMESSAGE("Self Check Finished. Time: %fms", CheckTimer.Format(ITimeKeeper::Milli));
     m_Wait = false;
 }

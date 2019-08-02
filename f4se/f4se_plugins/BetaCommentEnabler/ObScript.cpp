@@ -19,7 +19,7 @@ namespace ObScript {
         // Get Computer Name
         DWORD bufCharCount = INFO_SIZE;
         if (!GetComputerName(computerName, &bufCharCount)) {
-            g_Log.LogError("Couldn't get computer name.");
+            _LOGERROR("Couldn't get computer name.");
             return false;
         }
 
@@ -27,7 +27,7 @@ namespace ObScript {
         std::string commentFilePath = g_Settings.GetString("sFileName:General", "BetaComments.txt");
         sprintf_s(filePath, sizeof(filePath), "%s%s", runtimeDir, commentFilePath.c_str());
 
-        g_Log.LogMessage("Using output path: %s", filePath);
+        _LOGMESSAGE("Using output path: %s", filePath);
         s_argString = (char*)malloc(0x4000);
         return true;
     }

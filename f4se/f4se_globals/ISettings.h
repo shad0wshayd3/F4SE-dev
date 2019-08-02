@@ -34,3 +34,5 @@ private:
     const char*     GetConfigPath();
     std::string     configPath;
 };
+
+extern ISettings g_Settings;

@@ -42,7 +42,7 @@ public:
 };
 extern RelocPtr<UIMessageManager*>	g_uiMessageManager;
 
-class IMenu : 
+class IMenu :
 	public SWFToCodeFunctionHandler,
 	public BSInputEventUser
 {
@@ -255,7 +255,7 @@ public:
 	DEFINE_MEMBER_FN_3(Impl_ctor, HUDComponentBase *, 0x00A22950, GFxValue * parent, const char * componentName, HUDContextArray<BSFixedString> * contextList);
 	DEFINE_MEMBER_FN_0(Impl_IsVisible, bool, 0x00A22C90);
 	DEFINE_MEMBER_FN_0(Impl_UpdateComponent, void, 0x00A229F0);
-	
+
 };
 STATIC_ASSERT(offsetof(HUDComponentBase, contexts) == 0xC8);
 STATIC_ASSERT(offsetof(HUDComponentBase, unkE8) == 0xE8);
@@ -308,11 +308,11 @@ class PipboyQuestMenu : public PipboySubMenu
 {
 public:
 
-	virtual ~PipboyQuestMenu();	
+	virtual ~PipboyQuestMenu();
 };
 
 
-// 18 
+// 18
 class PipboyValue
 {
 public:
@@ -334,7 +334,7 @@ class PipboyPrimitiveValue : public PipboyValue
 {
 public:
 
-	T	value;	// 18	
+	T	value;	// 18
 };
 STATIC_ASSERT(offsetof(PipboyPrimitiveValue<bool>, value) == 0x18);
 
@@ -413,13 +413,9 @@ public:
 	}
 	bool IsMenuRegistered(BSFixedString & menuName);
 
+	// Moved to GameMenus.cpp, fixes C3861.
 	template<typename T>
-	void ForEachMenu(T & menuFunc)
-	{
-		g_menuTableLock->LockForReadAndWrite();
-		menuTable.ForEach(menuFunc);
-		g_menuTableLock->Release();
-	}
+	void ForEachMenu(T & menuFunc);
 
 	bool UnregisterMenu(BSFixedString & name, bool force = false);
 

@@ -1,4 +1,4 @@
-version: 1.10.138.{build}
+version: 1.10.138.0 v{build}
 skip_tags: true
 only_commits:
   message: /build:/
@@ -17,13 +17,13 @@ build:
 test: off
 artifacts:
 - path: .\Output\
-  name: Release
+  name: $(appveyor_build_version)
 deploy:
 - provider: GitHub
-  tag: v$(appveyor_build_version)
-  release: Build-v$(appveyor_build_version)
+  tag: $(appveyor_build_version)
+  release: $(appveyor_build_version)
   auth_token:
     secure: s2D57W+hrwj0bss6mvAfGKG6JWqs93aHx0CSF2C7mrld0SnzG060RsuqXi82c9eI
-  artifact: Release
+  artifact: $(appveyor_build_version)
   prerelease: false
   force_update: true

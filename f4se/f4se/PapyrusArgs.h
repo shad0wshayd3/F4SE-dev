@@ -14,6 +14,14 @@ class VMArgList;
 
 struct StaticFunctionTag;
 
+// Moved to forward declaration, fixes C3861.
+template <typename T>
+UInt64 GetTypeID(VirtualMachine* vm);
+
+// Moved to forward declaration, fixes C3861.
+template <class T>
+struct IsStructType;
+
 class VMState
 {
 public:
@@ -361,9 +369,6 @@ void PackValue(VMValue * dst, VMArray<T> * src, VirtualMachine * vm)
 
 template <typename T>
 void UnpackValue(T * dst, VMValue * src);
-
-template <typename T>
-UInt64 GetTypeID(VirtualMachine * vm);
 
 template <> void PackValue <void>(VMValue * dst, void * src, VirtualMachine * registry);
 template <> void PackValue <UInt32>(VMValue * dst, UInt32 * src, VirtualMachine * registry);

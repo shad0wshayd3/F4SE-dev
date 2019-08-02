@@ -8,8 +8,8 @@
 #include <typeinfo>
 #include <map>
 
-class GFxValue;
-class GFxMovieView;
+// Remove dummy class declarations, replace with include, fixes C2027.
+#include "f4se/ScaleformValue.h"
 
 class GFxFunctionHandler : public GRefCountBase
 {
