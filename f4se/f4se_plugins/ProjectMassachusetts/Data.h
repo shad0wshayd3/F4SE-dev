@@ -100,16 +100,16 @@ extern F4SESerializationInterface*      g_Serialization;
 
 #define CheckForm(Form, FormTypeID, NameVar)\
     if (##Form##) {\
-        g_Log.LogMessageNT("%s", #Form);\
+        _LOGMESSAGENT("%s", #Form);\
         g_Log.Indent();\
-        g_Log.LogMessageNT("%s has a value, it is not null.", #Form);\
-        g_Log.LogMessageNT("%s is FormType: %i. Should be %i.", #Form, ##Form##->formType, FormTypeID);\
+        _LOGMESSAGENT("%s has a value, it is not null.", #Form);\
+        _LOGMESSAGENT("%s is FormType: %i. Should be %i.", #Form, ##Form##->formType, FormTypeID);\
         if (##Form##->formType == ##FormTypeID##) {\
             if (FormTypeID == 94)\
-                g_Log.LogMessageNT("%s reporting list count as: %i", #Form, ##Form##->##NameVar##);\
-            else g_Log.LogMessageNT("%s reporting name as: %s", #Form, ##Form##->##NameVar##);\
+                _LOGMESSAGENT("%s reporting list count as: %i", #Form, ##Form##->##NameVar##);\
+            else _LOGMESSAGENT("%s reporting name as: %s", #Form, ##Form##->##NameVar##);\
         }\
-        g_Log.LogMessageNT("");\
+        _LOGMESSAGENT("");\
         g_Log.Outdent();\
     }
 

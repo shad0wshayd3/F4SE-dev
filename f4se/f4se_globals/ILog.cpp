@@ -8,23 +8,24 @@
 #include <sstream>
 
 ILog::ILog(const char* logName) {
-    char logPath[MAX_PATH];
-    indentLevel = 0; cursorPos = 0;
-    logFile = NULL;
+    m_logFile       = NULL;
+    m_indentLevel   = 0;
+    m_cursorPos     = 0;
 
+    char logPath[MAX_PATH];
     sprintf_s(logPath, sizeof(logPath), "\\My Games\\Fallout4\\F4SE\\%s.log", logName);
     OpenRelative(CSIDL_MYDOCUMENTS, logPath);
 }
 
 ILog::~ILog() {
-    if (logFile)
-        fclose(logFile);
+    if (m_logFile)
+        fclose(m_logFile);
 }
 
 void ILog::Open(const char* logPath) {
-    logFile = _fsopen(logPath, "w", _SH_DENYWR);
+    m_logFile = _fsopen(logPath, "w", _SH_DENYWR);
 
-    if (!logFile) {
+    if (!m_logFile) {
         UInt32 id = 0;
         char name[1024];
 
@@ -32,9 +33,9 @@ void ILog::Open(const char* logPath) {
             sprintf_s(name, sizeof(name), "%s%d", logPath, id);
             id++;
 
-            logFile = NULL;
-            logFile = _fsopen(name, "w", _SH_DENYWR);
-        } while (!logFile && (id < 5));
+            m_logFile = NULL;
+            m_logFile = _fsopen(name, "w", _SH_DENYWR);
+        } while (!m_logFile && (id < 5));
     }
 }
 
@@ -42,9 +43,8 @@ void ILog::OpenRelative(int folderID, const char* relativePath) {
     char logPath[MAX_PATH];
 
     HRESULT err = SHGetFolderPath(NULL, folderID | CSIDL_FLAG_CREATE, NULL, SHGFP_TYPE_CURRENT, logPath);
-    if (!SUCCEEDED(err)) {
+    if (!SUCCEEDED(err))
         _FATALERROR("SHGetFolderPath %08X failed (result = %08X lasterr = %08X)", folderID, err, GetLastError());
-    }
 
     ASSERT_CODE(SUCCEEDED(err), err);
 
@@ -53,13 +53,13 @@ void ILog::OpenRelative(int folderID, const char* relativePath) {
     Open(logPath);
 }
 
-void ILog::Indent(void) {
-    indentLevel++;
+void ILog::Indent() {
+    m_indentLevel++;
 }
 
-void ILog::Outdent(void) {
-    if (indentLevel)
-        indentLevel--;
+void ILog::Outdent() {
+    if (m_indentLevel)
+        m_indentLevel--;
 }
 
 void ILog::LogMessage(const char* messageText, ...) {
@@ -80,10 +80,46 @@ void ILog::LogError(const char* messageText, ...) {
     va_end(args);
 }
 
+void ILog::LogMessage(const char* messageText, va_list args) {
+    TimestampedMessage(messageText, args);
+}
+
+void ILog::LogWarning(const char* messageText, va_list args) {
+    TimestampedMessage(messageText, args, "Warning: ");
+}
+
+void ILog::LogError(const char* messageText, va_list args) {
+    TimestampedMessage(messageText, args, "Error: ");
+}
+
 void ILog::LogMessageNT(const char* messageText, ...) {
     va_list args; va_start(args, messageText);
     MessageNT(messageText, args);
     va_end(args);
+}
+
+void ILog::LogWarningNT(const char* messageText, ...) {
+    va_list args; va_start(args, messageText);
+    MessageNT(messageText, args, "Warning: ");
+    va_end(args);
+}
+
+void ILog::LogErrorNT(const char* messageText, ...) {
+    va_list args; va_start(args, messageText);
+    MessageNT(messageText, args, "Error: ");
+    va_end(args);
+}
+
+void ILog::LogMessageNT(const char* messageText, va_list args) {
+    MessageNT(messageText, args);
+}
+
+void ILog::LogWarningNT(const char* messageText, va_list args) {
+    MessageNT(messageText, args, "Warning: ");
+}
+
+void ILog::LogErrorNT(const char* messageText, va_list args) {
+    MessageNT(messageText, args, "Error: ");
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -91,7 +127,7 @@ void ILog::LogMessageNT(const char* messageText, ...) {
 // ------------------------------------------------------------------------------------------------
 
 void ILog::Message(const char* message, bool newLine) {
-    SeekCursor(indentLevel * 4);
+    SeekCursor(m_indentLevel * 4);
     PrintText(message);
 
     if (newLine)
@@ -135,33 +171,33 @@ void ILog::MessageNT(const char* messageText, va_list args, const char* messageP
 }
 
 void ILog::SeekCursor(int position) {
-    if (position > cursorPos)
-        PrintSpaces(position - cursorPos);
+    if (position > m_cursorPos)
+        PrintSpaces(position - m_cursorPos);
 }
 
 void ILog::PrintSpaces(int numSpaces) {
     int	originalNumSpaces = numSpaces;
 
-    if (logFile) {
+    if (m_logFile) {
         while (numSpaces > 0) {
             if (numSpaces >= TabSize()) {
                 numSpaces -= TabSize();
-                fputc('\t', logFile);
+                fputc('\t', m_logFile);
             }
             else {
                 numSpaces--;
-                fputc(' ', logFile);
+                fputc(' ', m_logFile);
             }
         }
     }
 
-    cursorPos += originalNumSpaces;
+    m_cursorPos += originalNumSpaces;
 }
 
 void ILog::PrintText(const char* buf) {
-    if (logFile) {
-        fputs(buf, logFile);
-        fflush(logFile);
+    if (m_logFile) {
+        fputs(buf, m_logFile);
+        fflush(m_logFile);
     }
 
     const char* traverse = buf;
@@ -169,21 +205,21 @@ void ILog::PrintText(const char* buf) {
 
     while (data = *traverse++) {
         if (data == '\t')
-            cursorPos += TabSize();
+            m_cursorPos += TabSize();
         else
-            cursorPos++;
+            m_cursorPos++;
     }
 }
 
 void ILog::NewLine() {
-    if (logFile) {
-        fputc('\n', logFile);
-        fflush(logFile);
+    if (m_logFile) {
+        fputc('\n', m_logFile);
+        fflush(m_logFile);
     }
 
-    cursorPos = 0;
+    m_cursorPos = 0;
 }
 
 int ILog::TabSize() {
-    return ((~cursorPos) & 3) + 1;
+    return ((~m_cursorPos) & 3) + 1;
 }

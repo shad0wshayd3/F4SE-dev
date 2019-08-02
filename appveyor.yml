@@ -1,7 +1,7 @@
-#version: 1.10.138.{build}
+version: 1.10.138.0 v{build}
 skip_tags: true
-#only_commits:
-#  message: /build:/
+only_commits:
+  message: /build:/
 image: Visual Studio 2019
 configuration: Release
 platform: x64
@@ -14,16 +14,16 @@ build:
   project: f4se\f4se.sln
   parallel: true
   verbosity: minimal
-#test: off
-#artifacts:
-#- path: .\Output\
-#  name: Release
-#deploy:
-#- provider: GitHub
-#  tag: v$(appveyor_build_version)
-#  release: Build-v$(appveyor_build_version)
-#  auth_token:
-#    secure: s2D57W+hrwj0bss6mvAfGKG6JWqs93aHx0CSF2C7mrld0SnzG060RsuqXi82c9eI
-#  artifact: Release
-#  prerelease: false
-#  force_update: true
+test: off
+artifacts:
+- path: .\Output\
+  name: $(appveyor_build_version)
+deploy:
+- provider: GitHub
+  tag: $(appveyor_build_version)
+  release: $(appveyor_build_version)
+  auth_token:
+    secure: s2D57W+hrwj0bss6mvAfGKG6JWqs93aHx0CSF2C7mrld0SnzG060RsuqXi82c9eI
+  artifact: $(appveyor_build_version)
+  prerelease: false
+  force_update: true
