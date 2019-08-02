@@ -186,7 +186,7 @@ TESForm* DataManager::LookupFormFromPlugin(UInt32 FormID) {
 
 void DataManager::DoSelfCheck() {
     g_Log.LogMessage("Perfoming data self check...");
-    g_Log.LogMessage("(If the game crashes, that's a pretty good indication that a form is incorrect.");
+    g_Log.LogMessage("(If the game crashes, that's a pretty good indication that a form is incorrect.)");
     g_Log.LogMessageNT("");
 
     ITimeKeeper CheckTimer = ITimeKeeper();

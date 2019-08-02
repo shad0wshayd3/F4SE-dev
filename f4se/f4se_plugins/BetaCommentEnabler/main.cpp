@@ -50,6 +50,11 @@ extern "C" {
             return false;
         }
 
-        return ObScript::InitializeBetaComment();
+        if (!ObScript::InitializeBetaComment()) {
+            g_Log.LogWarning("Failed to initialize BetaComment.");
+            return false;
+        }
+
+        return true;
     }
 }

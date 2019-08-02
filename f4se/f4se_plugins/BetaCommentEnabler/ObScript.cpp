@@ -29,6 +29,7 @@ namespace ObScript {
 
         g_Log.LogMessage("Using output path: %s", filePath);
         s_argString = (char*)malloc(0x4000);
+        return true;
     }
 
     bool Cmd_BetaComment_Execute(EXECUTE_ARGS) {
