@@ -75,6 +75,14 @@ IMenu * UI::GetMenuByMovie(GFxMovieView * movie)
 	return menu;
 }
 
+template<typename T>
+void UI::ForEachMenu(T & menuFunc)
+{
+	g_menuTableLock->LockForReadAndWrite();
+	menuTable.ForEach(menuFunc);
+	g_menuTableLock->Release();
+}
+
 bool UI::UnregisterMenu(BSFixedString & name, bool force)
 {
 	BSReadAndWriteLocker locker(g_menuTableLock);

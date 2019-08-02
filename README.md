@@ -4,7 +4,8 @@
 
 ## Source code for Fallout 4 Script Extender (F4SE) plugins
 * Beta Comment Enabler
-* F4SE Plugin Template (f4se_template)
+* F4SE Plugin Template
+* Project Massachusetts
 
 
 Source code for for F4SE from https://f4se.silverlock.org

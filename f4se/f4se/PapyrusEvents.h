@@ -10,6 +10,10 @@
 #include <map>
 #include <set>
 
+// :: f4se-dev ::
+// RegistrationMapHolder and RegistrationSetHolder had every reference to SafeDataHolder members prefixed with 'this->', fixes C2065
+// RegistrationMapHolder and RegistrationSetHolder had every instance of RegSet::iterator changed to 'auto', fixes C2760
+
 // This is the callback function to ScriptObject.SendCustomEvent, the high-level parameters were more convenient
 // The only issue is you actually need a sending object and a CustomEvent on the sender's script, which can't be native
 typedef void (* _SendCustomEvent)(VirtualMachine * vm, UInt64 unk1, VMIdentifier * sender, const BSFixedString * eventName, VMValue * args);
@@ -244,14 +248,14 @@ public:
 		if (params)
 			reg.params = *params;
 
-		Lock();
+		this->Lock();
 
-		if (m_data[key].insert(reg).second)
+		if (this->m_data[key].insert(reg).second)
 			policy->AddRef(handle);
 
-		Release();
+		this->Release();
 	}
-	
+
 	void Unregister(K & key, UInt64 handle, BSFixedString scriptName)
 	{
 		VirtualMachine * vm = (*g_gameVM)->m_virtualMachine;
@@ -261,12 +265,12 @@ public:
 		reg.handle = handle;
 		reg.scriptName = scriptName;
 
-		Lock();
+		this->Lock();
 
-		if (m_data[key].erase(reg))
+		if (this->m_data[key].erase(reg))
 			policy->Release(handle);
 
-		Release();
+		this->Release();
 	}
 
 	void UnregisterAll(UInt64 handle, BSFixedString scriptName)
@@ -278,43 +282,43 @@ public:
 		reg.handle = handle;
 		reg.scriptName = scriptName;
 
-		Lock();
+		this->Lock();
 
-		for (RegMap::iterator iter = m_data.begin(); iter != m_data.end(); ++iter)
+		for (auto iter = this->m_data.begin(); iter != this->m_data.end(); ++iter)
 			if (iter->second.erase(reg))
 				policy->Release(handle);
 
-		Release();
+		this->Release();
 	}
-	
+
 	template <typename F>
 	void ForEach(K & key, F & functor)
 	{
-		Lock();
+		this->Lock();
 
-		RegMap::iterator handles = m_data.find(key);
+		auto handles = this->m_data.find(key);
 
-		if (handles != m_data.end())
-			for (RegSet::iterator iter = handles->second.begin(); iter != handles->second.end(); ++iter)
+		if (handles != this->m_data.end())
+			for (auto iter = handles->second.begin(); iter != handles->second.end(); ++iter)
 				functor(*iter);
 
-		Release();
+		this->Release();
 	}
 
 	void Clear(void)
 	{
-		Lock();
-		m_data.clear();
-		Release();
+		this->Lock();
+		this->m_data.clear();
+		this->Release();
 	}
 
 	bool Save(const F4SESerializationInterface * intfc, UInt32 type, UInt32 version)
 	{
 		intfc->OpenRecord(type, version);
 
-		Lock();
+		this->Lock();
 
-		for (RegMap::iterator iter = m_data.begin(); iter != m_data.end(); ++iter)
+		for (auto iter = this->m_data.begin(); iter != this->m_data.end(); ++iter)
 		{
 			UInt32 numRegs = iter->second.size();
 
@@ -328,13 +332,13 @@ public:
 			// Reg count
 			intfc->WriteRecordData(&numRegs, sizeof(numRegs));
 			// Regs
-			for (RegSet::iterator elems = iter->second.begin(); elems != iter->second.end(); ++elems)
+			for (auto elems = iter->second.begin(); elems != iter->second.end(); ++elems)
 				elems->Save(intfc, version);
 		}
 
 		intfc->OpenRecord('REGE', version);
 
-		Release();
+		this->Release();
 
 		return true;
 	}
@@ -390,12 +394,12 @@ public:
 
 							reg.handle = newHandle;
 
-							Lock();
+							this->Lock();
 
-							if (m_data[curKey].insert(reg).second)
+							if (this->m_data[curKey].insert(reg).second)
 								policy->AddRef(reg.handle);
 
-							Release();
+							this->Release();
 
 						}
 						else
@@ -442,12 +446,12 @@ public:
 		if (params)
 			reg.params = *params;
 
-		Lock();
+		this->Lock();
 
-		if (m_data.insert(reg).second)
+		if (this->m_data.insert(reg).second)
 			policy->AddRef(handle);
 
-		Release();
+		this->Release();
 	}
 
 	void Unregister(UInt64 handle, BSFixedString scriptName)
@@ -459,48 +463,48 @@ public:
 		reg.handle = handle;
 		reg.scriptName = scriptName;
 
-		Lock();
+		this->Lock();
 
-		if (m_data.erase(reg))
+		if (this->m_data.erase(reg))
 			policy->Release(handle);
 
-		Release();
+		this->Release();
 	}
 
 	template <typename F>
 	void ForEach(F & functor)
 	{
-		Lock();
+		this->Lock();
 
-		for (RegSet::iterator iter = m_data.begin(); iter != m_data.end(); ++iter)
+		for (auto iter = this->m_data.begin(); iter != this->m_data.end(); ++iter)
 			functor(*iter);
 
-		Release();
+		this->Release();
 	}
 
 	void Clear(void)
-	{
-		Lock();
-		m_data.clear();
-		Release();
+    {
+		this->Lock();
+		this->m_data.clear();
+		this->Release();
 	}
 
 	bool Save(const F4SESerializationInterface * intfc, UInt32 type, UInt32 version)
 	{
 		intfc->OpenRecord(type, version);
 
-		Lock();
+		this->Lock();
 
-		UInt32 numRegs = m_data.size();
+		UInt32 numRegs = this->m_data.size();
 
 		// Reg count
 		intfc->WriteRecordData(&numRegs, sizeof(numRegs));
 
 		// Regs
-		for (RegSet::iterator iter = m_data.begin(); iter != m_data.end(); ++iter)
+		for (auto iter = this->m_data.begin(); iter != this->m_data.end(); ++iter)
 			iter->Save(intfc, version);
 
-		Release();
+		this->Release();
 
 		return true;
 	}
@@ -540,12 +544,12 @@ public:
 
 				reg.handle = newHandle;
 
-				Lock();
+				this->Lock();
 
-				if (m_data.insert(reg).second)
+				if (this->m_data.insert(reg).second)
 					policy->AddRef(reg.handle);
 
-				Release();
+				this->Release();
 
 			}
 			else
