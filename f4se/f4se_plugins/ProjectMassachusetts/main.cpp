@@ -1,67 +1,65 @@
-#include "Data.h"
-#include "Config.h"
-#include "ObScript.h"
-#include "Papyrus.h"
-#include "Perks.h"
-#include "Scaleform.h"
-#include "Serialization.h"
-#include "Skills.h"
-
-#include "f4se_globals/Globals.h"
+#include "DataManager.h"
+#include "PerkManager.h"
+#include "SaveManager.h"
+#include "ScaleformManager.h"
+#include "ScriptManager.h"
+#include "ValueManager.h"
 
 #include "common/ICriticalSection.h"
 #include "f4se_common/BranchTrampoline.h"
 
-ILog                            g_Log           = ILog(PLUGIN_NAME_SHORT);
-ISettings                       g_Settings      = ISettings(INI_FILE_NAME);
-PluginHandle                    g_PluginHandle  = kPluginHandle_Invalid;
-
-DataManager                     g_Data;
-GameSettings                    g_GameSettings;
-IObScript                       g_ObScript;
 ICriticalSection                s_LoadLock;
 
-F4SEPapyrusInterface*           g_Papyrus       = NULL;
-F4SEMessagingInterface*         g_Messaging     = NULL;
-F4SEScaleformInterface*         g_Scaleform     = NULL;
-F4SESerializationInterface*     g_Serialization = NULL;
+PluginHandle                    g_PluginHandle      = kPluginHandle_Invalid;
+
+F4SEPapyrusInterface*           g_Papyrus           = NULL;
+F4SEMessagingInterface*         g_Messaging         = NULL;
+F4SEScaleformInterface*         g_Scaleform         = NULL;
+F4SESerializationInterface*     g_Serialization     = NULL;
 
 extern "C" {
     void F4SEMessageHandler(F4SEMessagingInterface::Message* Message) {
         switch (Message->type) {
         case F4SEMessagingInterface::kMessage_GameDataReady:
+            ITimeKeeper MessageHandlerTimer = ITimeKeeper();
+            MessageHandlerTimer.Start();
+
             s_LoadLock.Enter();
 
             if (reinterpret_cast<uintptr_t>(Message->data)) {
-                ITimeKeeper DataLoader = ITimeKeeper();
-                DataLoader.Start();
-
-                if (!g_Data.Init()) {
+                if (!DataManager::Load()) {
                     s_LoadLock.Leave();
-                    return;
+                    HALT("Game Plugin is not loaded.");
                 }
 
-                if ((*g_player)->actorValueOwner.GetValue(g_Data.CurrentLevel) == 0)
-                    (*g_player)->actorValueOwner.SetBase(g_Data.CurrentLevel, 1);
+                g_GlobalSettings.Init("PM_");
 
-                g_GameSettings.Init();
-                Skills::RegisterSkills();
-                Perks::BuildList();
+                ValueManager::Init();
+                PerkManager::Init();
 
-                _LOGMESSAGE("F4SEMessageHandler() Time: %fms", DataLoader.Format(ITimeKeeper::Milli));
+                _LOGMESSAGE("Data should now be loaded.");
+                _LOGMESSAGE("F4SEMessageHandler() Time: %fms", MessageHandlerTimer.Format(ITimeKeeper::Milli));
             }
             else {
-                _LOGMESSAGE("Data should be unloaded.");
-                g_Data = DataManager(); // Okay?
+                // Unload DataManager
+                DataManager::Unload();
+
+                // Unload everything else
+                ValueManager::Unload();
+                PerkManager::Unload();
+
+                _LOGMESSAGE("Data should now be unloaded.");
+                _LOGMESSAGE("F4SEMessageHandler() Time: %fms", MessageHandlerTimer.Format(ITimeKeeper::Milli));
             }
 
             s_LoadLock.Leave();
+            break;
         }
     }
 
     bool F4SEPlugin_Query(const F4SEInterface* F4SE, PluginInfo* Info) {
-        ITimeKeeper startupClock = ITimeKeeper();
-        startupClock.Start();
+        ITimeKeeper PluginQueryTimer = ITimeKeeper();
+        PluginQueryTimer.Start();
 
         _LOGMESSAGE("%s log opened (PC-64)", PLUGIN_NAME_LONG);
         _LOGMESSAGE("This is a plugin log only and does not contain information on any other part of the game, including crashes.");
@@ -92,6 +90,11 @@ extern "C" {
             return false;
         }
 
+        if (!g_ObScript.Init()) {
+            _LOGERROR("Failed to get ObScript interface. Plugin will be disabled.");
+            return false;
+        }
+
         g_Messaging = (F4SEMessagingInterface*)F4SE->QueryInterface(kInterface_Messaging);
         if (!g_Messaging) {
             _LOGERROR("Failed to get Messaging interface. Plugin will be disabled.");
@@ -110,8 +113,6 @@ extern "C" {
             return false;
         }
 
-        g_ObScript.Init();
-
         if (!g_branchTrampoline.Create(1024 * 64)) {
             _LOGERROR("Failed to create Branch Trampoline. Plugin will be disabled.");
             return false;
@@ -122,13 +123,13 @@ extern "C" {
             return false;
         }
 
-        _LOGMESSAGE("F4SEPlugin_Query Time: %fms", startupClock.Format(ITimeKeeper::Milli));
+        _LOGMESSAGE("F4SEPlugin_Query() Time: %fms", PluginQueryTimer.Format(ITimeKeeper::Milli));
         return true;
     }
 
     bool F4SEPlugin_Load(const F4SEInterface* F4SE) {
-        if (!g_Papyrus->Register(Papyrus::RegisterFunctions)) {
-            _LOGWARNING("Failed to register Papyrus functions");
+        if (!g_Papyrus->Register(ScriptManager::Init)) {
+            _LOGWARNING("Failed to register Script functions");
             return false;
         }
 
@@ -137,26 +138,21 @@ extern "C" {
             return false;
         }
 
-        if (!g_Scaleform->Register("RTNG", Scaleform::RegisterFunctions)) {
+        if (!g_Scaleform->Register("RTNG", ScaleformManager::Init)) {
             _LOGWARNING("Failed to register for Scaleform interface");
             return false;
         }
 
-        if (!Serialization::Hook_Commit(g_PluginHandle)) {
+        if (!SaveManager::Hook_Commit(g_PluginHandle)) {
             _LOGWARNING("Failed to commit Serialization interface.");
             return false;
         }
 
-        if (!ObScript::Commit()) {
-            _LOGWARNING("Failed to commit ObScript functions.");
-            return false;
-        }
-
         // Hook "Hold [Pipboy] to open Perks menu." to detect player level ups.
-        g_branchTrampoline.Write6Branch(LevelUpPrompt.GetUIntPtr(), (uintptr_t)Perks::LUPrompt_Hook);
+        g_branchTrampoline.Write6Branch(LevelUpPrompt.GetUIntPtr(), (uintptr_t)PerkManager::LevelUp_Hook);
 
         // Hook DR Calc to replace it with something sane
-        g_branchTrampoline.Write6Branch(CalculateDamageResist.GetUIntPtr(), (uintptr_t)Calculate::DamageResist);
+        g_branchTrampoline.Write6Branch(CalculateDamageResist.GetUIntPtr(), (uintptr_t)ValueManager::DamageResistFormula);
 
         _LOGMESSAGE("Plugin loaded successfully.");
         return true;

@@ -32,6 +32,7 @@ class Condition;
 class TESObjectREFR;
 class BGSDamageType;
 class BGSRefAlias;
+class BGSPerk;
 
 typedef bool (* _EvaluationConditions)(Condition ** condition, TESObjectREFR * ref1, TESObjectREFR * ref2);
 extern RelocAddr <_EvaluationConditions> EvaluationConditions; // Evaluates whole condition LinkedList
@@ -470,9 +471,16 @@ public:
 class BGSPerkRankArray : public BaseFormComponent
 {
 public:
-	void	* unk08;	// 08
-	UInt32	unk10;		// 10
-	UInt32	pad14;		// 14
+    struct Data
+    {
+        BGSPerk * perk;
+        UInt8   rank;
+        UInt8   pad05[3];
+    };
+
+    Data    * perkRanks;    // 08
+    UInt32  numPerkRanks;   // 10
+    UInt32  pad14;          // 14
 };
 
 

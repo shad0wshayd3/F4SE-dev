@@ -2,76 +2,67 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClInclude Include="Config.h" />
-    <ClInclude Include="Data.h">
-      <Filter>Data</Filter>
+    <ClInclude Include="DataManager.h">
+      <Filter>DataManager</Filter>
     </ClInclude>
-    <ClInclude Include="ObScript.h">
-      <Filter>ObScript</Filter>
+    <ClInclude Include="PerkManager.h">
+      <Filter>PerkManager</Filter>
     </ClInclude>
-    <ClInclude Include="Papyrus.h">
-      <Filter>Papyrus</Filter>
+    <ClInclude Include="ScaleformManager.h">
+      <Filter>ScaleformManager</Filter>
     </ClInclude>
-    <ClInclude Include="Perks.h">
-      <Filter>Perks</Filter>
+    <ClInclude Include="ValueManager.h">
+      <Filter>ValueManager</Filter>
     </ClInclude>
-    <ClInclude Include="Scaleform.h">
-      <Filter>Scaleform</Filter>
+    <ClInclude Include="ScriptManager.h">
+      <Filter>ScriptManager</Filter>
     </ClInclude>
-    <ClInclude Include="Serialization.h">
-      <Filter>Serialization</Filter>
-    </ClInclude>
-    <ClInclude Include="Skills.h">
-      <Filter>Skills</Filter>
+    <ClInclude Include="SaveManager.h">
+      <Filter>SaveManager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Data.cpp">
-      <Filter>Data</Filter>
+    <ClCompile Include="DataManager.cpp">
+      <Filter>DataManager</Filter>
     </ClCompile>
-    <ClCompile Include="ObScript.cpp">
-      <Filter>ObScript</Filter>
+    <ClCompile Include="PerkManager.cpp">
+      <Filter>PerkManager</Filter>
     </ClCompile>
-    <ClCompile Include="Papyrus.cpp">
-      <Filter>Papyrus</Filter>
+    <ClCompile Include="ScaleformManager.cpp">
+      <Filter>ScaleformManager</Filter>
     </ClCompile>
-    <ClCompile Include="Perks.cpp">
-      <Filter>Perks</Filter>
+    <ClCompile Include="ValueManager.cpp">
+      <Filter>ValueManager</Filter>
     </ClCompile>
-    <ClCompile Include="Scaleform.cpp">
-      <Filter>Scaleform</Filter>
+    <ClCompile Include="ScriptManager.cpp">
+      <Filter>ScriptManager</Filter>
     </ClCompile>
-    <ClCompile Include="Serialization.cpp">
-      <Filter>Serialization</Filter>
-    </ClCompile>
-    <ClCompile Include="Skills.cpp">
-      <Filter>Skills</Filter>
+    <ClCompile Include="SaveManager.cpp">
+      <Filter>SaveManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Data">
-      <UniqueIdentifier>{71dc7f6c-696c-4fda-beb9-2e535fed3221}</UniqueIdentifier>
+    <Filter Include="DataManager">
+      <UniqueIdentifier>{cbbd266a-ff9c-41ca-b163-12ea730fb8a9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ObScript">
-      <UniqueIdentifier>{29b79abf-d95d-42f8-85e4-791dafe26888}</UniqueIdentifier>
+    <Filter Include="PerkManager">
+      <UniqueIdentifier>{958749d7-ba0e-44f8-8b29-d7f357f5ac5d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Papyrus">
-      <UniqueIdentifier>{b7e79771-452e-4a51-9b1f-febb74554760}</UniqueIdentifier>
+    <Filter Include="ScaleformManager">
+      <UniqueIdentifier>{b08b0888-6c7e-400c-b5af-0c617b1b1cad}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Perks">
-      <UniqueIdentifier>{6ca33e92-a27d-47aa-adbf-0facd3b39bee}</UniqueIdentifier>
+    <Filter Include="ValueManager">
+      <UniqueIdentifier>{b9ba6962-1cfd-41eb-a88b-2d4648a8fb69}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Scaleform">
-      <UniqueIdentifier>{009163f0-9192-4bf5-af96-1a25141c24b6}</UniqueIdentifier>
+    <Filter Include="ScriptManager">
+      <UniqueIdentifier>{2c036e25-1d13-41e0-bc26-873ae7c01d6f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Serialization">
-      <UniqueIdentifier>{a9b4c513-4310-4538-84fd-29861e534543}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Skills">
-      <UniqueIdentifier>{ade59688-92a8-431b-999e-b3e7f5706280}</UniqueIdentifier>
+    <Filter Include="SaveManager">
+      <UniqueIdentifier>{f24d08d4-8221-4bca-bc16-205fa2ec12c4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

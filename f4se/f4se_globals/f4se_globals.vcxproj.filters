@@ -23,6 +23,12 @@
     <ClCompile Include="Definitions.cpp">
       <Filter>Definitions</Filter>
     </ClCompile>
+    <ClCompile Include="Scaleform.cpp">
+      <Filter>Scaleform</Filter>
+    </ClCompile>
+    <ClCompile Include="IGlobalSettings.cpp">
+      <Filter>Settings</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Globals.h" />
@@ -47,6 +53,12 @@
     <ClInclude Include="Definitions.h">
       <Filter>Definitions</Filter>
     </ClInclude>
+    <ClInclude Include="Scaleform.h">
+      <Filter>Scaleform</Filter>
+    </ClInclude>
+    <ClInclude Include="IGlobalSettings.h">
+      <Filter>Settings</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Logging">
@@ -69,6 +81,9 @@
     </Filter>
     <Filter Include="Definitions">
       <UniqueIdentifier>{e9d5da64-6510-4e29-ad17-92a15c85dd27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scaleform">
+      <UniqueIdentifier>{8e351b52-0bb1-4f61-b2e0-f49e204ddcf7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

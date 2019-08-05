@@ -1,5 +1,4 @@
 #pragma once
-
 #include "f4se_common/f4se_version.h"
 
 //-----------------------

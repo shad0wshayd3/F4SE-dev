@@ -1,38 +1,11 @@
-#include "Scaleform.h"
+#include "ScaleformManager.h"
 
-#include "Data.h"
-#include "f4se_globals/Globals.h"
+#include "PerkManager.h"
+#include "ValueManager.h"
 
-#include "f4se/GameReferences.h"
 #include "f4se/PapyrusEvents.h"
 
 #include <regex>
-
-namespace GFxHelperFunctions {
-    void RegisterString(GFxValue* dst, GFxMovieRoot* root, const char* name, const char* str) {
-        GFxValue fxValue;
-        root->CreateString(&fxValue, str);
-        dst->SetMember(name, &fxValue);
-    }
-
-    void RegisterNumber(GFxValue* dst, const char* name, double value) {
-        GFxValue fxValue;
-        fxValue.SetNumber(value);
-        dst->SetMember(name, &fxValue);
-    }
-
-    void RegisterInt(GFxValue* dst, const char* name, int value) {
-        GFxValue fxValue;
-        fxValue.SetInt(value);
-        dst->SetMember(name, &fxValue);
-    }
-
-    void RegisterBool(GFxValue* dst, const char* name, bool value) {
-        GFxValue fxValue;
-        fxValue.SetBool(value);
-        dst->SetMember(name, &fxValue);
-    }
-}
 
 namespace LevelUpMenuInput {
     void ProcessUserEvent(const char* controlName, bool isDown) {
@@ -164,18 +137,18 @@ namespace LockpickingMenuInput {
     }
 }
 
-namespace Regex {
+namespace BSRegex {
     using namespace std::regex_constants;
 
-    std::regex BSComment   ("(<!--[A-Za-z ]*-->)(\r?\n)*",   ECMAScript | icase);
-    std::regex BSPagebreak ("([<\\[](br|pagebreak)+[\\]>])", ECMAScript | icase);
-    std::regex BSSimple    ("(</?(i|b|u|ul|li|p|font)+>)",   ECMAScript | icase);
+    std::regex BSComment("(<!--[A-Za-z ]*-->)(\r?\n)*", ECMAScript | icase);
+    std::regex BSPagebreak("([<\\[](br|pagebreak)+[\\]>])", ECMAScript | icase);
+    std::regex BSSimple("(</?(i|b|u|ul|li|p|font)+>)", ECMAScript | icase);
 
-    std::regex BSEmbed ("(<(font|img|p)+ [A-Z0-9=_'\":./$# ]+>)(\r?\n)*",               ECMAScript | icase);
-    std::regex BSAlias ("(<(Alias|BaseName|Global|Relationship|Token)+[A-Z0-9=_. ]*>)", ECMAScript | icase);
+    std::regex BSEmbed("(<(font|img|p)+ [A-Z0-9=_'\":./$# ]+>)(\r?\n)*", ECMAScript | icase);
+    std::regex BSAlias("(<(Alias|BaseName|Global|Relationship|Token)+[A-Z0-9=_. ]*>)", ECMAScript | icase);
 
-    std::regex BSSingleLine ("(\r?\n)");
-    std::regex BSDoubleLine ("(\r?\n)(\r?\n)+");
+    std::regex BSSingleLine("(\r?\n)");
+    std::regex BSDoubleLine("(\r?\n)(\r?\n)+");
 
     std::string GetBookText(TESForm* bookForm) {
         if (!bookForm)
@@ -222,9 +195,9 @@ namespace Regex {
         }
 
         bookText = std::regex_replace(bookText, BSPagebreak, "\n");
-        bookText = std::regex_replace(bookText, BSComment,   "");
-        bookText = std::regex_replace(bookText, BSSimple,    "");
-        bookText = std::regex_replace(bookText, BSEmbed,     "");
+        bookText = std::regex_replace(bookText, BSComment, "");
+        bookText = std::regex_replace(bookText, BSSimple, "");
+        bookText = std::regex_replace(bookText, BSEmbed, "");
         bookText = std::regex_replace(bookText, BSSingleLine, "\n");
         bookText = std::regex_replace(bookText, BSDoubleLine, "\n\n");
 
@@ -232,7 +205,7 @@ namespace Regex {
     }
 }
 
-namespace Scaleform {
+namespace ScaleformFunctions {
     void EquipItem(Actor* actor, TESForm* form, bool preventRemoval, bool silent) {
         // Obviously, this implimentation is terrible. But it's less bad than alternative. Sort of.
         // The alternative being Scaleform -> F4SE -> Papyrus -> Papyrus, this just cuts out an ExternalEvent registration.
@@ -250,7 +223,7 @@ namespace Scaleform {
         CallFunctionNoWait<Actor>(actor, "EquipItem", args);
     }
 
-    class PlayMenuSound : public GFxFunctionHandler {
+    class GFxPlayMenuSound : public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
             if (args->args[0].IsString())
@@ -258,19 +231,19 @@ namespace Scaleform {
         }
     };
 
-    class StimpakCount : public GFxFunctionHandler {
+    class GFxStimpakCount : public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
-            std::string itemCount = std::to_string(GetItemCount((*g_player), g_Data.ObjectTypeStimpak));
+            std::string itemCount = std::to_string(GetItemCount((*g_player), DataManager::ObjectTypeStimpak));
             args->movie->movieRoot->CreateString(args->result, itemCount.c_str());
         }
     };
 
-    class UseStimpak : public GFxFunctionHandler {
+    class GFxUseStimpak : public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
-            for (int i = 0; i < g_Data.StimpakOrder->forms.count; i++) {
-                TESForm* thisForm = g_Data.StimpakOrder->forms[i];
+            for (int i = 0; i < DataManager::StimpakOrder->forms.count; i++) {
+                TESForm* thisForm = DataManager::StimpakOrder->forms[i];
 
                 if (GetItemCount((*g_player), thisForm) > 0) {
                     EquipItem((*g_player), thisForm, false, true);
@@ -280,108 +253,111 @@ namespace Scaleform {
         }
     };
 
-    class RadXCount : public GFxFunctionHandler {
+    class GFxRadXCount : public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
-            std::string itemCount = std::to_string(GetItemCount((*g_player), g_Data.RadX));
+            std::string itemCount = std::to_string(GetItemCount((*g_player), DataManager::RadX));
             args->movie->movieRoot->CreateString(args->result, itemCount.c_str());
         }
     };
 
-    class UseRadX : public GFxFunctionHandler {
+    class GFxUseRadX : public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
-            EquipItem((*g_player), g_Data.RadX, false, true);
+            EquipItem((*g_player), DataManager::RadX, false, true);
         }
     };
 
-    class DoctorBagCount : public GFxFunctionHandler {
+    class GFxDoctorBagCount : public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
-            std::string itemCount = std::to_string(GetItemCount((*g_player), g_Data.DoctorsBag));
+            std::string itemCount = std::to_string(GetItemCount((*g_player), DataManager::DoctorsBag));
             args->movie->movieRoot->CreateString(args->result, itemCount.c_str());
         }
     };
 
-    class UseDoctorBag : public GFxFunctionHandler {
+    class GFxUseDoctorBag : public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
-            EquipItem((*g_player), g_Data.DoctorsBag, false, true);
+            EquipItem((*g_player), DataManager::DoctorsBag, false, true);
         }
     };
 
-    class SetLimbTarget : public GFxFunctionHandler {
+    class GFxSetLimbTarget : public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
-            g_Data.LimbTarget->value = args->args[0].GetUInt();
+            DataManager::LimbTarget->value = args->args[0].GetUInt();
         }
     };
 
-    class ConsoleLimbSelect : public GFxFunctionHandler {
+    class GFxConsoleLimbSelect : public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
-            g_Data.LimbTarget->value = 7.0;
-            EquipItem((*g_player), g_Data.DoctorsBag, false, true);
+            DataManager::LimbTarget->value = 7.0;
+            EquipItem((*g_player), DataManager::DoctorsBag, false, true);
         }
     };
 
-    class HardcoreData : public GFxFunctionHandler {
+    class GFxHardcoreData : public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
             args->movie->movieRoot->CreateObject(args->result, "Object");
 
-            if (g_GameSettings.GetBool("Rule_HardcoreNeeds")) {
-                GFxHelperFunctions::RegisterInt(args->result, "H2O", (int)(*g_player)->actorValueOwner.GetValue(g_Data.Dehydration));
-                GFxHelperFunctions::RegisterInt(args->result, "FOD", (int)(*g_player)->actorValueOwner.GetValue(g_Data.Starvation));
-                GFxHelperFunctions::RegisterInt(args->result, "SLP", (int)(*g_player)->actorValueOwner.GetValue(g_Data.SleepDeprivation));
+            if (g_GlobalSettings.GetBool("Rule_HardcoreNeeds")) {
+                GFxHelperFunctions::RegisterInt(args->result, "H2O", (int)(*g_player)->actorValueOwner.GetValue(DataManager::Dehydration));
+                GFxHelperFunctions::RegisterInt(args->result, "FOD", (int)(*g_player)->actorValueOwner.GetValue(DataManager::Starvation));
+                GFxHelperFunctions::RegisterInt(args->result, "SLP", (int)(*g_player)->actorValueOwner.GetValue(DataManager::SleepDeprivation));
             }
-            else
+            else {
                 GFxHelperFunctions::RegisterInt(args->result, "H2O", -1);
+                GFxHelperFunctions::RegisterInt(args->result, "FOD", -1);
+                GFxHelperFunctions::RegisterInt(args->result, "SLP", -1);
+            }
         }
     };
 
-    class RadiationData : public GFxFunctionHandler {
+    class GFxRadiationData : public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
-            float cRads = (*g_player)->actorValueOwner.GetValue(g_Data.Rads);
-            float cMax = g_GameSettings.GetFloat("RadiationThreshold05");
+            float CurrentRads = (*g_player)->actorValueOwner.GetValue(DataManager::Rads);
+            float CurrentMax = g_GlobalSettings.GetFloat("RadiationThreshold05");
 
             args->movie->movieRoot->CreateObject(args->result, "Object");
-            GFxHelperFunctions::RegisterInt(args->result, "current", (int)cRads);
-            GFxHelperFunctions::RegisterInt(args->result, "next", (int)cMax);
-            GFxHelperFunctions::RegisterInt(args->result, "max", (int)cMax);
+            GFxHelperFunctions::RegisterInt(args->result, "current", (int)CurrentRads);
+            GFxHelperFunctions::RegisterInt(args->result, "next", (int)CurrentMax);
+            GFxHelperFunctions::RegisterInt(args->result, "max", (int)CurrentMax);
 
             for (int i = 1; i < 6; i++) {
                 char RadiationThreshold[21]; sprintf_s(RadiationThreshold,
                     sizeof(RadiationThreshold), "RadiationThreshold0%i", i);
 
-                float value = g_GameSettings.GetFloat(RadiationThreshold);
-                if (cRads < value) {
+                float value = g_GlobalSettings.GetFloat(RadiationThreshold);
+                if (CurrentRads < value) {
                     GFxHelperFunctions::RegisterInt(args->result, "next", value);
                     break;
                 }
             }
 
-            GFxHelperFunctions::RegisterInt(args->result, "resist", (int)ceilf((*g_player)->actorValueOwner.GetValue(g_Data.RadResistExposure)));
+            GFxHelperFunctions::RegisterInt(args->result, "resist", (int)ceilf((*g_player)->actorValueOwner.GetValue(DataManager::RadResistExposure)));
         }
     };
 
-    class ExperienceData : public GFxFunctionHandler {
+    class GFxExperienceData : public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
-            int pLevel = GetLevel(*g_player);
-            int xpReq = GetXPForLevel(pLevel);
+            int PlayerLevel = GetLevel(*g_player);
+            int ExperenceRequirement = GetXPForLevel(PlayerLevel);
 
-            float cXP = (*g_player)->actorValueOwner.GetValue(g_Data.Experience) - xpReq;
-            float cMax = GetXPForLevel(pLevel + 1) - xpReq;
+            float CurrentXP = (*g_player)->actorValueOwner.GetValue(DataManager::Experience) - ExperenceRequirement;
+            float CurrentMax = GetXPForLevel(PlayerLevel + 1) - ExperenceRequirement;
 
             args->movie->movieRoot->CreateObject(args->result, "Object");
-            GFxHelperFunctions::RegisterInt(args->result, "current", (int)cXP);
-            GFxHelperFunctions::RegisterInt(args->result, "max", (int)cMax);
+            GFxHelperFunctions::RegisterInt(args->result, "current", (int)CurrentXP);
+            GFxHelperFunctions::RegisterInt(args->result, "max", (int)CurrentMax);
         }
     };
 
-    class SkillList : public GFxFunctionHandler {
+    class GFxSkillList : public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
             GFxMovieRoot* root = args->movie->movieRoot;
@@ -389,23 +365,23 @@ namespace Scaleform {
 
             ActorValueOwner* owner = DYNAMIC_CAST((*g_player), PlayerCharacter, ActorValueOwner);
 
-            for (auto ActorValue : Perks::SkillList) {
+            for (auto iter : DataManager::m_SkillList) {
                 GFxValue Skill;
                 root->CreateObject(&Skill);
 
-                float value = owner->GetValue(ActorValue);
+                float value = owner->GetValue(iter);
 
-                GFxHelperFunctions::RegisterString(&Skill, root, "text", ActorValue->fullName.name);
-                GFxHelperFunctions::RegisterString(&Skill, root, "EditorID", ActorValue->GetEditorID());
+                GFxHelperFunctions::RegisterString(&Skill, root, "text", iter->GetFullName());
+                GFxHelperFunctions::RegisterString(&Skill, root, "EditorID", iter->GetEditorID());
 
                 BSString description;
-                TESDescription* avDesc = DYNAMIC_CAST(ActorValue, ActorValueInfo, TESDescription);
+                TESDescription* avDesc = DYNAMIC_CAST(iter, ActorValueInfo, TESDescription);
                 CALL_MEMBER_FN(avDesc, Get)(&description, nullptr);
 
                 GFxHelperFunctions::RegisterString(&Skill, root, "description", description.Get());
                 GFxHelperFunctions::RegisterInt(&Skill, "value", (int)floorf(value));
 
-                float modifier = owner->GetMod(0, ActorValue) + (owner->GetMod(0, Calculate::GetDependent(ActorValue)) * 2) + floorf(owner->GetMod(0, g_Data.Luck));
+                float modifier = owner->GetMod(0, iter) + (owner->GetMod(0, ValueManager::GetDependent(iter)) * 2) + floorf(owner->GetMod(0, DataManager::Luck));
                 GFxHelperFunctions::RegisterNumber(&Skill, "modifier", (double)modifier);
 
                 args->result->PushBack(&Skill);
@@ -413,25 +389,25 @@ namespace Scaleform {
         }
     };
 
-    class PerkList : public GFxFunctionHandler {
+    class GFxPerkList : public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
             GFxMovieRoot* root = args->movie->movieRoot;
             root->CreateArray(args->result);
 
-            for (auto Perk : Perks::EntirePerkList) {
-                if (Perk->hidden || (Perk->numRanks == 0))
+            for (auto iter : DataManager::m_MasterPerkList) {
+                if (iter->hidden || (iter->numRanks == 0))
                     continue;
 
-                if (HasPerk((*g_player), Perk)) {
+                if (HasPerk((*g_player), iter)) {
                     std::vector<BGSPerk*> Ranks;
-                    if (Perk->numRanks > 1) {
-                        Ranks = Perks::GetRankList(Perk);
-                        if (Ranks[0] != Perk)
+                    if (iter->numRanks > 1) {
+                        Ranks = PerkManager::GetRankList(iter);
+                        if (Ranks[0] != iter)
                             continue;
                     }
                     else
-                        Ranks.emplace_back(Perk);
+                        Ranks.emplace_back(iter);
 
                     GFxValue GFxPerk;
                     GFxValue GFxDesc;
@@ -440,27 +416,27 @@ namespace Scaleform {
                     root->CreateArray(&GFxDesc);
                     root->CreateObject(&GFxPerk);
 
-                    for (auto PerkRank : Ranks) {
-                        if (HasPerk((*g_player), PerkRank))
+                    for (auto iterRank : Ranks) {
+                        if (HasPerk((*g_player), iterRank))
                             NumRanks++;
 
-                        BSString description;
-                        TESDescription* perkDesc = DYNAMIC_CAST(Perk, BGSPerk, TESDescription);
-                        CALL_MEMBER_FN(perkDesc, Get)(&description, nullptr);
+                        BSString DescText;
+                        TESDescription* DescriptionForm = DYNAMIC_CAST(iter, BGSPerk, TESDescription);
+                        CALL_MEMBER_FN(DescriptionForm, Get)(&DescText, nullptr);
 
-                        GFxValue nDesc(description.Get());
+                        GFxValue nDesc(DescText.Get());
                         GFxDesc.PushBack(&nDesc);
                     }
 
-                    std::string PerkName = Perk->fullName.name.c_str();
-                    if (PerkName == "")
+                    std::string PerkName = iter->GetFullName();
+                    if (PerkName.empty())
                         continue;
 
                     GFxHelperFunctions::RegisterString(&GFxPerk, root, "text", PerkName.c_str());
-                    GFxHelperFunctions::RegisterString(&GFxPerk, root, "SWFFile", Perk->swfPath.c_str());
+                    GFxHelperFunctions::RegisterString(&GFxPerk, root, "SWFFile", iter->swfPath.c_str());
                     GFxPerk.SetMember("descriptions", &GFxDesc);
 
-                    GFxHelperFunctions::RegisterInt(&GFxPerk, "FormID", Perk->formID);
+                    GFxHelperFunctions::RegisterInt(&GFxPerk, "FormID", iter->formID);
                     GFxHelperFunctions::RegisterInt(&GFxPerk, "maxRank", Ranks.size());
                     GFxHelperFunctions::RegisterInt(&GFxPerk, "rank", NumRanks);
 
@@ -470,7 +446,7 @@ namespace Scaleform {
         }
     };
 
-    class AddPerks : public GFxFunctionHandler {
+    class GFxAddPerks : public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
             int count = args->args[0].GetArraySize();
@@ -489,7 +465,7 @@ namespace Scaleform {
         }
     };
 
-    class ModSkills : public GFxFunctionHandler {
+    class GFxModSkills : public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
             int count = args->args[0].GetArraySize();
@@ -509,7 +485,7 @@ namespace Scaleform {
         }
     };
 
-    class TagSkills : public GFxFunctionHandler {
+    class GFxTagSkills : public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
             int count = args->args[0].GetArraySize();
@@ -517,89 +493,89 @@ namespace Scaleform {
             GFxValue ArrayElement;
             GFxValue ObjElementFormID;
 
-            if (Perks::PlayerTags.Barter)
-                (*g_player)->actorValueOwner.Mod(1, g_Data.Barter, -15);
+            if (PerkManager::m_PlayerTags.Barter)
+                (*g_player)->actorValueOwner.Mod(1, DataManager::Barter, -15);
 
-            if (Perks::PlayerTags.EnergyWeapons)
-                (*g_player)->actorValueOwner.Mod(1, g_Data.EnergyWeapons, -15);
+            if (PerkManager::m_PlayerTags.EnergyWeapons)
+                (*g_player)->actorValueOwner.Mod(1, DataManager::EnergyWeapons, -15);
 
-            if (Perks::PlayerTags.Explosives)
-                (*g_player)->actorValueOwner.Mod(1, g_Data.Explosives, -15);
+            if (PerkManager::m_PlayerTags.Explosives)
+                (*g_player)->actorValueOwner.Mod(1, DataManager::Explosives, -15);
 
-            if (Perks::PlayerTags.Guns)
-                (*g_player)->actorValueOwner.Mod(1, g_Data.Guns, -15);
+            if (PerkManager::m_PlayerTags.Guns)
+                (*g_player)->actorValueOwner.Mod(1, DataManager::Guns, -15);
 
-            if (Perks::PlayerTags.Lockpick)
-                (*g_player)->actorValueOwner.Mod(1, g_Data.Lockpick, -15);
+            if (PerkManager::m_PlayerTags.Lockpick)
+                (*g_player)->actorValueOwner.Mod(1, DataManager::Lockpick, -15);
 
-            if (Perks::PlayerTags.Medicine)
-                (*g_player)->actorValueOwner.Mod(1, g_Data.Medicine, -15);
+            if (PerkManager::m_PlayerTags.Medicine)
+                (*g_player)->actorValueOwner.Mod(1, DataManager::Medicine, -15);
 
-            if (Perks::PlayerTags.MeleeWeapons)
-                (*g_player)->actorValueOwner.Mod(1, g_Data.MeleeWeapons, -15);
+            if (PerkManager::m_PlayerTags.MeleeWeapons)
+                (*g_player)->actorValueOwner.Mod(1, DataManager::MeleeWeapons, -15);
 
-            if (Perks::PlayerTags.Repair)
-                (*g_player)->actorValueOwner.Mod(1, g_Data.Repair, -15);
+            if (PerkManager::m_PlayerTags.Repair)
+                (*g_player)->actorValueOwner.Mod(1, DataManager::Repair, -15);
 
-            if (Perks::PlayerTags.Science)
-                (*g_player)->actorValueOwner.Mod(1, g_Data.Science, -15);
+            if (PerkManager::m_PlayerTags.Science)
+                (*g_player)->actorValueOwner.Mod(1, DataManager::Science, -15);
 
-            if (Perks::PlayerTags.Sneak)
-                (*g_player)->actorValueOwner.Mod(1, g_Data.Sneak, -15);
+            if (PerkManager::m_PlayerTags.Sneak)
+                (*g_player)->actorValueOwner.Mod(1, DataManager::Sneak, -15);
 
-            if (Perks::PlayerTags.Speech)
-                (*g_player)->actorValueOwner.Mod(1, g_Data.Speech, -15);
+            if (PerkManager::m_PlayerTags.Speech)
+                (*g_player)->actorValueOwner.Mod(1, DataManager::Speech, -15);
 
-            if (Perks::PlayerTags.Survival)
-                (*g_player)->actorValueOwner.Mod(1, g_Data.Survival, -15);
+            if (PerkManager::m_PlayerTags.Survival)
+                (*g_player)->actorValueOwner.Mod(1, DataManager::Survival, -15);
 
-            if (Perks::PlayerTags.Unarmed)
-                (*g_player)->actorValueOwner.Mod(1, g_Data.Unarmed, -15);
+            if (PerkManager::m_PlayerTags.Unarmed)
+                (*g_player)->actorValueOwner.Mod(1, DataManager::Unarmed, -15);
 
-            Perks::PlayerTags = Perks::DefaultTags;
+            PerkManager::m_PlayerTags = PerkManager::m_DefaultTags;
 
             for (int i = 0; i < count; i++) {
                 args->args[0].GetElement(i, &ArrayElement);
                 ArrayElement.GetMember("FormID", &ObjElementFormID);
 
-                if (ObjElementFormID.GetInt() == g_Data.Barter->formID)
-                    Perks::PlayerTags.Barter = true;
+                if (ObjElementFormID.GetInt() == DataManager::Barter->formID)
+                    PerkManager::m_PlayerTags.Barter = true;
 
-                else if (ObjElementFormID.GetInt() == g_Data.EnergyWeapons->formID)
-                    Perks::PlayerTags.EnergyWeapons = true;
+                else if (ObjElementFormID.GetInt() == DataManager::EnergyWeapons->formID)
+                    PerkManager::m_PlayerTags.EnergyWeapons = true;
 
-                else if (ObjElementFormID.GetInt() == g_Data.Explosives->formID)
-                    Perks::PlayerTags.Explosives = true;
+                else if (ObjElementFormID.GetInt() == DataManager::Explosives->formID)
+                    PerkManager::m_PlayerTags.Explosives = true;
 
-                else if (ObjElementFormID.GetInt() == g_Data.Guns->formID)
-                    Perks::PlayerTags.Guns = true;
+                else if (ObjElementFormID.GetInt() == DataManager::Guns->formID)
+                    PerkManager::m_PlayerTags.Guns = true;
 
-                else if (ObjElementFormID.GetInt() == g_Data.Lockpick->formID)
-                    Perks::PlayerTags.Lockpick = true;
+                else if (ObjElementFormID.GetInt() == DataManager::Lockpick->formID)
+                    PerkManager::m_PlayerTags.Lockpick = true;
 
-                else if (ObjElementFormID.GetInt() == g_Data.Medicine->formID)
-                    Perks::PlayerTags.Medicine = true;
+                else if (ObjElementFormID.GetInt() == DataManager::Medicine->formID)
+                    PerkManager::m_PlayerTags.Medicine = true;
 
-                else if (ObjElementFormID.GetInt() == g_Data.MeleeWeapons->formID)
-                    Perks::PlayerTags.MeleeWeapons = true;
+                else if (ObjElementFormID.GetInt() == DataManager::MeleeWeapons->formID)
+                    PerkManager::m_PlayerTags.MeleeWeapons = true;
 
-                else if (ObjElementFormID.GetInt() == g_Data.Repair->formID)
-                    Perks::PlayerTags.Repair = true;
+                else if (ObjElementFormID.GetInt() == DataManager::Repair->formID)
+                    PerkManager::m_PlayerTags.Repair = true;
 
-                else if (ObjElementFormID.GetInt() == g_Data.Science->formID)
-                    Perks::PlayerTags.Science = true;
+                else if (ObjElementFormID.GetInt() == DataManager::Science->formID)
+                    PerkManager::m_PlayerTags.Science = true;
 
-                else if (ObjElementFormID.GetInt() == g_Data.Sneak->formID)
-                    Perks::PlayerTags.Sneak = true;
+                else if (ObjElementFormID.GetInt() == DataManager::Sneak->formID)
+                    PerkManager::m_PlayerTags.Sneak = true;
 
-                else if (ObjElementFormID.GetInt() == g_Data.Speech->formID)
-                    Perks::PlayerTags.Speech = true;
+                else if (ObjElementFormID.GetInt() == DataManager::Speech->formID)
+                    PerkManager::m_PlayerTags.Speech = true;
 
-                else if (ObjElementFormID.GetInt() == g_Data.Survival->formID)
-                    Perks::PlayerTags.Survival = true;
+                else if (ObjElementFormID.GetInt() == DataManager::Survival->formID)
+                    PerkManager::m_PlayerTags.Survival = true;
 
-                else if (ObjElementFormID.GetInt() == g_Data.Unarmed->formID)
-                    Perks::PlayerTags.Unarmed = true;
+                else if (ObjElementFormID.GetInt() == DataManager::Unarmed->formID)
+                    PerkManager::m_PlayerTags.Unarmed = true;
 
                 ActorValueInfo* ActorValue = DYNAMIC_CAST(LookupFormByID(ObjElementFormID.GetInt()), TESForm, ActorValueInfo);
                 (*g_player)->actorValueOwner.Mod(1, ActorValue, 15);
@@ -607,48 +583,48 @@ namespace Scaleform {
         }
     };
 
-    class BlurBackground : public GFxFunctionHandler {
+    class GFxBlurBackground : public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
-            ApplyImagespaceModifier(g_Data.PipboyMenuImod, 1.0, NULL);
+            ApplyImagespaceModifier(DataManager::PipboyMenuIMOD, 1.0, NULL);
         }
     };
 
-    class UnblurBackground : public GFxFunctionHandler {
+    class GFxUnblurBackground : public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
-            RemoveImagespaceModifier(g_Data.PipboyMenuImod);
+            RemoveImagespaceModifier(DataManager::PipboyMenuIMOD);
         }
     };
 
-    class CloseLevelUpMenu : public GFxFunctionHandler {
+    class GFxCloseLevelUpMenu : public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
             BSFixedString LevelUpMenu("LevelUpMenu");
             CALL_MEMBER_FN(*g_uiMessageManager, SendUIMessage)(LevelUpMenu, kMessage_Close);
             LevelUpMenuInput::RegisterForInput(false);
-            RemoveImagespaceModifier(g_Data.PipboyMenuImod);
+            RemoveImagespaceModifier(DataManager::PipboyMenuIMOD);
         }
     };
 
-    class ForceUnlock : public GFxFunctionHandler {
+    class GFxForceUnlock : public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
             BSFixedString LockpickingMenu("LockpickingMenu");
             CALL_MEMBER_FN(*g_uiMessageManager, SendUIMessage)(LockpickingMenu, kMessage_Close);
-            VMArray<VMVariable> pArgs; CallFunctionNoWait<TESQuest>(g_Data.PerksQuest, "OnForceLock", pArgs);
+            VMArray<VMVariable> pArgs; CallFunctionNoWait<TESQuest>(DataManager::PerksQuest, "OnForceLock", pArgs);
         }
     };
 
-    class GetLockpickLevel : public GFxFunctionHandler {
+    class GFxGetLockpickLevel : public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
-            std::string level = std::to_string((*g_player)->actorValueOwner.GetValue(g_Data.Lockpick));
+            std::string level = std::to_string((*g_player)->actorValueOwner.GetValue(DataManager::Lockpick));
             args->movie->movieRoot->CreateString(args->result, level.c_str());
         }
     };
 
-    class UpdateInvFilter : public GFxFunctionHandler {
+    class GFxUpdateInvFilter : public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
             args->movie->movieRoot->CreateArray(args->result);
@@ -692,17 +668,18 @@ namespace Scaleform {
     public:
         virtual void Invoke(Args* args) {
             GFxValue FormID; args->args[0].GetMember("formID", &FormID);
-            std::string bText = Regex::GetBookText(LookupFormByID(FormID.GetUInt()));
+            std::string bText = BSRegex::GetBookText(LookupFormByID(FormID.GetUInt()));
             args->args[0].SetMember("description", &GFxValue(bText.c_str()));
         }
     };
 }
 
-bool Scaleform::RegisterFunctions(GFxMovieView* view, GFxValue* F4SERoot) {
-    GFxMovieRoot* movieRoot = view->movieRoot;
+bool ScaleformManager::Init(GFxMovieView* View, GFxValue* F4SERoot) {
+    using namespace ScaleformFunctions;
 
     GFxValue currentSWFPath;
     std::string currentSWFPathString = "";
+    GFxMovieRoot* movieRoot = View->movieRoot;
 
     if (movieRoot->GetVariable(&currentSWFPath, "root.loaderInfo.url")) {
         currentSWFPathString = currentSWFPath.GetString();
@@ -711,40 +688,40 @@ bool Scaleform::RegisterFunctions(GFxMovieView* view, GFxValue* F4SERoot) {
             movieRoot->SetVariable("root.LeftMeters_mc.HPMeter_mc.RadsBar_mc.visible", &GFxValue(false));
 
         else if (currentSWFPathString.find("LevelUpMenu.swf") != std::string::npos) {
-            RegisterFunction<PlayMenuSound>     (F4SERoot, movieRoot, "PlaySound");
-            RegisterFunction<BlurBackground>    (F4SERoot, movieRoot, "BlurBackground");
-            RegisterFunction<UnblurBackground>  (F4SERoot, movieRoot, "UnblurBackground");
-            RegisterFunction<CloseLevelUpMenu>  (F4SERoot, movieRoot, "CloseLevelUpMenu");
-            RegisterFunction<AddPerks>          (F4SERoot, movieRoot, "AddPerks");
-            RegisterFunction<ModSkills>         (F4SERoot, movieRoot, "ModSkills");
-            RegisterFunction<TagSkills>         (F4SERoot, movieRoot, "TagSkills");
+            RegisterFunction<GFxPlayMenuSound>      (F4SERoot, movieRoot, "PlaySound");
+            RegisterFunction<GFxBlurBackground>     (F4SERoot, movieRoot, "BlurBackground");
+            RegisterFunction<GFxUnblurBackground>   (F4SERoot, movieRoot, "UnblurBackground");
+            RegisterFunction<GFxCloseLevelUpMenu>   (F4SERoot, movieRoot, "CloseLevelUpMenu");
+            RegisterFunction<GFxAddPerks>           (F4SERoot, movieRoot, "AddPerks");
+            RegisterFunction<GFxModSkills>          (F4SERoot, movieRoot, "ModSkills");
+            RegisterFunction<GFxTagSkills>          (F4SERoot, movieRoot, "TagSkills");
 
-            Perks::ProcessPerkList(movieRoot, Perks::CurrentList);
+            PerkManager::ProcessPerkList(movieRoot);
             LevelUpMenuInput::RegisterForInput(true);
         }
 
         else if (currentSWFPathString.find("LockpickingMenu.swf") != std::string::npos) {
-            RegisterFunction<ForceUnlock>       (F4SERoot, movieRoot, "ForceUnlock");
-            RegisterFunction<GetLockpickLevel>  (F4SERoot, movieRoot, "GetLockpickLevel");
+            RegisterFunction<GFxForceUnlock>        (F4SERoot, movieRoot, "ForceUnlock");
+            RegisterFunction<GFxGetLockpickLevel>   (F4SERoot, movieRoot, "GetLockpickLevel");
             LockpickingMenuInput::RegisterForInput(true);
         }
 
         else if (currentSWFPathString.find("Pipboy") != std::string::npos) {
-            RegisterFunction<StimpakCount>      (F4SERoot, movieRoot, "StimpakCount");
-            RegisterFunction<UseStimpak>        (F4SERoot, movieRoot, "UseStimpak");
-            RegisterFunction<RadXCount>         (F4SERoot, movieRoot, "RadXCount");
-            RegisterFunction<UseRadX>           (F4SERoot, movieRoot, "UseRadX");
-            RegisterFunction<DoctorBagCount>    (F4SERoot, movieRoot, "DoctorBagCount");
-            RegisterFunction<UseDoctorBag>      (F4SERoot, movieRoot, "UseDoctorBag");
-            RegisterFunction<SetLimbTarget>     (F4SERoot, movieRoot, "SetLimbTarget");
-            RegisterFunction<ConsoleLimbSelect> (F4SERoot, movieRoot, "ConsoleLimbSelect");
-            RegisterFunction<HardcoreData>      (F4SERoot, movieRoot, "HardcoreData");
-            RegisterFunction<RadiationData>     (F4SERoot, movieRoot, "RadiationData");
-            RegisterFunction<ExperienceData>    (F4SERoot, movieRoot, "ExperienceData");
-            RegisterFunction<SkillList>         (F4SERoot, movieRoot, "SkillList");
-            RegisterFunction<PerkList>          (F4SERoot, movieRoot, "PerkList");
-            RegisterFunction<UpdateInvFilter>   (F4SERoot, movieRoot, "UpdateInvFilter");
-            RegisterFunction<GFxGetBookText>    (F4SERoot, movieRoot, "GetBookText");
+            RegisterFunction<GFxStimpakCount>       (F4SERoot, movieRoot, "StimpakCount");
+            RegisterFunction<GFxUseStimpak>         (F4SERoot, movieRoot, "UseStimpak");
+            RegisterFunction<GFxRadXCount>          (F4SERoot, movieRoot, "RadXCount");
+            RegisterFunction<GFxUseRadX>            (F4SERoot, movieRoot, "UseRadX");
+            RegisterFunction<GFxDoctorBagCount>     (F4SERoot, movieRoot, "DoctorBagCount");
+            RegisterFunction<GFxUseDoctorBag>       (F4SERoot, movieRoot, "UseDoctorBag");
+            RegisterFunction<GFxSetLimbTarget>      (F4SERoot, movieRoot, "SetLimbTarget");
+            RegisterFunction<GFxConsoleLimbSelect>  (F4SERoot, movieRoot, "ConsoleLimbSelect");
+            RegisterFunction<GFxHardcoreData>       (F4SERoot, movieRoot, "HardcoreData");
+            RegisterFunction<GFxRadiationData>      (F4SERoot, movieRoot, "RadiationData");
+            RegisterFunction<GFxExperienceData>     (F4SERoot, movieRoot, "ExperienceData");
+            RegisterFunction<GFxSkillList>          (F4SERoot, movieRoot, "SkillList");
+            RegisterFunction<GFxPerkList>           (F4SERoot, movieRoot, "PerkList");
+            RegisterFunction<GFxUpdateInvFilter>    (F4SERoot, movieRoot, "UpdateInvFilter");
+            RegisterFunction<GFxGetBookText>        (F4SERoot, movieRoot, "GetBookText");
         }
     }
 

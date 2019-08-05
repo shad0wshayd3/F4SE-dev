@@ -57,7 +57,7 @@ bool ObScript_Default_Parse(UInt32 numParams, void* paramInfo, void* lineBuf, vo
 class IObScript {
 public:
 
-    void Init();
+    bool                    Init();
 
     ObScriptCommand*        GetCommand(const char* name);
     ObScriptCommandList     GetMatchingCommands(bool(*filterFunction)(ObScriptCommand* command));

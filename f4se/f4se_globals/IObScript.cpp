@@ -8,7 +8,7 @@ bool ObScript_Default_Parse(UInt32 numParams, void* paramInfo, void* lineBuf, vo
     return ObScript_Parse(numParams, paramInfo, lineBuf, scriptBuf);
 }
 
-void IObScript::Init() {
+bool IObScript::Init() {
     std::vector<int>    m_opcodes   = { kObScript_NumConsoleCommands + kObScript_ConsoleOpBase, kObScript_NumObScriptCommands + kObScript_ScriptOpBase };
     ObScriptCommandList m_init      = { g_firstConsoleCommand, g_firstObScriptCommand };
 
@@ -17,6 +17,8 @@ void IObScript::Init() {
             m_commands.emplace_back(iter);
         }
     }
+
+    return true;
 }
 
 ObScriptCommand* IObScript::GetCommand(const char* name) {

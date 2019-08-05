@@ -8,8 +8,8 @@
 
 ISettingsPath::ISettingsPath(std::string settingPath) {
     auto delimiter = settingPath.find_first_of(":");
-    section = settingPath.substr(delimiter + 1);
-    setting = settingPath.substr(0, delimiter);
+    setting = settingPath.substr(delimiter + 1);
+    section = settingPath.substr(0, delimiter);
 }
 
 ISettingsPath::~ISettingsPath() {
