@@ -52,7 +52,6 @@ extern float GetPermValue(TESObjectREFR* Obj, ActorValueInfo* AVIF);
 
 namespace Papyrus {
     DECLARE_EXTERN_STRUCT(TaggedSkills);
-    extern Papyrus::TaggedSkills DefaultSkills;
 }
 
 #define LookupTypeByID(FormID, Type)\
@@ -155,7 +154,6 @@ public:
     static ActorValueInfo*          Unarmed_Secondary;
     static ActorValueInfo*          ActionPointsMult;
     static ActorValueInfo*          SkillOffset;
-    static ActorValueInfo*          CurrentLevel;
     static ActorValueInfo*          InventoryWeight;
     static ActorValueInfo*          Dehydration;
     static ActorValueInfo*          Starvation;

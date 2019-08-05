@@ -374,11 +374,11 @@ namespace ScaleformFunctions {
                 GFxHelperFunctions::RegisterString(&Skill, root, "text", iter->GetFullName());
                 GFxHelperFunctions::RegisterString(&Skill, root, "EditorID", iter->GetEditorID());
 
-                BSString description;
-                TESDescription* avDesc = DYNAMIC_CAST(iter, ActorValueInfo, TESDescription);
-                CALL_MEMBER_FN(avDesc, Get)(&description, nullptr);
+                BSString DescText;
+                TESDescription* DescriptionForm = DYNAMIC_CAST(iter, ActorValueInfo, TESDescription);
+                CALL_MEMBER_FN(DescriptionForm, Get)(&DescText, nullptr);
 
-                GFxHelperFunctions::RegisterString(&Skill, root, "description", description.Get());
+                GFxHelperFunctions::RegisterString(&Skill, root, "description", DescText.Get());
                 GFxHelperFunctions::RegisterInt(&Skill, "value", (int)floorf(value));
 
                 float modifier = owner->GetMod(0, iter) + (owner->GetMod(0, ValueManager::GetDependent(iter)) * 2) + floorf(owner->GetMod(0, DataManager::Luck));

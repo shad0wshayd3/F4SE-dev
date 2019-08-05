@@ -82,7 +82,6 @@ bool DataManager::Load() {
     Unarmed_Secondary       = LookupTypeFromPlugin(0x00FBB, "SkillMod:Unarmed_Secondary",           ActorValueInfo);
     ActionPointsMult        = LookupTypeFromPlugin(0x00FBD, "MiscAV:ActionPointsMult",              ActorValueInfo);
     SkillOffset             = LookupTypeFromPlugin(0x00FBC, "MiscAV:SkillOffset",                   ActorValueInfo);
-    CurrentLevel            = LookupTypeFromPlugin(0x00FBE, "MiscAV:CurrentLevel",                  ActorValueInfo);
     InventoryWeight         = LookupTypeFromPlugin(0x15FC0, "MiscAV:InventoryWeight",               ActorValueInfo);
     Dehydration             = LookupTypeFromPlugin(0x04C50, "Hardcore:Dehydration",                 ActorValueInfo);
     Starvation              = LookupTypeFromPlugin(0x04C51, "Hardcore:Starvation",                  ActorValueInfo);
@@ -243,7 +242,6 @@ void DataManager::Unload() {
     Unarmed_Secondary       = nullptr;
     ActionPointsMult        = nullptr;
     SkillOffset             = nullptr;
-    CurrentLevel            = nullptr;
     InventoryWeight         = nullptr;
     Dehydration             = nullptr;
     Starvation              = nullptr;
@@ -333,7 +331,6 @@ bool DataManager::CheckLoadedData() {
     CheckForm(Unarmed_Secondary,        kFormType_AVIF, avName);
     CheckForm(ActionPointsMult,         kFormType_AVIF, avName);
     CheckForm(SkillOffset,              kFormType_AVIF, avName);
-    CheckForm(CurrentLevel,             kFormType_AVIF, avName);
     CheckForm(InventoryWeight,          kFormType_AVIF, avName);
     CheckForm(Dehydration,              kFormType_AVIF, avName);
     CheckForm(Starvation,               kFormType_AVIF, avName);
@@ -448,7 +445,6 @@ ActorValueInfo*         DataManager::Unarmed_Damage             = nullptr;
 ActorValueInfo*         DataManager::Unarmed_Secondary          = nullptr;
 ActorValueInfo*         DataManager::ActionPointsMult           = nullptr;
 ActorValueInfo*         DataManager::SkillOffset                = nullptr;
-ActorValueInfo*         DataManager::CurrentLevel               = nullptr;
 ActorValueInfo*         DataManager::InventoryWeight            = nullptr;
 ActorValueInfo*         DataManager::Dehydration                = nullptr;
 ActorValueInfo*         DataManager::Starvation                 = nullptr;

@@ -47,6 +47,7 @@ namespace ObScript {
             points = 0;
 
         BSFixedString LevelUpMenu("LevelUpMenu");
+        Papyrus::TaggedSkills blankSkills; blankSkills.SetNone(true);
 
         switch (menuID) {
         case 1:
@@ -62,7 +63,7 @@ namespace ObScript {
             break;
 
         case 4:
-            PerkManager::ShowTagMenu(nullptr, (points != 0) ? points : 3, Papyrus::DefaultSkills, false);
+            PerkManager::ShowTagMenu(nullptr, (points != 0) ? points : 3, blankSkills, false);
             break;
 
         case 5:
@@ -86,7 +87,6 @@ namespace ObScript {
 
 namespace Papyrus {
     DECLARE_STRUCT(TaggedSkills, SCRIPT_NAME);
-    TaggedSkills DefaultSkills;
 
     void AdvanceSkill(StaticFunctionTag* base, BSFixedString skillName, float value) {
         if (!skillName || !value)
@@ -168,8 +168,6 @@ bool ScriptManager::Init(VirtualMachine* VM) {
 // --------------------------------------------------------------------------------------------
 // Papyrus
 // --------------------------------------------------------------------------------------------
-    Papyrus::DefaultSkills.SetNone(true);
-
     VM->RegisterFunction(new NativeFunction1<StaticFunctionTag, void, UInt32>
         ("ShowSkillsMenu",        SCRIPT_NAME, PerkManager::ShowSkillsMenu, VM));
 

@@ -44,6 +44,9 @@ void PerkManager::Init() {
 
     // And anything else
     m_SortStrings.emplace_back(std::vector<std::string>{});
+
+    // Set Base CurrentLevel to 1, for new saves
+    m_CurrentLevel = 1;
 }
 
 void PerkManager::Unload() {
@@ -255,7 +258,6 @@ void PerkManager::LevelUpThread() {
                 std::this_thread::sleep_for(std::chrono::seconds(1));
         }
 
-        (*g_player)->actorValueOwner.SetBase(CurrentLevel, m_CurrentLevel);
         m_LevelUp = false;
     }
 }
@@ -426,7 +428,7 @@ bool PerkManager::IsBlockingMenuOpen(bool AllowDialogueMenu) {
         );
 }
 
-#define CompareTag(CmpSkill) if (CmpSkill == Skill) return Tags.CmpSkill
+#define CompareTag(CmpSkill) if (CmpSkill->formID == Skill->formID) return Tags.CmpSkill
 bool PerkManager::IsTagEnabled(TaggedSkills Tags, ActorValueInfo * Skill) {
     CompareTag(Barter);
     CompareTag(EnergyWeapons);
@@ -462,7 +464,7 @@ DataList PerkManager::BuildPerkList(int ForLevel, bool Trait) {
             continue;
 
         if (iter->numRanks > 1)
-            if (IsFirstValidRank(iter))
+            if (!IsFirstValidRank(iter))
                 continue;
 
         std::string PerkName = iter->GetFullName();
