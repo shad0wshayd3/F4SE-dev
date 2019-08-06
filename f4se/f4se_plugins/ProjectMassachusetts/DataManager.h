@@ -81,6 +81,21 @@ namespace Papyrus {
         return false;\
     }\
 
+#define CheckPerk(Form, index)\
+    if (##Form##) {\
+        _LOGMESSAGENT("Variable: %s [%i]", #Form, index); g_Log.Indent();\
+        _LOGMESSAGENT("%s is FormType: %i. Should be %i.", #Form, ##Form##->formType, kFormType_PERK);\
+        if (##Form##->formType == kFormType_PERK) {\
+            _LOGMESSAGENT("%s reporting name as: %s", #Form, ##Form##->GetFullName());\
+            break;\
+        }\
+        g_Log.Outdent();\
+        _LOGMESSAGENT("");\
+    }\
+    else {\
+        return false;\
+    }\
+
 class DataManager {
 public:
     static bool                     Load();

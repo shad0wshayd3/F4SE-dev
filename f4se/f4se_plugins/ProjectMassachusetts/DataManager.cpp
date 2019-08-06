@@ -355,20 +355,9 @@ bool DataManager::CheckLoadedData() {
     CheckForm(StimpakOrder,             kFormType_FLST, forms.count);
     CheckForm(PerksQuest,               kFormType_QUST, GetEditorID());
     CheckForm(DoctorsBag,               kFormType_ALCH, GetFullName());
-    CheckForm(m_SkillPList[0],          kFormType_PERK, GetFullName());
-    CheckForm(m_SkillPList[1],          kFormType_PERK, GetFullName());
-    CheckForm(m_SkillPList[2],          kFormType_PERK, GetFullName());
-    CheckForm(m_SkillPList[3],          kFormType_PERK, GetFullName());
-    CheckForm(m_SkillPList[4],          kFormType_PERK, GetFullName());
-    CheckForm(m_SkillPList[5],          kFormType_PERK, GetFullName());
-    CheckForm(m_SkillPList[6],          kFormType_PERK, GetFullName());
-    CheckForm(m_SkillPList[7],          kFormType_PERK, GetFullName());
-    CheckForm(m_SkillPList[8],          kFormType_PERK, GetFullName());
-    CheckForm(m_SkillPList[9],          kFormType_PERK, GetFullName());
-    CheckForm(m_SkillPList[10],         kFormType_PERK, GetFullName());
-    CheckForm(m_SkillPList[11],         kFormType_PERK, GetFullName());
-    CheckForm(m_SkillPList[12],         kFormType_PERK, GetFullName());
-    CheckForm(m_SkillPList[13],         kFormType_PERK, GetFullName());
+
+    for (int i = 0; i < m_SkillPList.size(); i++)
+        CheckPerk(m_SkillPList[i], i);
     }
 
     _LOGMESSAGE("DataManager: Finished CheckLoadedData()");
