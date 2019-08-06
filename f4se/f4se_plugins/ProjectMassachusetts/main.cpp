@@ -29,7 +29,7 @@ extern "C" {
             if (reinterpret_cast<uintptr_t>(Message->data)) {
                 if (!DataManager::Load()) {
                     s_LoadLock.Leave();
-                    HALT("Game Plugin is not loaded.");
+                    HALT("Game Plugin error.");
                 }
 
                 g_GlobalSettings.Init("PM_");

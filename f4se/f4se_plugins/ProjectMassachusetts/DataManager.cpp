@@ -14,7 +14,7 @@ float GetPermValue(TESObjectREFR* Obj, ActorValueInfo* AVIF) {
 // ------------------------------------------------------------------------------------------------
 
 bool DataManager::Load() {
-    m_PluginName = g_Settings.GetString("sPluginName:General", DEFAULT_PLUGIN_NAME);
+    m_PluginName = g_Settings.GetString("General:PluginName", DEFAULT_PLUGIN_NAME);
     _LOGMESSAGE("DataManager: Using Game Plugin: %s", m_PluginName.c_str());
 
     if (!CheckGamePlugin()) {
@@ -163,8 +163,11 @@ bool DataManager::Load() {
     m_SkillModList.emplace_back(Unarmed_Secondary);
     }
 
-    if (g_Settings.GetBool("bCheckLoadedData:General", false)) {
-        CheckLoadedData();
+    if (g_Settings.GetBool("General:CheckLoadedData", false)) {
+        if (!CheckLoadedData()) {
+            _LOGERROR("DataManager: CheckLoadedData() failed.");
+            return false;
+        }
     }
 
     return true;
