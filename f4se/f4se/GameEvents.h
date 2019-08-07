@@ -239,3 +239,11 @@ DECLARE_EVENT_DISPATCHER(TESObjectLoadedEvent, 0x004430B0)
 
 // 22274238010A92A75A0E77127FF6D54FDBC6F943+821 (inside call)
 DECLARE_EVENT_DISPATCHER(TESInitScriptEvent, 0x00442C50)
+
+struct WeaponFiredEvent {
+    UInt32          unk00;  // 00
+    TESObjectREFR*  source; // 08
+    UInt32          unk10;  // 10
+};
+
+extern RelocAddr <BSTEventDispatcher<WeaponFiredEvent>*> g_weaponFiredDispatcher;

@@ -320,28 +320,35 @@ public:
 		return true;
 	};
 
-	bool Insert(UInt32 index, const T & entry)
-	{
-		if(!entries)
-				return false;
+    bool Insert(UInt32 index, const T& entry)
+    {
+        if (!entries) {
+            // tArray makes raw calls to malloc to allocate
+            auto memSize = 4 * sizeof(T);    // cant remember the default size, pretty sure it's 4
+            auto mem = Heap_Allocate(memSize);
+            std::memset(mem, 0, memSize);
+            capacity = 4;
+            count = 0;
+            entries = static_cast<T*>(mem);
+        }
 
-		UInt32 lastSize = count;
-		if(count + 1 > capacity) // Not enough space, grow
-		{
-			if(!Grow(nGrow))
-				return false;
-		}
+        UInt32 lastSize = count;
+        if (count + 1 > capacity) // Not enough space, grow
+        {
+            if (!Grow(nGrow))
+                return false;
+        }
 
-		if(index != lastSize)  // Not inserting onto the end, need to move everything down
-		{
-			UInt32 remaining = count - index;
-			memmove_s(&entries[index + 1], sizeof(T) * remaining, &entries[index], sizeof(T) * remaining); // Move the rest up
-		}
+        if (index != lastSize)  // Not inserting onto the end, need to move everything down
+        {
+            UInt32 remaining = count - index;
+            memmove_s(&entries[index + 1], sizeof(T) * remaining, &entries[index], sizeof(T) * remaining); // Move the rest up
+        }
 
-		entries[index] = entry;
-		count++;
-		return true;
-	};
+        entries[index] = entry;
+        count++;
+        return true;
+    };
 
 	bool Remove(UInt32 index)
 	{

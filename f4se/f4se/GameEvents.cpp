@@ -5,3 +5,5 @@ RelocPtr <BSTGlobalEvent::EventSource<ApplyColorUpdateEvent>*> g_colorUpdateDisp
 
 // 61A1F6B0E46CB298CD32C55D9A653D702CCD1B67+63
 RelocPtr <BSTGlobalEvent*> g_globalEvents(0x058CEC18);
+
+RelocAddr <BSTEventDispatcher<WeaponFiredEvent>*> g_weaponFiredDispatcher(0x058E3E60);
