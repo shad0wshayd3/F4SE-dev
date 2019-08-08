@@ -18,3 +18,8 @@ public:
     BGSKeywordForm              keywordForm;
     BGSFeaturedItemMessage      featured;
 };
+
+class TESIdleForm : public TESForm {
+public:
+    enum { kTypeID = kFormType_IDLE };
+};

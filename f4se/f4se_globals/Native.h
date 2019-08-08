@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Definitions.h"
+
 #include "f4se/GameExtraData.h"
 #include "f4se/GameMenus.h"
 #include "f4se/GameReferences.h"
@@ -39,6 +41,9 @@ extern RelocAddr <_ObScript_Parse> ObScript_Parse;
 
 typedef void(*_DoTokenReplacement_Internal)(ExtraTextDisplayData* extraText, BSString& text);
 extern RelocAddr <_DoTokenReplacement_Internal> DoTokenReplacement_Internal;
+
+typedef void(*_PlayIdle_Internal)(void* unk00, Actor* actor, UInt32 unk02, TESIdleForm* idle, UInt32 unk04, void* unk05);
+extern RelocAddr <_PlayIdle_Internal> PlayIdle_Internal;
 
 extern RelocAddr <uintptr_t> ActorValueDerivedVtbl;
 

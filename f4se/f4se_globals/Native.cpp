@@ -12,6 +12,7 @@ RelocAddr <_GetXPForLevel> GetXPForLevel(0x664A10);
 RelocAddr <_ExtractArgs> ExtractArgs(0x4E36B0);
 RelocAddr <_ObScript_Parse> ObScript_Parse(0x404E7CE0);
 RelocAddr <_DoTokenReplacement_Internal> DoTokenReplacement_Internal(0xC0C70);
+RelocAddr <_PlayIdle_Internal> PlayIdle_Internal(0xE353F0);
 
 RelocAddr <uintptr_t> ActorValueDerivedVtbl(0x2CEDBC8);
 // ActorValue AVOwner*, AVInfo&
