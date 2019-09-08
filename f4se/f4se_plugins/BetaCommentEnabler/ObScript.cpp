@@ -19,21 +19,24 @@ namespace ObScript {
         // Get Computer Name
         DWORD bufCharCount = INFO_SIZE;
         if (!GetComputerName(computerName, &bufCharCount)) {
-            _LOGERROR("Couldn't get computer name.");
+            _LogError("Couldn't get computer name.");
             return false;
         }
 
         // Get Output File
-        std::string commentFilePath = g_Settings.GetString("sFileName:General", "BetaComments.txt");
+        std::string commentFilePath = ISettings::GetString("General:sFileName", "BetaComments.txt");
         sprintf_s(filePath, sizeof(filePath), "%s%s", runtimeDir, commentFilePath.c_str());
 
-        _LOGMESSAGE("Using output path: %s", filePath);
+        _LogMessage("Using output path: %s", filePath);
         s_argString = (char*)malloc(0x4000);
         return true;
     }
 
     bool Cmd_BetaComment_Execute(EXECUTE_ARGS) {
-        if (!ExtractArgs(EXTRACT_ARGS, s_argString))
+        if (!ExtractArgs(PASS_EXTRACT_ARGS, s_argString))
+            return true;
+
+        if (!thisObj)
             return true;
 
         // Check Plugin Name
@@ -111,7 +114,7 @@ namespace ObScript {
     }
 
     bool Hook_Commit() {
-        if (!g_ObScript.OverloadCommand("BetaComment", kCommand_BetaComment)) {
+        if (!IObScript::OverloadCommand("BetaComment", kObScriptCommand_BetaComment)) {
             return false;
         }
 
