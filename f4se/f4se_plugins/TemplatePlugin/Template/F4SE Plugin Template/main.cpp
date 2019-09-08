@@ -1,28 +1,26 @@
 #include "Config.h"
-
 #include "f4se_globals/Globals.h"
 
 #include "f4se/PluginAPI.h"
 
-ILog            g_Log           = ILog(PLUGIN_NAME_SHORT);
-PluginHandle    g_PluginHandle  = kPluginHandle_Invalid;
+PluginHandle g_PluginHandle = kPluginHandle_Invalid;
 
 extern "C" {
     bool F4SEPlugin_Query(const F4SEInterface* F4SE, PluginInfo* Info) {
-        ITimeKeeper startupClock = ITimeKeeper();
-        startupClock.Start();
+        InitializePlugin(PLUGIN_NAME);
+        ITimeKeeper PluginQueryTimer = ITimeKeeper();
 
-        _LOGMESSAGE("%s log opened (PC-64)", PLUGIN_NAME_LONG);
-        _LOGMESSAGE("This is a plugin log only and does not contain information on any other part of the game, including crashes.");
+        _LogMessage("%s log opened (PC-64)", PLUGIN_NAME);
+        _LogMessage("This is a plugin log only and does not contain information on any other part of the game, including crashes.");
 
         Info->infoVersion   = PluginInfo::kInfoVersion;
-        Info->name          = PLUGIN_NAME_LONG;
+        Info->name          = PLUGIN_NAME;
         Info->version       = PLUGIN_VERSION;
 
         g_PluginHandle      = F4SE->GetPluginHandle();
 
         if (F4SE->runtimeVersion != SUPPORTED_RUNTIME_VERSION) {
-            _LOGERROR("Unsupported runtime version v%d.%d.%d.%d. This DLL is built for v%d.%d.%d.%d only. Plugin will be disabled.",
+            _LogError("Unsupported runtime version v%d.%d.%d.%d. This DLL is built for v%d.%d.%d.%d only. Plugin will be disabled.",
                 GET_EXE_VERSION_MAJOR (F4SE->runtimeVersion),
                 GET_EXE_VERSION_MINOR (F4SE->runtimeVersion),
                 GET_EXE_VERSION_BUILD (F4SE->runtimeVersion),
@@ -35,12 +33,12 @@ extern "C" {
             return false;
         }
 
-        _LOGMESSAGE("F4SEPlugin_Query Time: %fms", startupClock.Format(ITimeKeeper::Milli));
+        _LogMessage("F4SEPlugin_Query Time: %fms", PluginQueryTimer.Format(ITimeKeeper::kDuration_Milli));
         return true;
     }
 
     bool F4SEPlugin_Load(const F4SEInterface* F4SE) {
-        _LOGMESSAGE("Plugin loaded successfully.");
+        _LogMessage("Plugin loaded successfully.");
         return true;
     }
 }
