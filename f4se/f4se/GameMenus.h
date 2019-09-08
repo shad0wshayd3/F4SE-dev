@@ -50,28 +50,27 @@ public:
 	enum
 	{
 		//Confirmed
-		kFlag_PauseGame = 0x01,
-		kFlag_DoNotDeleteOnClose = 0x02,
-		kFlag_ShowCursor = 0x04,
-		kFlag_EnableMenuControl = 0x08, // 1, 2
-		kFlag_ShaderdWorld = 0x20,
-		kFlag_Open = 0x40,//set it after open.
-		kFlag_DoNotPreventGameSave = 0x800,
-		kFlag_ApplyDropDownFilter = 0x8000, //
-		kFlag_BlurBackground = 0x400000,
-
-		//Unconfirmed
-		kFlag_Modal = 0x10,
-		kFlag_PreventGameLoad = 0x80,
-		kFlag_Unk0100 = 0x100,
-		kFlag_HideOther = 0x200,
-		kFlag_DisableInteractive = 0x4000,
-		kFlag_UpdateCursorOnPlatformChange = 0x400,
-		kFlag_Unk1000 = 0x1000,
-		kFlag_ItemMenu = 0x2000,
-		kFlag_Unk10000 = 0x10000,	// mouse cursor
-		kFlag_Unk800000 = 0x800000
+		kFlag_PauseGame                         = 0x01,
+		kFlag_DoNotDeleteOnClose                = 0x02,
+		kFlag_ShowCursor                        = 0x04,
+		kFlag_EnableMenuControl                 = 0x08,         // 1, 2
+		kFlag_Modal                             = 0x10,         // Unconfirmed
+		kFlag_ShaderdWorld                      = 0x20,
+		kFlag_Open                              = 0x40,         // set it after open.
+		kFlag_PreventGameLoad                   = 0x80,         // Unconfirmed
+		kFlag_Unk0100                           = 0x100,        // Unconfirmed
+		kFlag_HideOther                         = 0x200,        // Unconfirmed
+		kFlag_UpdateCursorOnPlatformChange      = 0x400,        // Unconfirmed
+		kFlag_DoNotPreventGameSave              = 0x800,
+		kFlag_Unk1000                           = 0x1000,       // Unconfirmed
+		kFlag_ItemMenu                          = 0x2000,       // Unconfirmed
+		kFlag_DisableInteractive                = 0x4000,       // Unconfirmed
+		kFlag_ApplyDropDownFilter               = 0x8000,
+		kFlag_Unk10000                          = 0x10000,      // Unconfirmed, mouse cursor
+		kFlag_BlurBackground                    = 0x400000,
+		kFlag_Unk800000                         = 0x800000      // Unconfirmed
 	};
+
 	virtual UInt32	ProcessMessage(UIMessage * msg) = 0;//???
 	virtual void	DrawNextFrame(float unk0, void * unk1) = 0; //210E8C0
 	virtual void *	Unk_05(void) { return nullptr; }; //return 0;
