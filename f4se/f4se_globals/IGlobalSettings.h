@@ -4,13 +4,11 @@
 
 class IGlobalSettings {
 public:
-    void                                        Init(std::string GlobalPrefix);
+    static void                                     Open(std::string settingPrefix);
 
-    bool                                        GetBool(std::string settingName);
-    float                                       GetFloat(std::string settingName);
+    static bool                                     GetBool(std::string settingName);
+    static float                                    GetFloat(std::string settingName);
 
 private:
-    std::unordered_map<std::string, UInt32>     m_SettingMap;
+    static std::unordered_map<std::string, UInt32>  m_SettingMap;
 };
-
-extern IGlobalSettings g_GlobalSettings;

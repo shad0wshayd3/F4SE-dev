@@ -7,22 +7,21 @@
 #include <ShlObj.h>
 #include <sstream>
 
-ILog::ILog(const char* logName) {
-    m_logFile       = NULL;
-    m_indentLevel   = 0;
-    m_cursorPos     = 0;
+// ------------------------------------------------------------------------------------------------
+// ILog
+// ------------------------------------------------------------------------------------------------
 
-    char logPath[MAX_PATH];
-    sprintf_s(logPath, sizeof(logPath), "\\My Games\\Fallout4\\F4SE\\%s.log", logName);
-    OpenRelative(CSIDL_MYDOCUMENTS, logPath);
-}
+void ILog::Open(const char* logName) {
+    char logPath[MAX_PATH], relativePath[MAX_PATH];
 
-ILog::~ILog() {
-    if (m_logFile)
-        fclose(m_logFile);
-}
+    sprintf_s(relativePath, sizeof(relativePath), "\\My Games\\Fallout4\\F4SE\\%s.log", logName);
+    HRESULT err = SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS | CSIDL_FLAG_CREATE, NULL, SHGFP_TYPE_CURRENT, logPath);
+    if (!SUCCEEDED(err))
+        HALT("Could not create log file.");
 
-void ILog::Open(const char* logPath) {
+    strcat_s(logPath, sizeof(logPath), relativePath);
+    IFileStream::MakeAllDirs(logPath);
+
     m_logFile = _fsopen(logPath, "w", _SH_DENYWR);
 
     if (!m_logFile) {
@@ -39,102 +38,20 @@ void ILog::Open(const char* logPath) {
     }
 }
 
-void ILog::OpenRelative(int folderID, const char* relativePath) {
-    char logPath[MAX_PATH];
+void ILog::MessageNT(const char* messageText, va_list args, const char* messagePrefix) {
+    std::stringstream MessageStream;
 
-    HRESULT err = SHGetFolderPath(NULL, folderID | CSIDL_FLAG_CREATE, NULL, SHGFP_TYPE_CURRENT, logPath);
-    if (!SUCCEEDED(err))
-        _FATALERROR("SHGetFolderPath %08X failed (result = %08X lasterr = %08X)", folderID, err, GetLastError());
+    if (messagePrefix)
+        MessageStream << messagePrefix;
 
-    ASSERT_CODE(SUCCEEDED(err), err);
+    char formatBuf[8192];
+    vsprintf_s(formatBuf, sizeof(formatBuf), messageText, args);
 
-    strcat_s(logPath, sizeof(logPath), relativePath);
-    IFileStream::MakeAllDirs(logPath);
-    Open(logPath);
+    MessageStream << formatBuf;
+    PrintMessage(MessageStream.str().c_str());
 }
 
-void ILog::Indent() {
-    m_indentLevel++;
-}
-
-void ILog::Outdent() {
-    if (m_indentLevel)
-        m_indentLevel--;
-}
-
-void ILog::LogMessage(const char* messageText, ...) {
-    va_list args; va_start(args, messageText);
-    TimestampedMessage(messageText, args);
-    va_end(args);
-}
-
-void ILog::LogWarning(const char* messageText, ...) {
-    va_list args; va_start(args, messageText);
-    TimestampedMessage(messageText, args, "Warning: ");
-    va_end(args);
-}
-
-void ILog::LogError(const char* messageText, ...) {
-    va_list args; va_start(args, messageText);
-    TimestampedMessage(messageText, args, "Error: ");
-    va_end(args);
-}
-
-void ILog::LogMessage(const char* messageText, va_list args) {
-    TimestampedMessage(messageText, args);
-}
-
-void ILog::LogWarning(const char* messageText, va_list args) {
-    TimestampedMessage(messageText, args, "Warning: ");
-}
-
-void ILog::LogError(const char* messageText, va_list args) {
-    TimestampedMessage(messageText, args, "Error: ");
-}
-
-void ILog::LogMessageNT(const char* messageText, ...) {
-    va_list args; va_start(args, messageText);
-    MessageNT(messageText, args);
-    va_end(args);
-}
-
-void ILog::LogWarningNT(const char* messageText, ...) {
-    va_list args; va_start(args, messageText);
-    MessageNT(messageText, args, "Warning: ");
-    va_end(args);
-}
-
-void ILog::LogErrorNT(const char* messageText, ...) {
-    va_list args; va_start(args, messageText);
-    MessageNT(messageText, args, "Error: ");
-    va_end(args);
-}
-
-void ILog::LogMessageNT(const char* messageText, va_list args) {
-    MessageNT(messageText, args);
-}
-
-void ILog::LogWarningNT(const char* messageText, va_list args) {
-    MessageNT(messageText, args, "Warning: ");
-}
-
-void ILog::LogErrorNT(const char* messageText, va_list args) {
-    MessageNT(messageText, args, "Error: ");
-}
-
-// ------------------------------------------------------------------------------------------------
-// Internal Functions
-// ------------------------------------------------------------------------------------------------
-
-void ILog::Message(const char* message, bool newLine) {
-    SeekCursor(m_indentLevel * 4);
-    PrintText(message);
-
-    if (newLine)
-        NewLine();
-}
-
-void ILog::TimestampedMessage(const char* messageText, const char* messagePrefix) {
+void ILog::MessageTS(const char* messageText, va_list args, const char* messagePrefix) {
     std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     tm Timestamp; localtime_s(&Timestamp, &now);
 
@@ -144,30 +61,21 @@ void ILog::TimestampedMessage(const char* messageText, const char* messagePrefix
     if (messagePrefix)
         MessageStream << messagePrefix;
 
-    MessageStream << messageText;
-    Message(MessageStream.str().c_str());
-}
-
-void ILog::TimestampedMessage(const char* messageText, va_list args, const char* messagePrefix) {
     char formatBuf[8192];
     vsprintf_s(formatBuf, sizeof(formatBuf), messageText, args);
-    TimestampedMessage(formatBuf, messagePrefix);
+
+    MessageStream << formatBuf;
+    PrintMessage(MessageStream.str().c_str());
 }
 
-void ILog::MessageNT(const char* messageText, const char* messagePrefix) {
-    std::stringstream MessageStream;
+// ------------------------------------------------------------------------------------------------
+// Internal Functions
+// ------------------------------------------------------------------------------------------------
 
-    if (messagePrefix)
-        MessageStream << messagePrefix;
-
-    MessageStream << messageText;
-    Message(MessageStream.str().c_str());
-}
-
-void ILog::MessageNT(const char* messageText, va_list args, const char* messagePrefix) {
-    char formatBuf[8192];
-    vsprintf_s(formatBuf, sizeof(formatBuf), messageText, args);
-    MessageNT(formatBuf, messagePrefix);
+void ILog::PrintMessage(const char* message) {
+    SeekCursor(m_indentLevel * 4);
+    PrintText(message);
+    NewLine();
 }
 
 void ILog::SeekCursor(int position) {
@@ -180,14 +88,8 @@ void ILog::PrintSpaces(int numSpaces) {
 
     if (m_logFile) {
         while (numSpaces > 0) {
-            if (numSpaces >= TabSize()) {
-                numSpaces -= TabSize();
-                fputc('\t', m_logFile);
-            }
-            else {
-                numSpaces--;
-                fputc(' ', m_logFile);
-            }
+            numSpaces--;
+            fputc(' ', m_logFile);
         }
     }
 
@@ -223,3 +125,12 @@ void ILog::NewLine() {
 int ILog::TabSize() {
     return ((~m_cursorPos) & 3) + 1;
 }
+
+// ------------------------------------------------------------------------------------------------
+// Initialize
+// ------------------------------------------------------------------------------------------------
+
+int     ILog::m_indentLevel = 0;
+
+FILE*   ILog::m_logFile       = NULL;
+int     ILog::m_cursorPos     = 0;

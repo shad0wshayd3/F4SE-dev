@@ -1,32 +1,17 @@
 #include "ITimeKeeper.h"
 
-double      ITimeKeeper::s_secondsPerCount = 0;
-TIMECAPS    ITimeKeeper::s_timecaps = { 0 };
-bool        ITimeKeeper::s_setTime = false;
-UInt64      ITimeKeeper::s_lastQPC = 0;
-UInt64      ITimeKeeper::s_qpcWrapMargin = 0;
-bool        ITimeKeeper::s_hasLastQPC = false;
-UInt32      ITimeKeeper::s_qpcWrapCount = 0;
-UInt32      ITimeKeeper::s_qpcInaccurateCount = 0;
+#include "ILog.h"
 
-ITimeKeeper::ITimeKeeper() :m_qpcBase(0), m_tickBase(0) {
-    Init();
-}
+// ------------------------------------------------------------------------------------------------
+// ITimeKeeper
+// ------------------------------------------------------------------------------------------------
 
-ITimeKeeper::~ITimeKeeper() {
-    //
-}
-
-void ITimeKeeper::Init(void) {
+ITimeKeeper::ITimeKeeper(bool startTimer) :m_qpcBase(0), m_tickBase(0) {
     if (!s_secondsPerCount) {
-        // init qpc
         UInt64 countsPerSecond;
-        BOOL res = QueryPerformanceFrequency((LARGE_INTEGER *)&countsPerSecond);
-
-        ASSERT_STR(res, "ITimer: no high-resolution timer support");
+        BOOL res = QueryPerformanceFrequency((LARGE_INTEGER*)& countsPerSecond);
 
         s_secondsPerCount = 1.0 / countsPerSecond;
-
         s_qpcWrapMargin = (UInt64)(-((SInt64)(countsPerSecond * 60))); // detect if we've wrapped around by a delta greater than this - also limits max time
 
         // init multimedia timer
@@ -34,27 +19,50 @@ void ITimeKeeper::Init(void) {
 
         s_setTime = (timeBeginPeriod(s_timecaps.wPeriodMin) == TIMERR_NOERROR);
         if (!s_setTime)
-            MessageBox(NULL, "Error!\n!s_setTime", "ITimeKeeper", MB_OK | MB_ICONEXCLAMATION);
+            _LogError("s_setTime is False!");
     }
+
+    if (startTimer)
+        Start();
 }
 
-void ITimeKeeper::DeInit(void) {
-    if (s_secondsPerCount) {
-        if (s_setTime) {
-            timeEndPeriod(s_timecaps.wPeriodMin);
-            s_setTime = false;
-        }
-
-        s_secondsPerCount = 0;
-    }
-}
-
-void ITimeKeeper::Start(void) {
+void ITimeKeeper::Start() {
     m_qpcBase = GetQPC();
     m_tickBase = timeGetTime();
 }
 
-double ITimeKeeper::GetElapsedTime(void) {
+void ITimeKeeper::Stop() {
+    m_qpcBase = 0;
+    m_tickBase = 0;
+}
+
+double ITimeKeeper::Format(int Duration) {
+    switch (Duration) {
+    case kDuration_Nano:
+        return (GetElapsedTime() * 1000000000.0);
+
+    case kDuration_Micro:
+        return (GetElapsedTime() * 1000000.0);
+
+    case kDuration_Milli:
+        return (GetElapsedTime() * 1000.0);
+
+    case kDuration_Minute:
+        return (GetElapsedTime() / 60.0);
+
+    case kDuration_Hour:
+        return (GetElapsedTime() / 3600.0);
+
+    default:
+        return GetElapsedTime();
+    }
+}
+
+// ------------------------------------------------------------------------------------------------
+// Internal Functions
+// ------------------------------------------------------------------------------------------------
+
+double ITimeKeeper::GetElapsedTime() {
     UInt64 qpcNow = GetQPC();
     UInt32 tickNow = timeGetTime();
 
@@ -77,7 +85,7 @@ double ITimeKeeper::GetElapsedTime(void) {
     }
 }
 
-UInt64 ITimeKeeper::GetQPC(void) {
+UInt64 ITimeKeeper::GetQPC() {
     UInt64 now;
     QueryPerformanceCounter((LARGE_INTEGER*)&now);
 
@@ -104,24 +112,15 @@ UInt64 ITimeKeeper::GetQPC(void) {
     return now;
 }
 
-double ITimeKeeper::Format(int Duration) {
-    switch (Duration) {
-    case kDuration::Nano:
-        return (GetElapsedTime() * 1000000000.0);
+// ------------------------------------------------------------------------------------------------
+// Initialize
+// ------------------------------------------------------------------------------------------------
 
-    case kDuration::Micro:
-        return (GetElapsedTime() * 1000000.0);
-
-    case kDuration::Milli:
-        return (GetElapsedTime() * 1000.0);
-
-    case kDuration::Minute:
-        return (GetElapsedTime() / 60.0);
-
-    case kDuration::Hour:
-        return (GetElapsedTime() / 3600.0);
-
-    default:
-        return GetElapsedTime();
-    }
-}
+double      ITimeKeeper::s_secondsPerCount = 0;
+TIMECAPS    ITimeKeeper::s_timecaps = { 0 };
+bool        ITimeKeeper::s_setTime = false;
+UInt64      ITimeKeeper::s_lastQPC = 0;
+UInt64      ITimeKeeper::s_qpcWrapMargin = 0;
+bool        ITimeKeeper::s_hasLastQPC = false;
+UInt32      ITimeKeeper::s_qpcWrapCount = 0;
+UInt32      ITimeKeeper::s_qpcInaccurateCount = 0;

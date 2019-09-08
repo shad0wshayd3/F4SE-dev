@@ -5,35 +5,32 @@
 
 class ISettingsPath {
 public:
-                    ISettingsPath(std::string settingPath);
-                    ~ISettingsPath();
+                        ISettingsPath(std::string settingPath);
 
-    const char*     GetSection();
-    const char*     GetSetting();
+    const char*         GetSection();
+    const char*         GetSetting();
 
 private:
-    std::string     section;
-    std::string     setting;
+    std::string         section;
+    std::string         setting;
 };
 
 class ISettings {
 public:
-                    ISettings(const char* filePath);
-                    ~ISettings();
+    static void         Open(const char* filePath);
 
-    int             GetInteger(std::string settingPath, int settingDefault);
-    float           GetFloat(std::string settingPath, float settingDefault);
-    std::string     GetString(std::string settingPath, std::string settingDefault);
-    bool            GetBool(std::string settingPath, bool settingDefault);
+    static int          GetInteger(std::string settingPath, int settingDefault);
+    static float        GetFloat(std::string settingPath, float settingDefault);
+    static std::string  GetString(std::string settingPath, std::string settingDefault);
+    static bool         GetBool(std::string settingPath, bool settingDefault);
 
-    void            SetInteger(std::string settingPath, int settingValue);
-    void            SetFloat(std::string settingPath, float settingValue);
-    void            SetString(std::string settingPath, std::string settingValue);
-    void            SetBool(std::string settingPath, bool settingValue);
+    static void         SetInteger(std::string settingPath, int settingValue);
+    static void         SetFloat(std::string settingPath, float settingValue);
+    static void         SetString(std::string settingPath, std::string settingValue);
+    static void         SetBool(std::string settingPath, bool settingValue);
 
 private:
-    const char*     GetConfigPath();
-    std::string     configPath;
-};
+    static const char*  GetConfigPath();
 
-extern ISettings g_Settings;
+    static std::string  configPath;
+};

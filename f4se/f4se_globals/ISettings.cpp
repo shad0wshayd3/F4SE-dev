@@ -12,10 +12,6 @@ ISettingsPath::ISettingsPath(std::string settingPath) {
     section = settingPath.substr(0, delimiter);
 }
 
-ISettingsPath::~ISettingsPath() {
-    //
-}
-
 const char* ISettingsPath::GetSection() {
     return section.c_str();
 }
@@ -28,14 +24,10 @@ const char* ISettingsPath::GetSetting() {
 // ISettings
 // ------------------------------------------------------------------------------------------------
 
-ISettings::ISettings(const char* filePath) {
+void ISettings::Open(const char* filePath) {
     char tempConfigPath[MAX_PATH];
     sprintf_s(tempConfigPath, sizeof(tempConfigPath), "%s%s", GetRuntimeDirectory().c_str(), filePath);
     configPath = std::string(tempConfigPath);
-}
-
-ISettings::~ISettings() {
-    //
 }
 
 int ISettings::GetInteger(std::string settingPath, int settingDefault) {
@@ -94,6 +86,16 @@ void ISettings::SetBool(std::string settingPath, bool settingValue) {
     WritePrivateProfileString(Path.GetSection(), Path.GetSetting(), Value, GetConfigPath());
 }
 
+// ------------------------------------------------------------------------------------------------
+// Internal Functions
+// ------------------------------------------------------------------------------------------------
+
 const char* ISettings::GetConfigPath() {
     return configPath.c_str();
 }
+
+// ------------------------------------------------------------------------------------------------
+// Initialize
+// ------------------------------------------------------------------------------------------------
+
+std::string ISettings::configPath = "";

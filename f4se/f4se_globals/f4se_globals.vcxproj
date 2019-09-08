@@ -144,18 +144,21 @@
     <ClCompile Include="IGlobalSettings.cpp" />
     <ClCompile Include="ILog.cpp" />
     <ClCompile Include="ITimeKeeper.cpp" />
-    <ClCompile Include="Native.cpp" />
     <ClCompile Include="ISettings.cpp" />
     <ClCompile Include="IObScript.cpp" />
+    <ClCompile Include="Native.cpp" />
     <ClCompile Include="Scaleform.cpp" />
     <ClCompile Include="Utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Definitions.h" />
+    <ClInclude Include="EventDefinitions.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="IGlobalSettings.h" />
     <ClInclude Include="ILog.h" />
+    <ClInclude Include="IObScriptParams.h" />
     <ClInclude Include="ITimeKeeper.h" />
+    <ClInclude Include="MenuDefinitions.h" />
     <ClInclude Include="Native.h" />
     <ClInclude Include="ISettings.h" />
     <ClInclude Include="IObScript.h" />

@@ -1,19 +1,21 @@
 #include "IGlobalSettings.h"
 
-#include "ILog.h"
-
 #include "f4se/GameData.h"
 #include "f4se/GameRTTI.h"
 
-void IGlobalSettings::Init(std::string GlobalPrefix) {
+// ------------------------------------------------------------------------------------------------
+// IGlobalSettings
+// ------------------------------------------------------------------------------------------------
+
+void IGlobalSettings::Open(std::string settingPrefix) {
     tArray<TESForm*> Globals = (*g_dataHandler)->arrGLOB;
 
     for (int i = 0; i < Globals.count; i++) {
-        std::string GlobalName = Globals[i]->GetEditorID();
+        std::string settingName = Globals[i]->GetEditorID();
             
-        auto index = GlobalName.find(GlobalPrefix);
+        auto index = settingName.find(settingPrefix);
         if (index != std::string::npos)
-            m_SettingMap.emplace(GlobalName.substr(GlobalPrefix.size(), std::string::npos), Globals[i]->formID);
+            m_SettingMap.emplace(settingName.substr(settingPrefix.size(), std::string::npos), Globals[i]->formID);
     }
 }
 
@@ -38,3 +40,9 @@ float IGlobalSettings::GetFloat(std::string settingName) {
 
     return 0.0;
 }
+
+// ------------------------------------------------------------------------------------------------
+// Initialize
+// ------------------------------------------------------------------------------------------------
+
+std::unordered_map<std::string, UInt32> IGlobalSettings::m_SettingMap;

@@ -5,37 +5,34 @@
 */
 class ITimeKeeper {
 public:
-                    ITimeKeeper();
-                    ~ITimeKeeper();
+                    ITimeKeeper(bool startTimer = true);
 
-    static void     Init(void);
-    static void     DeInit(void);
-
-    void            Start(void);
+    void            Start();
+    void            Stop();
 
     double          Format(int Duration);
 
-    enum kDuration {
-        Nano    = 0x00000001,
-        Micro   = 0x00000010,
-        Milli   = 0x00000100,
-        Second  = 0x00001000,
-        Minute  = 0x00010000,
-        Hour    = 0x00100000
+    enum Duration {
+        kDuration_Nano    = 0x00000001,
+        kDuration_Micro   = 0x00000010,
+        kDuration_Milli   = 0x00000100,
+        kDuration_Second  = 0x00001000,
+        kDuration_Minute  = 0x00010000,
+        kDuration_Hour    = 0x00100000
     };
 
 private:
-    double  GetElapsedTime(void);
+    double  GetElapsedTime();
 
-    UInt64  m_qpcBase;  // QPC
-    UInt32  m_tickBase; // timeGetTime
+    UInt64  m_qpcBase;
+    UInt32  m_tickBase;
 
     static double   s_secondsPerCount;
     static TIMECAPS s_timecaps;
     static bool     s_setTime;
 
     // safe QPC stuff
-    static UInt64   GetQPC(void);
+    static UInt64   GetQPC();
 
     static UInt64   s_lastQPC;
     static UInt64   s_qpcWrapMargin;

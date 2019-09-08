@@ -1,89 +1,69 @@
 #pragma once
 
-/**
-    Reimplimentation of IDebugLog with support for multiple active classes, and less garbage.
-*/
 class ILog {
 public:
-            ILog(const char* logName);
-            ~ILog();
+    static void     Open(const char* logName);
 
-    void    Open(const char* logPath);
-    void    OpenRelative(int folderID, const char* relativePath);
+    static void     MessageNT(const char* messageText, va_list args, const char* messagePrefix = NULL);
+    static void     MessageTS(const char* messageText, va_list args, const char* messagePrefix = NULL);
 
-    void    Indent();
-    void    Outdent();
-
-    void    LogMessage(const char* messageText, ...);
-    void    LogWarning(const char* messageText, ...);
-    void    LogError(const char* messageText, ...);
-
-    void    LogMessage(const char* messageText, va_list args);
-    void    LogWarning(const char* messageText, va_list args);
-    void    LogError(const char* messageText, va_list args);
-
-    void    LogMessageNT(const char* messageText, ...);
-    void    LogWarningNT(const char* messageText, ...);
-    void    LogErrorNT(const char* messageText, ...);
-
-    void    LogMessageNT(const char* messageText, va_list args);
-    void    LogWarningNT(const char* messageText, va_list args);
-    void    LogErrorNT(const char* messageText, va_list args);
+    static int      m_indentLevel;
 
 private:
-    void    Message(const char* message, bool newLine = true);
+    static void     PrintMessage(const char* message);
 
-    void    MessageNT(const char* messageText, const char* messagePrefix = NULL);
-    void    MessageNT(const char* messageText, va_list args, const char* messagePrefix = NULL);
+    static void     SeekCursor(int position);
+    static void     PrintSpaces(int numSpaces);
+    static void     PrintText(const char* buf);
+    static void     NewLine();
+    static int      TabSize();
 
-    void    TimestampedMessage(const char* messageText, const char* messagePrefix = NULL);
-    void    TimestampedMessage(const char* messageText, va_list args, const char* messagePrefix = NULL);
-
-    void    SeekCursor(int position);
-    void    PrintSpaces(int numSpaces);
-    void    PrintText(const char* buf);
-    void    NewLine();
-    int     TabSize();
-
-    FILE*   m_logFile;
-    int     m_indentLevel;
-    int     m_cursorPos;
+    static FILE*    m_logFile;
+    
+    static int      m_cursorPos;
 };
 
-extern ILog g_Log;
+inline void _LogIndent() {
+    ILog::m_indentLevel++;
+}
 
-inline void _LOGMESSAGE(const char* messageText, ...) {
+inline void _LogOutdent() {
+    if (ILog::m_indentLevel)
+        ILog::m_indentLevel--;
+}
+
+inline void _LogMessage(const char* messageText, ...) {
     va_list args; va_start(args, messageText);
-    g_Log.LogMessage(messageText, args);
+    ILog::MessageTS(messageText, args);
     va_end(args);
 }
 
-inline void _LOGWARNING(const char* messageText, ...) {
+inline void _LogWarning(const char* messageText, ...) {
     va_list args; va_start(args, messageText);
-    g_Log.LogWarning(messageText, args);
+    ILog::MessageTS(messageText, args, "Warning: ");
     va_end(args);
 }
 
-inline void _LOGERROR(const char* messageText, ...) {
+inline void _LogError(const char* messageText, ...) {
     va_list args; va_start(args, messageText);
-    g_Log.LogError(messageText, args);
+    ILog::MessageTS(messageText, args, "Error: ");
     va_end(args);
 }
 
-inline void _LOGMESSAGENT(const char* messageText, ...) {
+inline void _LogMessageNT(const char* messageText, ...) {
     va_list args; va_start(args, messageText);
-    g_Log.LogMessageNT(messageText, args);
+    ILog::MessageNT(messageText, args);
     va_end(args);
 }
 
-inline void _LOGWARNINGNT(const char* messageText, ...) {
+inline void _LogWarningNT(const char* messageText, ...) {
     va_list args; va_start(args, messageText);
-    g_Log.LogWarningNT(messageText, args);
+    ILog::MessageNT(messageText, args, "Warning: ");
     va_end(args);
 }
 
-inline void _LOGERRORNT(const char* messageText, ...) {
+inline void _LogErrorNT(const char* messageText, ...) {
     va_list args; va_start(args, messageText);
-    g_Log.LogErrorNT(messageText, args);
+    ILog::MessageNT(messageText, args, "Error: ");
     va_end(args);
 }

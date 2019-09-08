@@ -1,12 +1,20 @@
 #include "IObScript.h"
 
-#include "Native.h"
-
-#include "f4se_common/SafeWrite.h"
-
-bool ObScript_Default_Parse(UInt32 numParams, void* paramInfo, void* lineBuf, void* scriptBuf) {
-    return ObScript_Parse(numParams, paramInfo, lineBuf, scriptBuf);
+bool Cmd_Default_Execute(EXECUTE_ARGS) {
+    return true;
 }
+
+bool Cmd_Default_Eval(EVAL_ARGS) {
+    return true;
+}
+
+bool Cmd_Default_Parse(PARSE_ARGS) {
+    return ObScript_Parse(PASS_PARSE_ARGS);
+}
+
+// ------------------------------------------------------------------------------------------------
+// IObScript
+// ------------------------------------------------------------------------------------------------
 
 bool IObScript::Init() {
     std::vector<int>    m_opcodes   = { kObScript_NumConsoleCommands + kObScript_ConsoleOpBase, kObScript_NumObScriptCommands + kObScript_ScriptOpBase };
@@ -22,22 +30,24 @@ bool IObScript::Init() {
 }
 
 ObScriptCommand* IObScript::GetCommand(const char* name) {
-    for (auto iter : m_commands) {
-        if (!strcmp(iter->longName, name) || !strcmp(iter->shortName, name))
+    for (auto iter : m_commands)
+        if (!_stricmp(iter->longName, name) || !_stricmp(iter->shortName, name))
             return iter;
-    }
 
     return nullptr;
 }
 
-ObScriptCommandList IObScript::GetMatchingCommands(bool(*filterFunction)(ObScriptCommand* command)) {
-    ObScriptCommandList Result;
-    for (auto iter : m_commands) {
-        if (filterFunction(iter))
-            Result.emplace_back(iter);
-    }
+ObScriptCommand* IObScript::GetCommand(UInt32 opcode) {
+    for (auto iter : m_commands)
+        if (iter->opcode == opcode)
+            return iter;
 
-    return Result;
+    return nullptr;
+}
+
+void IObScript::IterCommands(void(*iterFunction)(ObScriptCommand* command)) {
+    for (auto iter : m_commands)
+        iterFunction(iter);
 }
 
 bool IObScript::OverloadCommand(ObScriptCommand* command, ObScriptCommand overload) {
@@ -48,13 +58,10 @@ bool IObScript::OverloadCommand(ObScriptCommand* command, ObScriptCommand overlo
     commandUpdate.needsParent       = overload.needsParent;
     commandUpdate.numParams         = overload.numParams;
     commandUpdate.params            = overload.params;
+    commandUpdate.execute           = (overload.execute)    ? overload.execute  : command->execute;
+    //commandUpdate.parse             = (overload.parse)      ? overload.parse    : command->parse;
+    commandUpdate.eval              = (overload.eval)       ? overload.eval     : command->eval;
     commandUpdate.flags             = overload.flags;
-
-    if (overload.execute)
-        commandUpdate.execute = overload.execute;
-
-    if (overload.eval)
-        commandUpdate.eval = overload.eval;
 
     SafeWriteBuf((uintptr_t)command, &commandUpdate, sizeof(commandUpdate));
     return true;
@@ -67,3 +74,17 @@ bool IObScript::OverloadCommand(const char* name, ObScriptCommand overload) {
 
     return OverloadCommand(command, overload);
 }
+
+bool IObScript::OverloadCommand(UInt32 opcode, ObScriptCommand overload) {
+    ObScriptCommand* command = GetCommand(opcode);
+    if (!command)
+        return false;
+
+    return OverloadCommand(command, overload);
+}
+
+// ------------------------------------------------------------------------------------------------
+// Initial Statics
+// ------------------------------------------------------------------------------------------------
+
+ObScriptCommandList IObScript::m_commands;

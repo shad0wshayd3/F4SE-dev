@@ -6,61 +6,120 @@
 #include "f4se/GameMenus.h"
 #include "f4se/GameReferences.h"
 
-typedef void(*_LevelUpPrompt)();
-extern RelocAddr <_LevelUpPrompt> LevelUpPrompt;
+// ------------------------------------------------------------------------------------------------
+// typedefs
+// ------------------------------------------------------------------------------------------------
 
-typedef void(*_AddPerk)(Actor* actor, BGSPerk* perk, bool notify);
-extern RelocAddr <_AddPerk> AddPerk;
+typedef SimpleCollector<InvItemStack>* InvItemStackList;
 
-typedef void(*_RemovePerk)(Actor* actor, BGSPerk* perk);
-extern RelocAddr <_RemovePerk> RemovePerk;
+typedef void                (*_DoTokenReplacement)          (ExtraTextDisplayData* extraText, BSString& text);
+typedef BGSInventoryItem*   (*_GetItemByHandleID)           (InventoryInterface* invInterface, UInt32* handleID);
+typedef TESForm*            (*_GetFormByHandleID)           (InventoryInterface* invInterface, UInt32* handleID);
+typedef ObjectInstanceData* (*_UpdateInstanceData)          (ObjectInstanceData& Result, TESForm* Form, TBO_InstanceData* Data);
+typedef UInt32              (*_ApplyImagespaceModifier)     (TESImageSpaceModifier* imod, float intensity, UInt32 unk00);
+typedef void                (*_RemoveImagespaceModifier)    (TESImageSpaceModifier* imod);
+typedef bool                (*_ExtractArgs)                 (void* paramInfo, void* scriptData, void* opcodeOffset, TESObjectREFR* thisObj, void* containingObj, void* script, void* eventList, ...);
+typedef float               (*_CalculateDamageResist)       (ActorValueInfo* avif, float Damage, float DamageResist);
+typedef void                (*_Notification)                (const char* Message, const char* Sound, UInt64 unk00, UInt64 unk01, UInt64 unk02);
+typedef float               (*_GetXPForLevel)               (UInt16 level);
+typedef void                (*_PopulateItemCard)            (GFxValue* InfoObj, BGSInventoryItem* Item, UInt16 StackID, InvItemStackList CompareList);
+typedef void                (*_ContainerMenuInvoke)         (ContainerMenuBase* menu, GFxFunctionHandler::Args* args);
+typedef void                (*_ExamineMenuInvoke)           (ExamineMenu* menu, GFxFunctionHandler::Args* args);
+typedef void*               (*_InitializeButtonBar)         (IMenu* menu, BSGFxShaderFXTarget* shaderTarget, const char* stagePath, UInt64 unk00);
+typedef void                (*_LevelUpPrompt);
+typedef void                (*_PipboyMenuInvoke)            (PipboyMenu* menu, GFxFunctionHandler::Args* args);
+typedef void                (*_AddPerk)                     (Actor* actor, BGSPerk* perk, bool notify);
+typedef void                (*_RemovePerk)                  (Actor* actor, BGSPerk* perk);
+typedef bool                (*_HasPerk)                     (Actor* actor, BGSPerk* perk);
+typedef void                (*_EquipItem)                   (void* EquipManager, Actor* actor, void* equipStruct, UInt64 unk01, UInt64 unk02, void* unk03, UInt64 unk04, bool PreventRemoval, UInt64 unk05, UInt64 unk06, void* unk07);
+typedef void                (*_UnequipItem)                 (void* EquipManager, Actor* actor, void* equipStruct, UInt64 unk01, void* unk02, UInt64 unk03, UInt64 unk04, bool PreventRemoval, UInt64 unk05, UInt64 unk06, void* unk07);
+typedef void                (*_PlayIdle)                    (void* unk00, Actor* actor, UInt32 unk02, TESIdleForm* idle, UInt32 unk04, void* unk05);
+typedef UInt32              (*_GetItemCount)                (TESObjectREFR* refr, TESForm* form);
+typedef uintptr_t           (_ExtraChargeVtbl);
+typedef uintptr_t           (_ExtraObjectHealthVtbl);
+typedef uintptr_t           (_ActorValueDerivedVtbl);
+typedef uintptr_t           (_ActorValueCalcVtbl);
+typedef void*               (_EquipManager);
+typedef bool                (*_ObScript_Parse)              (UInt32 numParams, void* paramInfo, void* lineBuf, void* scriptBuf);
 
-typedef bool(*_HasPerk)(Actor* actor, BGSPerk* perk);
-extern RelocAddr <_HasPerk> HasPerk;
+// ------------------------------------------------------------------------------------------------
+// externs
+// ------------------------------------------------------------------------------------------------
 
-typedef UInt32(*_GetItemCount)(TESObjectREFR* refr, TESForm* form);
-extern RelocAddr <_GetItemCount> GetItemCount;
+extern RelocAddr    <_DoTokenReplacement>           DoTokenReplacement;
+extern RelocAddr    <_GetItemByHandleID>            GetItemByHandleID_Internal;
+extern RelocAddr    <_GetFormByHandleID>            GetFormByHandleID_Internal;
+extern RelocAddr    <_UpdateInstanceData>           UpdateInstanceData;
+extern RelocAddr    <_ApplyImagespaceModifier>      ApplyImagespaceModifier;
+extern RelocAddr    <_RemoveImagespaceModifier>     RemoveImagespaceModifier;
+extern RelocAddr    <_ExtractArgs>                  ExtractArgs;
+extern RelocAddr    <_CalculateDamageResist>        CalculateDamageResist;
+extern RelocAddr    <_GetXPForLevel>                GetXPForLevel;
+extern RelocAddr    <_Notification>                 Notification_internal;
+extern RelocAddr    <_PopulateItemCard>             PopulateItemCard;
+extern RelocAddr    <_ContainerMenuInvoke>          ContainerMenuInvoke;
+extern RelocAddr    <_ExamineMenuInvoke>            ExamineMenuInvoke;
+extern RelocAddr    <_InitializeButtonBar>          InitializeButtonBar;
+extern RelocAddr    <_LevelUpPrompt>                LevelUpPrompt;
+extern RelocAddr    <_PipboyMenuInvoke>             PipboyMenuInvoke;
+extern RelocAddr    <_AddPerk>                      AddPerk;
+extern RelocAddr    <_RemovePerk>                   RemovePerk;
+extern RelocAddr    <_HasPerk>                      HasPerk;
+extern RelocAddr    <_EquipItem>                    EquipItem_Internal;
+extern RelocAddr    <_UnequipItem>                  UnequipItem_Internal;
+extern RelocAddr    <_PlayIdle>                     PlayIdle_Internal;
+extern RelocAddr    <_GetItemCount>                 GetItemCount;
+extern RelocAddr    <_ExtraChargeVtbl>              ExtraChargeVtbl;
+extern RelocAddr    <_ExtraObjectHealthVtbl>        ExtraObjectHealthVtbl;
+extern RelocAddr    <_ActorValueDerivedVtbl>        ActorValueDerivedVtbl;
+extern RelocAddr    <_ActorValueCalcVtbl>           ActorValueCalcVtbl;
+extern RelocPtr     <PipboyDataManager*>            g_PipboyDataManager;
+extern RelocPtr     <InventoryInterface*>           g_InventoryInterface;
+extern RelocPtr     <_EquipManager>                 g_EquipManager;
+extern RelocAddr    <_ObScript_Parse>               ObScript_Parse;
 
-typedef UInt32(*_ApplyImagespaceModifier)(TESImageSpaceModifier* imod, float intensity, UInt32 unk00);
-extern RelocAddr <_ApplyImagespaceModifier> ApplyImagespaceModifier;
+// ------------------------------------------------------------------------------------------------
+// originals
+// ------------------------------------------------------------------------------------------------
 
-typedef void(*_RemoveImagespaceModifier)(TESImageSpaceModifier* imod);
-extern RelocAddr <_RemoveImagespaceModifier> RemoveImagespaceModifier;
+extern _ContainerMenuInvoke ContainerMenuInvoke_Original;
+void HookContainerMenuInvoke(void(*hookFunc)(ContainerMenuBase*, GFxFunctionHandler::Args*));
 
-typedef float(*_CalculateDamageResist)(ActorValueInfo* avif, float Damage, float DamageResist);
-extern RelocAddr <_CalculateDamageResist> CalculateDamageResist;
+extern _ExamineMenuInvoke ExamineMenuInvoke_Original;
+void HookExamineMenuInvoke(void(*hookFunc)(ExamineMenu*, GFxFunctionHandler::Args*));
 
-typedef float(*_GetXPForLevel)(UInt16 level);
-extern RelocAddr <_GetXPForLevel> GetXPForLevel;
+extern _PipboyMenuInvoke PipboyMenuInvoke_Original;
+void HookPipboyMenuInvoke(void(*hookFunc)(PipboyMenu*, GFxFunctionHandler::Args*));
 
-typedef bool(*_ExtractArgs)(void* paramInfo, void* scriptData, void* opcodeOffset, TESObjectREFR* thisObj, void* containingObj, void* script, void* eventList, ...);
-extern RelocAddr <_ExtractArgs> ExtractArgs;
+extern _PopulateItemCard PopulateItemCard_Original;
+void HookPopulateItemCard(void(*hookFunc)(GFxValue*, BGSInventoryItem*, UInt16, InvItemStackList));
 
-typedef bool (*_ObScript_Parse)(UInt32 numParams, void* paramInfo, void* lineBuf, void* scriptBuf);
-extern RelocAddr <_ObScript_Parse> ObScript_Parse;
+// ------------------------------------------------------------------------------------------------
+// Native Events
+// ------------------------------------------------------------------------------------------------
 
-typedef void(*_DoTokenReplacement_Internal)(ExtraTextDisplayData* extraText, BSString& text);
-extern RelocAddr <_DoTokenReplacement_Internal> DoTokenReplacement_Internal;
+// Alphabetically sorted, except TESHitEvent
+DECLARE_EVENT_DISPATCHER(TESActivateEvent,                                  0x00441B70);
+DECLARE_EVENT_DISPATCHER(TESBookReadEvent,                                  0x00441D50);
+DECLARE_EVENT_DISPATCHER(TESCellAttachDetachEvent,                          0x00441DF0);
+DECLARE_EVENT_DISPATCHER(TESCellFullyLoadedEvent,                           0x00441E90);
+DECLARE_EVENT_DISPATCHER(TESContainerChangedEvent,                          0x00442390);
+DECLARE_EVENT_DISPATCHER(TESEnterSneakingEvent,                             0x004426B0);
+DECLARE_EVENT_DISPATCHER(TESEquipEvent,                                     0x00442750);
+DECLARE_EVENT_DISPATCHER(TESGrabReleaseEvent,                               0x00442BB0);
+DECLARE_EVENT_DISPATCHER(TESLimbCrippleEvent,                               0x00442CF0);
+DECLARE_EVENT_DISPATCHER(TESLockChangedEvent,                               0x00442ED0);
+DECLARE_EVENT_DISPATCHER(TESMagicEffectApplyEvent,                          0x00442F70);
+DECLARE_EVENT_DISPATCHER(TESSleepStartEvent,                                0x00443BF0);
+DECLARE_EVENT_DISPATCHER(TESSleepStopEvent,                                 0x00443C90);
+DECLARE_EVENT_DISPATCHER(TESWaitStartEvent,                                 0x004442D0);
+DECLARE_EVENT_DISPATCHER(TESWaitStopEvent,                                  0x00444370);
+DECLARE_EVENT_DISPATCHER(TESHitEvent,                                       0x00444550);
 
-typedef void(*_PlayIdle_Internal)(void* unk00, Actor* actor, UInt32 unk02, TESIdleForm* idle, UInt32 unk04, void* unk05);
-extern RelocAddr <_PlayIdle_Internal> PlayIdle_Internal;
+// const BSTGlobalEvent::EventSource<T>::`vftable'
+DECLARE_GLOBAL_EVENT_DISPATCHER(CurrentRadiationSourceCount,                0x05A65FD8);
+DECLARE_GLOBAL_EVENT_DISPATCHER(PipboyLightEvent,                           0x05A66310);
+DECLARE_GLOBAL_EVENT_DISPATCHER(PlayerAmmoCountEvent,                       0x05A60530);
+DECLARE_GLOBAL_EVENT_DISPATCHER(PlayerWeaponReloadEvent,                    0x05A60540);
 
-extern RelocAddr <uintptr_t> ActorValueDerivedVtbl;
-
-extern RelocAddr <uintptr_t> ActorValueCalcVtbl;
-
-class ItemMenuDataManager {
-public:
-    DEFINE_MEMBER_FN_1(GetSelectedItem, BGSInventoryItem*, 0x001A3650, UInt32& handleID);
-    // ModdingSuccess (1), first CALL in loc_ top. 163 ref.
-
-    DEFINE_MEMBER_FN_1(GetSelectedForm, TESForm*, 0x001A3740, UInt32& handleID);
-    // CheckStackIDFunctor (1), called twice use 1st, 3 loc_ up, 2nd CALL. 30 ref.
-};
-
-class PipboyDataManager {
-public:
-    UInt64                  unk00[0x4A8 >> 3];
-    tArray<PipboyObject*>   itemData;
-};
-STATIC_ASSERT(sizeof(PipboyDataManager) == 0x4C0);
+DECLARE_SINGLETON_EVENT_DISPATCHER(WeaponFiredEvent,                        0x058E3E60);    // 'Weapon Equip Slot' | rax, qword ptr cs:unk_14*
