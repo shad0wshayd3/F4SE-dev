@@ -196,12 +196,12 @@ public:
 	float			unk118;				// 118
 	UInt32			unk11C;				// 11C
 
+	// Moved to NiObjects.cpp, fixes C2027.
+	template<typename T>
+	bool Visit(T& functor);
+
 	MEMBER_FN_PREFIX(NiAVObject);
 	DEFINE_MEMBER_FN(GetAVObjectByName, NiAVObject*, 0x01C93860, BSFixedString * name, bool unk1, bool unk2);
 	DEFINE_MEMBER_FN(SetScenegraphChange, void, 0x01BA46A0);
-
-	// Moved to NiObjects.cpp, fixes C2027.
-	template<typename T>
-	bool Visit(T & functor);
 };
 STATIC_ASSERT(sizeof(NiAVObject) == 0x120);
