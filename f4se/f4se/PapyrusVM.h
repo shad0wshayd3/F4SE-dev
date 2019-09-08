@@ -255,9 +255,9 @@ public:
 	BSReadWriteLock scriptsLock;					// BDF8
 	tHashSet<IdentifierItem, UInt64> m_attachedScripts;	// BE00
 };
-STATIC_ASSERT(offsetof(VirtualMachine, m_objectTypes) == 0x168);
-STATIC_ASSERT(offsetof(VirtualMachine, m_structTypes) == 0x198);
-STATIC_ASSERT(offsetof(VirtualMachine, m_typeNames) == 0x1C8);
+//STATIC_ASSERT(offsetof(VirtualMachine, m_objectTypes) == 0x168);
+//STATIC_ASSERT(offsetof(VirtualMachine, m_structTypes) == 0x198);
+//STATIC_ASSERT(offsetof(VirtualMachine, m_typeNames) == 0x1C8);
 
 // 87A0?
 class GameVM : public IClientVM
