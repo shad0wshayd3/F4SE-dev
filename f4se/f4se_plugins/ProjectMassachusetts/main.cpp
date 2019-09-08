@@ -1,77 +1,89 @@
-#include "DataManager.h"
-#include "PerkManager.h"
-#include "SaveManager.h"
-#include "ScaleformManager.h"
-#include "ScriptManager.h"
-#include "ValueManager.h"
+#include "Forms.h"
 
-#include "common/ICriticalSection.h"
+#include "Events.h"
+#include "ObScript.h"
+#include "Papyrus.h"
+#include "Scaleform.h"
+#include "Seralize.h"
+#include "Values.h"
+
 #include "f4se_common/BranchTrampoline.h"
-
-ICriticalSection                s_LoadLock;
+#include "common/ICriticalSection.h"
 
 PluginHandle                    g_PluginHandle      = kPluginHandle_Invalid;
+F4SEPapyrusInterface*           g_Papyrus           = nullptr;
+F4SEMessagingInterface*         g_Messaging         = nullptr;
+F4SEScaleformInterface*         g_Scaleform         = nullptr;
+F4SESerializationInterface*     g_Serialization     = nullptr;
+ICriticalSection                s_DataLock;
 
-F4SEPapyrusInterface*           g_Papyrus           = NULL;
-F4SEMessagingInterface*         g_Messaging         = NULL;
-F4SEScaleformInterface*         g_Scaleform         = NULL;
-F4SESerializationInterface*     g_Serialization     = NULL;
+static IMenu* CreateBlurMenu() {
+    return new Menus::BlurMenu();
+}
+
+static IMenu* CreateRepairMenu() {
+    return new Menus::RepairMenu();
+}
 
 extern "C" {
-    void F4SEMessageHandler(F4SEMessagingInterface::Message* Message) {
-        switch (Message->type) {
+    void F4SEMessageHandler(F4SEMessagingInterface::Message* msg) {
+        switch (msg->type) {
         case F4SEMessagingInterface::kMessage_GameDataReady:
-            ITimeKeeper MessageHandlerTimer = ITimeKeeper();
-            MessageHandlerTimer.Start();
+            s_DataLock.Enter();
 
-            s_LoadLock.Enter();
-
-            if (reinterpret_cast<uintptr_t>(Message->data)) {
-                if (!DataManager::Load()) {
-                    s_LoadLock.Leave();
+            if (reinterpret_cast<bool>(msg->data)) {
+                if (!Forms::Load()) {
+                    s_DataLock.Leave();
                     HALT("Game Plugin error.");
                 }
 
-                g_GlobalSettings.Init("PM_");
+                if ((*g_ui) != nullptr) {
+                    (*g_ui)->menuOpenCloseEventSource.AddEventSink(&g_MenuOpenCloseEventHandler);
+                
+                    if (!(*g_ui)->menuTable.Find(&BSFixedString("BlurMenu")))
+                        (*g_ui)->Register("BlurMenu", CreateBlurMenu);
 
-                ValueManager::Init();
-                PerkManager::Init();
+                    if (!(*g_ui)->menuTable.Find(&BSFixedString("RepairMenu")))
+                        (*g_ui)->Register("RepairMenu", CreateRepairMenu);
+                }
 
-                _LOGMESSAGE("Data should now be loaded.");
-                _LOGMESSAGE("F4SEMessageHandler() Time: %fms", MessageHandlerTimer.Format(ITimeKeeper::Milli));
+                GetEventDispatcher<TESContainerChangedEvent>    ()->AddEventSink(&g_TESContainerChangedEventHandler);
+                GetEventDispatcher<TESInitScriptEvent>          ()->AddEventSink(&g_TESInitScriptEventHandler);
+                GetEventDispatcher<TESSleepStartEvent>          ()->AddEventSink(&g_TESSleepStartEventHandler);
+                GetEventDispatcher<TESSleepStopEvent>           ()->AddEventSink(&g_TESSleepStopEventHandler);
+                GetEventDispatcher<TESWaitStartEvent>           ()->AddEventSink(&g_TESWaitStartEventHandler);
+                GetEventDispatcher<TESWaitStopEvent>            ()->AddEventSink(&g_TESWaitStopEventHandler);
+
+                GetSingletonEventDispatcher(WeaponFiredEvent).AddEventSink(&g_WeaponFiredEventHandler);
+                Values::RegisterValues();
             }
+
             else {
-                // Unload DataManager
-                DataManager::Unload();
-
-                // Unload everything else
-                ValueManager::Unload();
-                PerkManager::Unload();
-
-                _LOGMESSAGE("Data should now be unloaded.");
-                _LOGMESSAGE("F4SEMessageHandler() Time: %fms", MessageHandlerTimer.Format(ITimeKeeper::Milli));
+                Forms::Unload();
             }
 
-            s_LoadLock.Leave();
+            s_DataLock.Leave();
+            break;
+
+        default:
             break;
         }
     }
 
     bool F4SEPlugin_Query(const F4SEInterface* F4SE, PluginInfo* Info) {
-        ITimeKeeper PluginQueryTimer = ITimeKeeper();
-        PluginQueryTimer.Start();
+        InitializePlugin(PLUGIN_NAME);
 
-        _LOGMESSAGE("%s log opened (PC-64)", PLUGIN_NAME_LONG);
-        _LOGMESSAGE("This is a plugin log only and does not contain information on any other part of the game, including crashes.");
+        _LogMessage("%s log opened (PC-64)", PLUGIN_NAME);
+        _LogMessage("This is a plugin log only and does not contain information on any other part of the game, including crashes.");
 
         Info->infoVersion   = PluginInfo::kInfoVersion;
-        Info->name          = PLUGIN_NAME_LONG;
+        Info->name          = PLUGIN_NAME;
         Info->version       = PLUGIN_VERSION;
 
         g_PluginHandle      = F4SE->GetPluginHandle();
 
         if (F4SE->runtimeVersion != SUPPORTED_RUNTIME_VERSION) {
-            _LOGERROR("Unsupported runtime version v%d.%d.%d.%d. This DLL is built for v%d.%d.%d.%d only. Plugin will be disabled.",
+            _LogError("Unsupported runtime version v%d.%d.%d.%d. This DLL is built for v%d.%d.%d.%d only. Plugin will be disabled.",
                 GET_EXE_VERSION_MAJOR (F4SE->runtimeVersion),
                 GET_EXE_VERSION_MINOR (F4SE->runtimeVersion),
                 GET_EXE_VERSION_BUILD (F4SE->runtimeVersion),
@@ -84,77 +96,78 @@ extern "C" {
             return false;
         }
 
-        g_Papyrus = (F4SEPapyrusInterface*)F4SE->QueryInterface(kInterface_Papyrus);
-        if (!g_Papyrus) {
-            _LOGERROR("Failed to get Papyrus interface. Plugin will be disabled.");
-            return false;
-        }
-
-        if (!g_ObScript.Init()) {
-            _LOGERROR("Failed to get ObScript interface. Plugin will be disabled.");
-            return false;
-        }
-
         g_Messaging = (F4SEMessagingInterface*)F4SE->QueryInterface(kInterface_Messaging);
         if (!g_Messaging) {
-            _LOGERROR("Failed to get Messaging interface. Plugin will be disabled.");
+            _LogError("Failed to get Messaging interface. Plugin will be disabled.");
             return false;
         }
 
         g_Scaleform = (F4SEScaleformInterface*)F4SE->QueryInterface(kInterface_Scaleform);
         if (!g_Scaleform) {
-            _LOGERROR("Failed to get Scaleform interface. Plugin will be disabled.");
+            _LogError("Failed to get Scaleform interface. Plugin will be disabled.");
+            return false;
+        }
+
+        g_Papyrus = (F4SEPapyrusInterface*)F4SE->QueryInterface(kInterface_Papyrus);
+        if (!g_Papyrus) {
+            _LogError("Failed to get Papyrus interface. Plugin will be disabled.");
             return false;
         }
 
         g_Serialization = (F4SESerializationInterface*)F4SE->QueryInterface(kInterface_Serialization);
         if (!g_Serialization) {
-            _LOGERROR("Failed to get Serialization interface. Plugin will be disabled.");
+            _LogError("Failed to get Serialization interface. Plugin will be disabled.");
             return false;
         }
 
         if (!g_branchTrampoline.Create(1024 * 64)) {
-            _LOGERROR("Failed to create Branch Trampoline. Plugin will be disabled.");
+            _LogError("Failed to create Branch Trampoline. Plugin will be disabled.");
             return false;
         }
 
         if (!g_localTrampoline.Create(1024 * 64, nullptr)) {
-            _LOGERROR("Failed to create CodeGen Buffer. Plugin will be disabled.");
+            _LogError("Failed to create CodeGen Buffer. Plugin will be disabled.");
             return false;
         }
 
-        _LOGMESSAGE("F4SEPlugin_Query() Time: %fms", PluginQueryTimer.Format(ITimeKeeper::Milli));
+        if (!IObScript::Init()) {
+            _LogError("Failed to initialize ObScript interface. Plugin will be disabled.");
+            return false;
+        }
+
         return true;
     }
 
     bool F4SEPlugin_Load(const F4SEInterface* F4SE) {
-        if (!g_Papyrus->Register(ScriptManager::Init)) {
-            _LOGWARNING("Failed to register Script functions");
-            return false;
-        }
-
         if (!g_Messaging->RegisterListener(g_PluginHandle, "F4SE", F4SEMessageHandler)) {
-            _LOGWARNING("Failed to register for Messaging listener");
+            _LogWarning("Failed to register for Messaging listener.");
+            return false;
+        }
+        
+        if (!g_Papyrus->Register(Papyrus::Init)) {
+            _LogWarning("Failed to register Papyrus script functions.");
             return false;
         }
 
-        if (!g_Scaleform->Register("RTNG", ScaleformManager::Init)) {
-            _LOGWARNING("Failed to register for Scaleform interface");
+        if (!Serialize::Commit()) {
+            _LogWarning("Failed to commit Serialization interface.");
             return false;
         }
 
-        if (!SaveManager::Hook_Commit(g_PluginHandle)) {
-            _LOGWARNING("Failed to commit Serialization interface.");
+        if (!ObScript::Init()) {
+            _LogWarning("Failed to register ObScript script functions.");
             return false;
         }
 
-        // Hook "Hold [Pipboy] to open Perks menu." to detect player level ups.
-        g_branchTrampoline.Write6Branch(LevelUpPrompt.GetUIntPtr(), (uintptr_t)PerkManager::LevelUp_Hook);
+        HookContainerMenuInvoke(ContainerMenuInvoke_Hook);
+        HookExamineMenuInvoke(ExamineMenuInvoke_Hook);
+        HookPipboyMenuInvoke(PipboyMenuInvoke_Hook);
+        HookPopulateItemCard(PopulateItemCard_Hook);
 
-        // Hook DR Calc to replace it with something sane
-        g_branchTrampoline.Write6Branch(CalculateDamageResist.GetUIntPtr(), (uintptr_t)ValueManager::DamageResistFormula);
+        g_branchTrampoline.Write6Branch(LevelUpPrompt.GetUIntPtr(), (uintptr_t)LevelUpMenuPrompt_Hook);
+        g_branchTrampoline.Write6Branch(CalculateDamageResist.GetUIntPtr(), (uintptr_t)DamageResistFormula);
 
-        _LOGMESSAGE("Plugin loaded successfully.");
+        _LogMessage("Plugin loaded successfully.");
         return true;
     }
 }

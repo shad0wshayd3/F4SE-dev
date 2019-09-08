@@ -2,67 +2,91 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClInclude Include="Config.h" />
-    <ClInclude Include="DataManager.h">
-      <Filter>DataManager</Filter>
+    <ClInclude Include="Forms.h">
+      <Filter>Forms</Filter>
     </ClInclude>
-    <ClInclude Include="PerkManager.h">
-      <Filter>PerkManager</Filter>
+    <ClInclude Include="Scaleform.h">
+      <Filter>Scaleform</Filter>
     </ClInclude>
-    <ClInclude Include="ScaleformManager.h">
-      <Filter>ScaleformManager</Filter>
+    <ClInclude Include="InputHandler.h">
+      <Filter>Scaleform</Filter>
     </ClInclude>
-    <ClInclude Include="ValueManager.h">
-      <Filter>ValueManager</Filter>
+    <ClInclude Include="Seralize.h">
+      <Filter>Serialization</Filter>
     </ClInclude>
-    <ClInclude Include="ScriptManager.h">
-      <Filter>ScriptManager</Filter>
+    <ClInclude Include="Perks.h">
+      <Filter>Forms</Filter>
     </ClInclude>
-    <ClInclude Include="SaveManager.h">
-      <Filter>SaveManager</Filter>
+    <ClInclude Include="Values.h">
+      <Filter>Forms</Filter>
+    </ClInclude>
+    <ClInclude Include="ObScript.h">
+      <Filter>Scripts</Filter>
+    </ClInclude>
+    <ClInclude Include="Papyrus.h">
+      <Filter>Scripts</Filter>
+    </ClInclude>
+    <ClInclude Include="Events.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Condition.h">
+      <Filter>Condition</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="DataManager.cpp">
-      <Filter>DataManager</Filter>
+    <ClCompile Include="Forms.cpp">
+      <Filter>Forms</Filter>
     </ClCompile>
-    <ClCompile Include="PerkManager.cpp">
-      <Filter>PerkManager</Filter>
+    <ClCompile Include="Scaleform.cpp">
+      <Filter>Scaleform</Filter>
     </ClCompile>
-    <ClCompile Include="ScaleformManager.cpp">
-      <Filter>ScaleformManager</Filter>
+    <ClCompile Include="InputHandler.cpp">
+      <Filter>Scaleform</Filter>
     </ClCompile>
-    <ClCompile Include="ValueManager.cpp">
-      <Filter>ValueManager</Filter>
+    <ClCompile Include="Seralize.cpp">
+      <Filter>Serialization</Filter>
     </ClCompile>
-    <ClCompile Include="ScriptManager.cpp">
-      <Filter>ScriptManager</Filter>
+    <ClCompile Include="Perks.cpp">
+      <Filter>Forms</Filter>
     </ClCompile>
-    <ClCompile Include="SaveManager.cpp">
-      <Filter>SaveManager</Filter>
+    <ClCompile Include="Values.cpp">
+      <Filter>Forms</Filter>
+    </ClCompile>
+    <ClCompile Include="ObScript.cpp">
+      <Filter>Scripts</Filter>
+    </ClCompile>
+    <ClCompile Include="Papyrus.cpp">
+      <Filter>Scripts</Filter>
+    </ClCompile>
+    <ClCompile Include="Events.cpp">
+      <Filter>Events</Filter>
+    </ClCompile>
+    <ClCompile Include="Condition.cpp">
+      <Filter>Condition</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="DataManager">
-      <UniqueIdentifier>{cbbd266a-ff9c-41ca-b163-12ea730fb8a9}</UniqueIdentifier>
+    <Filter Include="Forms">
+      <UniqueIdentifier>{6a05b473-fdd9-49af-b9db-5b9a86468d77}</UniqueIdentifier>
     </Filter>
-    <Filter Include="PerkManager">
-      <UniqueIdentifier>{958749d7-ba0e-44f8-8b29-d7f357f5ac5d}</UniqueIdentifier>
+    <Filter Include="Scaleform">
+      <UniqueIdentifier>{7df83871-5c93-40b3-aad3-b60ac9e8db6e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ScaleformManager">
-      <UniqueIdentifier>{b08b0888-6c7e-400c-b5af-0c617b1b1cad}</UniqueIdentifier>
+    <Filter Include="Serialization">
+      <UniqueIdentifier>{c2ebb0ab-edda-42f5-a08a-f28d590840e3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ValueManager">
-      <UniqueIdentifier>{b9ba6962-1cfd-41eb-a88b-2d4648a8fb69}</UniqueIdentifier>
+    <Filter Include="Scripts">
+      <UniqueIdentifier>{cadbd28b-2b5d-4c5c-b2ab-dd6b985ec855}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ScriptManager">
-      <UniqueIdentifier>{2c036e25-1d13-41e0-bc26-873ae7c01d6f}</UniqueIdentifier>
+    <Filter Include="Events">
+      <UniqueIdentifier>{c36ff4ce-c51a-430d-ac61-6efe1f3758a9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="SaveManager">
-      <UniqueIdentifier>{f24d08d4-8221-4bca-bc16-205fa2ec12c4}</UniqueIdentifier>
+    <Filter Include="Condition">
+      <UniqueIdentifier>{bb2c15ef-5161-406d-a4fe-5b02894251c6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

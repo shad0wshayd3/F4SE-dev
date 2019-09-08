@@ -20,7 +20,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
-    <ProjectGuid>{6564521e-30d5-44e8-8c71-a3a431f34aaa}</ProjectGuid>
+    <ProjectGuid>{61835170-6a0d-4f47-a970-c92a1969dbfb}</ProjectGuid>
     <RootNamespace>ProjectMassachusetts</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -156,22 +156,30 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="SaveManager.h" />
-    <ClInclude Include="ScriptManager.h" />
-    <ClInclude Include="ValueManager.h" />
+    <ClInclude Include="Condition.h" />
     <ClInclude Include="Config.h" />
-    <ClInclude Include="DataManager.h" />
-    <ClInclude Include="PerkManager.h" />
-    <ClInclude Include="ScaleformManager.h" />
+    <ClInclude Include="Events.h" />
+    <ClInclude Include="Forms.h" />
+    <ClInclude Include="InputHandler.h" />
+    <ClInclude Include="ObScript.h" />
+    <ClInclude Include="Papyrus.h" />
+    <ClInclude Include="Perks.h" />
+    <ClInclude Include="Scaleform.h" />
+    <ClInclude Include="Seralize.h" />
+    <ClInclude Include="Values.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="SaveManager.cpp" />
-    <ClCompile Include="ScriptManager.cpp" />
-    <ClCompile Include="ValueManager.cpp" />
-    <ClCompile Include="DataManager.cpp" />
+    <ClCompile Include="Condition.cpp" />
+    <ClCompile Include="Events.cpp" />
+    <ClCompile Include="Forms.cpp" />
+    <ClCompile Include="InputHandler.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="PerkManager.cpp" />
-    <ClCompile Include="ScaleformManager.cpp" />
+    <ClCompile Include="ObScript.cpp" />
+    <ClCompile Include="Papyrus.cpp" />
+    <ClCompile Include="Perks.cpp" />
+    <ClCompile Include="Scaleform.cpp" />
+    <ClCompile Include="Seralize.cpp" />
+    <ClCompile Include="Values.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />
