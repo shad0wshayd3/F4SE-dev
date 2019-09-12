@@ -10,6 +10,7 @@ int GetTagCount();
 bool IsFirstRank(BGSPerk* Perk);
 bool IsFirstValidRank(BGSPerk* Perk);
 PerkVector GetRankList(BGSPerk* Perk);
+int GetPlayerRank(BGSPerk* Perk);
 
 std::string GetPerkIconPath(BGSPerk* Perk);
 std::string GetSkillIconPath(ActorValueInfo* avif);

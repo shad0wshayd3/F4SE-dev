@@ -72,6 +72,10 @@ float GetTempValue(Actor* actor, ActorValueInfo* avif) {
     return actor->actorValueOwner.GetBase(avif) + actor->actorValueOwner.GetMod(0, avif);
 }
 
+float GetTempMod(Actor* actor, ActorValueInfo* avif) {
+	return actor->actorValueOwner.GetMod(0, avif);
+}
+
 float GetValue(TESObjectREFR* refr, ActorValueInfo* avif) {
     return refr->actorValueOwner.GetValue(avif);
 }
@@ -86,6 +90,10 @@ float GetPermValue(TESObjectREFR* refr, ActorValueInfo* avif) {
 
 float GetTempValue(TESObjectREFR* refr, ActorValueInfo* avif) {
     return refr->actorValueOwner.GetBase(avif) + refr->actorValueOwner.GetMod(0, avif);
+}
+
+float GetTempMod(TESObjectREFR* refr, ActorValueInfo* avif) {
+	return refr->actorValueOwner.GetMod(0, avif);
 }
 
 int GetValueInt(Actor* actor, ActorValueInfo* avif) {
@@ -199,12 +207,10 @@ void GFxLogMembers::Visit(const char* member, GFxValue* value) {
 
     case GFxValue::kType_Int:
     case GFxValue::kType_UInt:
-        if (!_stricmp(member, "FormID")) {
+        if (!_stricmp(member, "FormID"))
             _LogMessageNT("%s: %08X: %i", member, Member.GetInt(), LookupFormByID(Member.GetInt())->formType);
-        }
-        else {
+        else
             _LogMessageNT("%s: %i", member, Member.GetInt());
-        }
         break;
 
     case GFxValue::kType_Number:
@@ -215,10 +221,25 @@ void GFxLogMembers::Visit(const char* member, GFxValue* value) {
         _LogMessageNT("%s: %s", member, Member.GetString());
         break;
 
+	case GFxValue::kType_Array: {
+		_LogMessageNT("%s: %i Elements", member, Member.GetArraySize());
+
+		_LogIndent(); GFxLogElements LE(&Member);
+		Member.VisitElements(&LE, 0, Member.GetArraySize()); _LogOutdent();
+		break;
+	}
+
     default:
         _LogMessageNT("%s: Type %i", member, Member.GetType());
         break;
     }
+}
+
+void GFxLogElements::Visit(UInt32 idx, GFxValue* value) {
+	_LogMessageNT("Array Index: %i", idx);
+
+	_LogIndent(); GFxLogMembers LM(value);
+	value->VisitMembers(&LM); _LogOutdent();
 }
 
 void GFxLogMembersBasic::Visit(const char* member, GFxValue* value) {

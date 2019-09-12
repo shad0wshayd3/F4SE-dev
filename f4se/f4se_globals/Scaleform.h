@@ -6,6 +6,7 @@
 
 void SetGFxValue(GFxValue* dst, GFxMovieRoot* root, const char* name, const char* str);
 void SetGFxValue(GFxValue* dst, GFxMovieRoot* root, const char* name, std::string str);
+void SetGFxValue(GFxValue* dst, const char* name, GFxValue* value);
 void SetGFxValue(GFxValue* dst, const char* name, GFxValue value);
 void SetGFxValue(GFxValue* dst, const char* name, UInt32 value);
 void SetGFxValue(GFxValue* dst, const char* name, double value);

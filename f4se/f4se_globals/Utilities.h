@@ -29,6 +29,12 @@
 #define LookupTypeByID(FormID, Type)\
     (##Type*) Runtime_DynamicCast((void*)(LookupFormByID(FormID)), RTTI_TESForm, RTTI_##Type)
 
+#define GetExtraDataByType(ExtraData, Type)\
+	((Extra##Type##*)ExtraData->GetByType(kExtraData_##Type##))
+
+#define GetExtraDataValue(ExtraData, Type, name)\
+    (GetExtraDataByType(ExtraData, Type)->##name##)
+
 void                        Notification(const char* Message, ...);
 void                        NotificationSound(const char* Message, const char* Sound, ...);
 bool                        strifind(const std::string& str, const std::string& search);
@@ -42,10 +48,12 @@ float                       GetValue(Actor* actor, ActorValueInfo* avif);
 float                       GetBaseValue(Actor* actor, ActorValueInfo* avif);
 float                       GetPermValue(Actor* actor, ActorValueInfo* avif);
 float                       GetTempValue(Actor* actor, ActorValueInfo* avif);
+float						GetTempMod(Actor* actor, ActorValueInfo* avif);
 float                       GetValue(TESObjectREFR* actor, ActorValueInfo* avif);
 float                       GetBaseValue(TESObjectREFR* actor, ActorValueInfo* avif);
 float                       GetPermValue(TESObjectREFR* actor, ActorValueInfo* avif);
 float                       GetTempValue(TESObjectREFR* actor, ActorValueInfo* avif);
+float						GetTempMod(TESObjectREFR* actor, ActorValueInfo* avif);
 int                         GetValueInt(Actor* actor, ActorValueInfo* avif);
 int                         GetBaseValueInt(Actor* actor, ActorValueInfo* avif);
 int                         GetPermValueInt(Actor* actor, ActorValueInfo* avif);
@@ -71,6 +79,13 @@ public:
     virtual bool            ShowDisplayMembers(void) override { return true; }
     virtual void            Visit(const char* member, GFxValue* value) override;
     GFxValue*               m_value;
+};
+
+class GFxLogElements : public GFxValue::ObjectInterface::ArrayVisitor {
+public:
+	GFxLogElements(GFxValue* value) : m_value(value) { }
+	virtual void			Visit(UInt32 idx, GFxValue* val);
+	GFxValue*				m_value;
 };
 
 class GFxLogMembersBasic : public GFxValue::ObjectInterface::ObjVisitor {

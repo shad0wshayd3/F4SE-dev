@@ -1,11 +1,27 @@
 #pragma once
 #include "Forms.h"
 
+#include <sstream>
+
 struct RepairMenuEntry {
     std::string     text;
     UInt32          HandleID;
     UInt32          StackID;
     float           Condition;
+};
+
+struct ActiveEffectEntry {
+	std::string		text;
+	std::string		Description;
+	bool			HasDuration;
+	int				Type;
+};
+
+struct EffectEntry {
+	std::string		text;
+	float			Duration;
+	float			Value;
+	bool			ShowAsPercent;
 };
 
 namespace Menus {

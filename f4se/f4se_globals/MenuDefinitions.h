@@ -182,26 +182,48 @@ public:
         kFunction_ToggleMovementToDirectional       = 0x28,
     };
 
-    enum TabFilters {
-        kFilter_Weapons = 0x00000002,
-        kFilter_Apparel = 0x00000004,
-        kFilter_Aid     = 0x00000008,
-        kFilter_Misc    = 0x00000200,
-        kFilter_Junk    = 0x00000400,
-        kFilter_Mods    = 0x00000800,
-        kFilter_Ammo    = 0x00001000,
-    };
+	enum Pages {
+		kPage_Stats			= 0,
+		kPage_Inventory		= 1,
+		kPage_Data			= 2,
+		kPage_Map			= 3,
+		kPage_Radio			= 4,
+	};
 
-    enum ItemFilters {
-        kItemFilter_Weapons = 0x00000002,   // kFormType_WEAP
-        KItemFilter_Apparel = 0x00000004,   // kFormType_ARMO
-        kItemFilter_Aid     = 0x00000008,   // kFormType_ALCH || kFormType_INGR
-        kItemFilter_Misc    = 0x00000200,   // kFormType_MISC && components->count = 0 || kFormType_KEYM
-        kItemFilter_BOOK    = 0x00000280,   // kFormType_BOOK
-        kItemFilter_Junk    = 0x00000400,   // kFormType_MISC && components->count > 0
-        kItemFilter_Mods    = 0x00000800,   // kFormType_MISC && Referenced by OMOD?
-        kItemFilter_AMMO    = 0x00001000,   // kFormType_AMMO
-        kItemFilter_NOTE    = 0x00002200,   // kFormType_NOTE
+	enum Tabs {
+		kTab_Stats_Status	= 0,
+		kTab_Stats_SPECIAL	= 1,
+		kTab_Stats_Skills	= 2,
+		kTab_Stats_Perks	= 3,
+
+		kTab_Inv_Weapons	= 0,
+		kTab_Inv_Apparel	= 1,
+		kTab_Inv_Aid		= 2,
+		kTab_Inv_Misc		= 3,
+		kTab_Inv_Junk		= 4,
+		kTab_Inv_Mods		= 5,
+		kTab_Inv_Ammo		= 6,
+		kTab_Inv_Keys		= 7,
+
+		kTab_Data_Quests	= 0,
+		kTab_Data_Notes		= 1,
+		kTab_Data_Workshops	= 2,
+		kTab_Data_Stats		= 3,
+	};
+
+    enum Filters {
+        kFilter_Weapons		= 0x00000002,	// kFormType_WEAP
+        kFilter_Apparel		= 0x00000004,   // kFormType_ARMO
+        kFilter_Aid			= 0x00000008,   // kFormType_ALCH || kFormType_INGR
+        kFilter_Misc		= 0x00000200,   // kFormType_MISC && components->count = 0 || kFormType_KEYM
+        kFilter_BOOK		= 0x00000280,   // kFormType_BOOK
+        kFilter_Junk		= 0x00000400,   // kFormType_MISC && components->count > 0
+        kFilter_Mods		= 0x00000800,   // kFormType_MISC && Referenced by OMOD?
+        kFilter_Ammo		= 0x00001000,   // kFormType_AMMO
+        kFilter_NOTE		= 0x00002200,   // kFormType_NOTE
+
+		kFilter_Keys		= 0x00008000,	// PM Keys Tab
+		kFilter_Notes		= 0x00016000,	// PM Notes Tab
     };
 };
 

@@ -993,11 +993,32 @@ class EffectSetting : public TESForm
 public:
 	enum { kTypeID = kFormType_MGEF };
 
+	enum {
+		kFlag_Hostile					= 1 << 0,
+		kFlag_Recover					= 1 << 1,
+		kFlag_Detrimental				= 1 << 2,
+		kFlag_SnapToNavmesh				= 1 << 3,
+		kFlag_NotHitEvent				= 1 << 4,
+		kFlag_DispelWithKeywords		= 1 << 8,
+		kFlag_NoDuration				= 1 << 9,
+		kFlag_NoMagnitude				= 1 << 10,
+		kFlag_NoArea					= 1 << 11,
+		kFlag_FXPersist					= 1 << 12,
+		kFlag_Gory						= 1 << 14,
+		kFlag_HideInUI					= 1 << 15,
+		kFlag_NoRecast					= 1 << 17,
+		kFlag_PowerAffectsMagnitude		= 1 << 21,
+		kFlag_PowerAffectsDuration		= 1 << 22,
+		kFlag_Painless					= 1 << 26,
+		kFlag_NoHitEvent2				= 1 << 27,
+		kFlag_NoDeathDispel				= 1 << 28,
+	};
+
 	TESFullName				fullName;		// 20
 	BGSMenuDisplayObject	menuObject;		// 30
 	BGSKeywordForm			keywordForm;	// 40
 	UInt64					unk060[2]; // 60
-	UInt32					unk070; // 70
+	UInt32					flags; // 70
 	float					unk074;
 	TESForm*				unk078;	// primary object? (SpellItem, TESObjectLIGH, BGSDamageType, BGSHazard)
 	UInt64					unk080;

@@ -1,5 +1,7 @@
 #include "Perks.h"
 
+#include "f4se/GameStreams.h"
+
 #include <algorithm>
 #include <iomanip>
 #include <sstream>
@@ -131,27 +133,46 @@ std::string SortRequirements(RequirementPairList RequirementsList) {
 
 std::string GetPerkIconPath(BGSPerk* Perk) {
     std::string Result = Perk->swfPath.c_str();
-    if (Result.empty()) {
-        if (Perk->numRanks > 1) {
-            BGSPerk* firstRank = GetRankList(Perk)[0];
-            if (firstRank)
-                Result = firstRank->swfPath.c_str();
-        }
+	std::string Path = "Interface/" + Result;
+	
+	BSResourceNiBinaryStream PerkPathStream(Path.c_str());
+	if (PerkPathStream.IsValid())
+		return Result;
+
+    if (Perk->numRanks > 1) {
+        BGSPerk* firstRank = GetRankList(Perk)[0];
+		if (firstRank)
+			Result = firstRank->swfPath.c_str();
+
+		Path = "Interface/" + Result;
+		BSResourceNiBinaryStream RankPathStream(Path.c_str());
+		if (RankPathStream.IsValid())
+			return Result;
     }
 
-    if (Result.empty()) {
-        std::stringstream ss;
-        ss << "Components/VaultBoys/Perks/PerkClip_" << std::hex << std::setw(8) << std::setfill('0') << Perk->formID << ".swf";
-        Result = ss.str();
-    }
+    std::stringstream ss;
+    ss << "Components/VaultBoys/Perks/PerkClip_" << std::hex << std::setw(8) << std::setfill('0') << Perk->formID << ".swf";
+    Result = ss.str();
 
-    return Result;
+	Path = "Interface/" + Result;
+	BSResourceNiBinaryStream FormPathStream(Path.c_str());
+	if (FormPathStream.IsValid())
+		return Result;
+
+    return "Components/VaultBoys/Perks/PerkClip_Default.swf";
 }
 
 std::string GetSkillIconPath(ActorValueInfo* avif) {
     std::stringstream ss;
     ss << "Components/VaultBoys/Skills/" << avif->GetEditorID() << ".swf";
-    return ss.str();
+
+	std::string Result = ss.str();
+	std::string Path = "Interface/" + Result;
+	BSResourceNiBinaryStream IconPathStream(Path.c_str());
+	if (IconPathStream.IsValid())
+		return Result;
+
+	return "Components/VaultBoys/Perks/PerkClip_Default.swf";
 }
 
 PerkVector GetRankList(BGSPerk* Perk) {
@@ -175,6 +196,18 @@ PerkVector GetRankList(BGSPerk* Perk) {
 
     std::sort(Result.begin(), Result.end(), &SortRanks);
     return Result;
+}
+
+int GetPlayerRank(BGSPerk* Perk) {
+	int Result = 0;
+
+	auto RankList = GetRankList(Perk);
+	for (auto iter : RankList) {
+		if (HasPerk((*g_player), iter))
+			Result++;
+	}
+
+	return Result;
 }
 
 bool IsFirstRank(BGSPerk* Perk) {

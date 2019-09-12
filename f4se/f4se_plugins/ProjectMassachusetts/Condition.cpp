@@ -6,9 +6,6 @@
 #define HasExtraData(ExtraData, Type)\
     ExtraData->HasType(kExtraData_##Type##)
 
-#define GetExtraData(ExtraData, Type, name)\
-    (((Extra##Type##*)ExtraData->GetByType(kExtraData_##Type##))->##name##)
-
 #define SetExtraData(ExtraData, Type, name, value)\
     (((Extra##Type##*)ExtraData->GetByType(kExtraData_##Type##))->##name##) = value;
 
@@ -56,7 +53,7 @@ float GetWeaponConditionMaximum(WeaponConditionData Data) {
         return -1.0;
     if (!HasExtraData(Data.extraData, Charge))
         return -1.0;
-    return GetExtraData(Data.extraData, Charge, charge);
+    return GetExtraDataValue(Data.extraData, Charge, charge);
 }
 
 float GetWeaponConditionPercent(WeaponConditionData Data) {
@@ -64,7 +61,7 @@ float GetWeaponConditionPercent(WeaponConditionData Data) {
         return -1.0;
     if (!HasExtraData(Data.extraData, Health))
         return -1.0;
-    return GetExtraData(Data.extraData, Health, health);
+    return GetExtraDataValue(Data.extraData, Health, health);
 }
 
 float GetWeaponConditionCurrent(WeaponConditionData Data) {

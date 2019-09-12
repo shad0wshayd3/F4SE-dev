@@ -39,3 +39,7 @@ void SetGFxValue(GFxValue* dst, const char* name, int value) {
 void SetGFxValue(GFxValue* dst, const char* name, GFxValue value) {
     dst->SetMember(name, &value);
 }
+
+void SetGFxValue(GFxValue* dst, const char* name, GFxValue* value) {
+	dst->SetMember(name, value);
+}

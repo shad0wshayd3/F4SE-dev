@@ -33,6 +33,8 @@ class TESObjectREFR;
 class BGSDamageType;
 class BGSRefAlias;
 class BGSPerk;
+class BGSMessage;
+class ActiveEffect;
 
 typedef bool (* _EvaluationConditions)(Condition ** condition, TESObjectREFR * ref1, TESObjectREFR * ref2);
 extern RelocAddr <_EvaluationConditions> EvaluationConditions; // Evaluates whole condition LinkedList
@@ -672,7 +674,7 @@ STATIC_ASSERT(sizeof(TESBipedModelForm) == 0x108);
 class BGSFeaturedItemMessage : public BaseFormComponent
 {
 public:
-	UInt64	unk08;	// 08
+	BGSMessage * message;	// 08
 };
 
 // 30
@@ -723,7 +725,7 @@ public:
 	virtual void	Unk_04(void);
 	virtual void	Unk_05(void);
 	virtual void	Unk_06(void);
-	virtual void	Unk_07(void);
+	virtual tArray<ActiveEffect*>* GetActiveEffects();
 	virtual void	Unk_08(void);
 	virtual void	Unk_09(void);
 	virtual void	Unk_0A(void);
