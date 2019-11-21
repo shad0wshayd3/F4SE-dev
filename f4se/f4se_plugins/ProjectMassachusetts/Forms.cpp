@@ -47,8 +47,8 @@ bool Forms::Load() {
     ActionPoints            = LookupTypeByID(0x0002D5,                                  ActorValueInfo);
     Rads                    = LookupTypeByID(0x0002E1,                                  ActorValueInfo);
     PoisonResistance        = LookupTypeByID(0x0002E4,                                  ActorValueInfo);
+	RadResistIngestion      = LookupTypeByID(0x0002E9,                                  ActorValueInfo);
     RadResistExposure       = LookupTypeByID(0x0002EA,                                  ActorValueInfo);
-    RadResistIngestion      = LookupTypeByID(0x0002EA,                                  ActorValueInfo);
     RadHealthMax            = LookupTypeByID(0x0002EE,                                  ActorValueInfo);
     HeadCondition           = LookupTypeByID(0x00036C,                                  ActorValueInfo);
     TorsoCondition          = LookupTypeByID(0x00036D,                                  ActorValueInfo);
@@ -58,22 +58,32 @@ bool Forms::Load() {
     RightLegCondition       = LookupTypeByID(0x000371,                                  ActorValueInfo);
     RadX                    = LookupTypeByID(0x024057,                                  AlchemyItem);
 
+	ObjectTypes.push_back(	{ LookupTypeByID(0x055ECC,									BGSKeyword),		56 });
+	ObjectTypes.push_back(	{ LookupTypeByID(0x0F4AED,									BGSKeyword),		53 });
+	ObjectTypes.push_back(	{ LookupTypeByID(0x10C416,									BGSKeyword),		57 });
+	ObjectTypes.push_back(	{ LookupTypeByID(0x249F30,									BGSKeyword),		39 });
+	ObjectTypes.push_back(	{ LookupTypeByID(0x0F4AE7,									BGSKeyword),		54 });
+	ObjectTypes.push_back(	{ LookupTypeByID(0x0842A1,									BGSKeyword),		58 });
+	ObjectTypes.push_back(	{ LookupTypeByID(0x0F4AEB,									BGSKeyword),		55 });
+	ObjectTypes.push_back(	{ LookupTypeByID(0x1D4A70,									BGSKeyword),		46 });
+
     // ------------------------------------------------------------------------
     // ProjectMassachusetts.esm Forms
     // ------------------------------------------------------------------------
-    Barter                  = LookupType(0x000F99,  "Skill:Barter",                     ActorValueInfo);
-    EnergyWeapons           = LookupType(0x000F9A,  "Skill:EnergyWeapons",              ActorValueInfo);
-    Explosives              = LookupType(0x000F9B,  "Skill:Explosives",                 ActorValueInfo);
-    Guns                    = LookupType(0x000F9C,  "Skill:Guns",                       ActorValueInfo);
-    Lockpick                = LookupType(0x000F9D,  "Skill:Lockpick",                   ActorValueInfo);
-    Medicine                = LookupType(0x000F9E,  "Skill:Medicine",                   ActorValueInfo);
-    MeleeWeapons            = LookupType(0x000F9F,  "Skill:MeleeWeapons",               ActorValueInfo);
-    Repair                  = LookupType(0x000FA0,  "Skill:Repair",                     ActorValueInfo);
-    Science                 = LookupType(0x000FA1,  "Skill:Science",                    ActorValueInfo);
-    Sneak                   = LookupType(0x000FA2,  "Skill:Sneak",                      ActorValueInfo);
-    Speech                  = LookupType(0x000FA3,  "Skill:Speech",                     ActorValueInfo);
-    Survival                = LookupType(0x000FA4,  "Skill:Survival",                   ActorValueInfo);
-    Unarmed                 = LookupType(0x000FA5,  "Skill:Unarmed",                    ActorValueInfo);
+    Barter                  = LookupType(0x000800,  "Skill:Barter",                     ActorValueInfo);
+    EnergyWeapons           = LookupType(0x000801,  "Skill:EnergyWeapons",              ActorValueInfo);
+    Explosives              = LookupType(0x000802,  "Skill:Explosives",                 ActorValueInfo);
+    Guns                    = LookupType(0x000803,  "Skill:Guns",                       ActorValueInfo);
+    Lockpick                = LookupType(0x000804,  "Skill:Lockpick",                   ActorValueInfo);
+    Medicine                = LookupType(0x000805,  "Skill:Medicine",                   ActorValueInfo);
+    MeleeWeapons            = LookupType(0x000806,  "Skill:MeleeWeapons",               ActorValueInfo);
+    Repair                  = LookupType(0x000807,  "Skill:Repair",                     ActorValueInfo);
+    Science                 = LookupType(0x000808,  "Skill:Science",                    ActorValueInfo);
+    Sneak                   = LookupType(0x000809,  "Skill:Sneak",                      ActorValueInfo);
+    Speech                  = LookupType(0x00080A,  "Skill:Speech",                     ActorValueInfo);
+    Survival                = LookupType(0x00080B,  "Skill:Survival",                   ActorValueInfo);
+    Unarmed                 = LookupType(0x00080C,  "Skill:Unarmed",                    ActorValueInfo);
+
     Barter_BuyMod           = LookupType(0x000FA6,  "SkillMod:Barter_BuyMod",           ActorValueInfo);
     Barter_SellMod          = LookupType(0x000FA7,  "SkillMod:Barter_SellMod",          ActorValueInfo);
     EnergyWeapons_Damage    = LookupType(0x000FA8,  "SkillMod:EnergyWeapons_Damage",    ActorValueInfo);
@@ -91,14 +101,22 @@ bool Forms::Load() {
     Survival_UsageMod       = LookupType(0x000FB9,  "SkillMod:Survival_UsageMod",       ActorValueInfo);
     Unarmed_Damage          = LookupType(0x000FBA,  "SkillMod:Unarmed_Damage",          ActorValueInfo);
     Unarmed_Secondary       = LookupType(0x000FBB,  "SkillMod:Unarmed_Secondary",       ActorValueInfo);
-    ActionPointsMult        = LookupType(0x000FBD,  "MiscAV:ActionPointsMult",          ActorValueInfo);
-    SkillPointBonus         = LookupType(0x000FBC,  "MiscAV:SkillPointBonus",           ActorValueInfo);
-    InventoryWeight         = LookupType(0x015FC0,  "MiscAV:InventoryWeight",           ActorValueInfo);
-    Dehydration             = LookupType(0x004C50,  "Hardcore:Dehydration",             ActorValueInfo);
-    Starvation              = LookupType(0x004C51,  "Hardcore:Starvation",              ActorValueInfo);
-    SleepDeprivation        = LookupType(0x004C52,  "Hardcore:SleepDeprivation",        ActorValueInfo);
+
+    Dehydration             = LookupType(0x000900,  "Hardcore:Dehydration",             ActorValueInfo);
+    Starvation              = LookupType(0x000901,  "Hardcore:Starvation",              ActorValueInfo);
+    SleepDeprivation        = LookupType(0x000902,  "Hardcore:SleepDeprivation",        ActorValueInfo);
+
+	ActionPointsMult        = LookupType(0x000B00,  "MiscAV:ActionPointsMult",          ActorValueInfo);
+    InventoryWeight         = LookupType(0x000B01,  "MiscAV:InventoryWeight",           ActorValueInfo);
+	SkillPointBonus         = LookupType(0x000B02,  "MiscAV:SkillPointBonus",           ActorValueInfo);
+
+	ItemCondMaxHealth       = LookupType(0x000C00,  "Condition:MaxHealth",              ActorValueInfo);
+    ItemCondMinHealth       = LookupType(0x000C01,  "Condition:MinHealth",              ActorValueInfo);
+    ItemCondStartCond       = LookupType(0x000C02,  "Condition:StartCond",              ActorValueInfo);
+
     StimpakOrder            = LookupType(0x02F9B8,  "MiscForm:StimpakOrder",            BGSListForm);
     DoctorsBag              = LookupType(0x0AD82B,  "MiscForm:DoctorsBag",              AlchemyItem);
+
     Perk_Barter             = LookupType(0x00268F,  "SkillPerk:Barter",                 BGSPerk);
     Perk_EnergyWeapons      = LookupType(0x002690,  "SkillPerk:EnergyWeapons",          BGSPerk);
     Perk_Explosives         = LookupType(0x002691,  "SkillPerk:Explosives",             BGSPerk);
@@ -113,10 +131,6 @@ bool Forms::Load() {
     Perk_Survival           = LookupType(0x00269A,  "SkillPerk:Survival",               BGSPerk);
     Perk_Unarmed            = LookupType(0x00269B,  "SkillPerk:Unarmed",                BGSPerk);
     Perk_Hardcore           = LookupType(0x004C55,  "SkillPerk:Hardcore",               BGSPerk);
-
-    ItemCondMaxHealth       = LookupType(0x015FC3,  "Condition:MaxHealth",              ActorValueInfo);
-    ItemCondMinHealth       = LookupType(0x015FC4,  "Condition:MinHealth",              ActorValueInfo);
-    ItemCondStartCond       = LookupType(0x015FC5,  "Condition:StartCond",              ActorValueInfo);
 
     // ------------------------------------------------------------------------
     // Create Lists
@@ -202,6 +216,28 @@ bool Forms::Load() {
     ListSortOrder[3].emplace_back("Perk");
 
     ListSortOrder.emplace_back(StringVector{}); // Anything Else
+	ListSortOrder[4].emplace_back(std::string{});
+
+	// ------------------------------------------------------------------------
+	// Create Effect Sorting Order
+	// ------------------------------------------------------------------------
+	EffectSortOrder.emplace_back(UInt32Vector{});
+	for (auto iter : ListSpecial)
+		EffectSortOrder[0].emplace_back(iter->formID);
+
+	EffectSortOrder.emplace_back(UInt32Vector{});
+	for (auto iter : ListSkills)
+		EffectSortOrder[1].emplace_back(iter->formID);
+
+	EffectSortOrder.emplace_back(UInt32Vector{});
+	EffectSortOrder[2].emplace_back(Health->formID);
+	EffectSortOrder[2].emplace_back(0x2D7);					// HealRate
+	EffectSortOrder[2].emplace_back(ActionPoints->formID);	
+	EffectSortOrder[2].emplace_back(0x2D8);					// ActionPointsRate
+	EffectSortOrder[2].emplace_back(0x2DC);					// CarryWeight
+
+	EffectSortOrder.emplace_back(UInt32Vector{});
+	EffectSortOrder[3].emplace_back(0);
 
     // ------------------------------------------------------------------------
     // Check Forms
@@ -419,6 +455,8 @@ void Forms::ClearMaps() {
     ListSkillMods.          clear();
     ListSortOrder.          clear();
     ListSkillPerks.         clear();
+	EffectSortOrder.		clear();
+	ObjectTypes.			clear();
     RegisteredDependents.   clear();
 }
 
@@ -515,6 +553,9 @@ PerkVector          Forms::ListSkillPerks;
 PerkVector          Forms::ListMaster;
 
 StringVectorVector  Forms::ListSortOrder;
+UInt32VectorVector	Forms::EffectSortOrder;
+
+KeywordMap			Forms::ObjectTypes;
 
 ActorValueMap       Forms::RegisteredDependents;
 PerkRankMap         Forms::RegisteredActors;

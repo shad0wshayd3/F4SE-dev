@@ -14,7 +14,7 @@ std::atomic<bool>   Values::PlayerThreadDidExit = false;
 float DefaultSkillFormula(ActorValueOwner* Owner, ActorValueInfo& AVIF) {
     if (!Owner || !&AVIF)
         return 0.0;
-    return (2 + (2 * Owner->GetValue(Forms::GetDependent(&AVIF))) + ceilf(Owner->GetValue(Forms::Luck) / 2));;
+    return (2 + (2 * Owner->GetValue(Forms::GetDependent(&AVIF))) + ceilf(Owner->GetValue(Forms::Luck) / 2));
 }
 
 float ActionPointsFormula(ActorValueOwner* Owner, ActorValueInfo& AVIF) {

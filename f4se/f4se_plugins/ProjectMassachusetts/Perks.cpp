@@ -18,9 +18,9 @@ struct PerkEntry {
     int             Level;
 };
 
-typedef std::pair<std::string, std::string> RequirementPair;
-typedef std::vector<RequirementPair>    RequirementPairList;
-typedef std::vector<PerkEntry>                PerkEntryList;
+typedef std::vector<PerkEntry>					PerkEntryList;
+typedef std::pair<std::string, std::string>		RequirementPair;
+typedef std::vector<RequirementPair>			RequirementPairList;
 
 #define AddErrorTags(str)\
     str = "<font color=\'#A9A9A9\'>" + str + "</font>"
@@ -85,44 +85,44 @@ bool SortRanks(BGSPerk* Perk1, BGSPerk* Perk2) {
     return (Perk1->perkLevel < Perk2->perkLevel);
 }
 
-std::string SortRequirements(RequirementPairList RequirementsList) {
-    std::string Result = "Req: ";
+int SortRequirement(RequirementPairList::iterator Req, std::string Query, std::string& Result, int Size) {
+	int Count = 0;
+	if (Req->first.find(Query) != std::string::npos) {
+		Result.append(Req->first);
+
+		if (Size > 1) {
+			Result.append(Req->second);
+
+			if (Req->second.find("or") != std::string::npos) {
+				Req++; Size--;
+				Count += SortRequirement(Req, "", Result, Size);
+			}
+		}
+
+		Count++;
+	}
+
+	return Count;
+}
+
+std::string SortRequirements(RequirementPairList Requirements) {
+    std::string Result = "";
     bool AddedItem = false;
 
-    for (auto iterSortList : Forms::ListSortOrder) {
-        for (auto iterReqList = RequirementsList.begin(); iterReqList != RequirementsList.end(); ) {
-            for (auto iterSort : iterSortList) {
-                auto index = iterReqList->first.find(iterSort);
-                if (index != std::string::npos) {
-                    Result.append(iterReqList->first);
-                    if (RequirementsList.size() > 1)
-                        Result.append(iterReqList->second);
+	for (auto iterSortList : Forms::ListSortOrder) {
+		for (auto iterSort : iterSortList) {
+			for (auto iterReq = Requirements.begin(); iterReq != Requirements.end();) {
+				int Count = SortRequirement(iterReq, iterSort, Result, Requirements.size());
+				if (Count > 0)
+					for (Count; Count > 0; Count--)
+						iterReq = Requirements.erase(iterReq);
+				else iterReq++;
+			}
+		}
+	}
 
-                    iterReqList = RequirementsList.erase(iterReqList);
-                    AddedItem = true;
-                    break;
-                }
-            }
-
-            // We still have Requirements, but no sorting rules for them, add
-            if (iterSortList.size() == 0) {
-                Result.append(iterReqList->first);
-                if (RequirementsList.size() > 1)
-                    Result.append(iterReqList->second);
-
-                iterReqList = RequirementsList.erase(iterReqList);
-                AddedItem = true;
-            }
-
-            if (!AddedItem)
-                iterReqList++;
-
-            AddedItem = false;
-        }
-    }
-
-    if ((Result == "Req: Level 1") || (Result == "Req: Level 2"))
-        Result = "Req: --";
+    if ((Result == "Level 1") || (Result == "Level 2") || Result.empty())
+        Result = "--";
 
     return Result;
 }
@@ -325,9 +325,6 @@ GFxValue* EntryList::BuildEntryList(GFxMovieRoot* root, GFxValue* Result) {
 
             int LevelRequirement = max(iter->perkLevel, 1);
             Requirement = "Level " + std::to_string(LevelRequirement);
-
-            if (LevelRequirement > m_Level)
-                AddErrorTags(Requirement);
             AddRequirement(Requirement, ", ");
 
             bool SkipPerk = false;
@@ -367,49 +364,31 @@ GFxValue* EntryList::BuildEntryList(GFxMovieRoot* root, GFxValue* Result) {
                     case Condition::kCompareOp_Equal:
                         Requirement += " = ";
                         Requirement += std::to_string(int(ComparisonValue));
-
-                        if (!(value == ComparisonValue))
-                            AddErrorTags(Requirement);
                         break;
 
                     case Condition::kCompareOp_NotEqual:
                         Requirement += " != ";
                         Requirement += std::to_string(int(ComparisonValue));
-
-                        if (!(value != ComparisonValue))
-                            AddErrorTags(Requirement);
                         break;
 
                     case Condition::kCompareOp_Greater:
                         Requirement += " &gt; ";
                         Requirement += std::to_string(int(ComparisonValue));
-
-                        if (!(value > ComparisonValue))
-                            AddErrorTags(Requirement);
                         break;
 
                     case Condition::kCompareOp_GreaterEqual:
                         Requirement += " ";
                         Requirement += std::to_string(int(ComparisonValue));
-
-                        if (!(value >= ComparisonValue))
-                            AddErrorTags(Requirement);
                         break;
 
                     case Condition::kCompareOp_Less:
                         Requirement += " &lt; ";
                         Requirement += std::to_string(int(ComparisonValue));
-
-                        if (!(value < ComparisonValue))
-                            AddErrorTags(Requirement);
                         break;
 
                     case Condition::kCompareOp_LessEqual:
                         Requirement += " &lt;= ";
                         Requirement += std::to_string(int(ComparisonValue));
-
-                        if (!(value <= ComparisonValue))
-                            AddErrorTags(Requirement);
                         break;
                     }
 
@@ -528,18 +507,12 @@ GFxValue* EntryList::BuildEntryList(GFxMovieRoot* root, GFxValue* Result) {
                         Requirement += (ComparisonValue) ? "" : " does not have ";
                         Requirement += Perk->GetFullName();
                         Requirement += " perk";
-
-                        if (!(HasPerk(Player, Perk) == (ComparisonValue > 0)))
-                            AddErrorTags(Requirement);
                         break;
 
                     case Condition::kCompareOp_NotEqual:
                         Requirement += (ComparisonValue) ? " does not have " : "";
                         Requirement += Perk->GetFullName();
                         Requirement += " perk";
-
-                        if (!(HasPerk(Player, Perk) != (ComparisonValue > 0)))
-                            AddErrorTags(Requirement);
                         break;
                     }
 
@@ -567,10 +540,15 @@ GFxValue* EntryList::BuildEntryList(GFxMovieRoot* root, GFxValue* Result) {
             if (SkipPerk)
                 continue;
 
-            std::stringstream Description;
-            Description << SortRequirements(Reqs) << "<br>" << "$$Ranks_cl " << std::to_string(iter->numRanks) << "<br><br>" << DescriptionText.Get();
-            bool IsValidPerk = (Description.str().find("A9A9A9") == std::string::npos);
+			std::string Requirements = SortRequirements(Reqs);
 
+			bool IsValidPerk = EvaluationConditions(&iter->condition, (*g_player), (*g_player)) && (m_Level >= LevelRequirement);
+			if (!IsValidPerk)
+				AddErrorTags(Requirements);
+
+            std::stringstream Description;
+            Description << "Req: " << Requirements << "<br>" << "$Ranks_cl " << std::to_string(iter->numRanks) << "<br><br>" << DescriptionText.Get();
+            
             PerkEntry Entry;
             Entry.text          = Name;
             Entry.Description   = Description.str();

@@ -8,59 +8,14 @@
 #include "f4se/ScaleformValue.h"
 
 #include <chrono>
+#include <iomanip>
 #include <regex>
 #include <sstream>
 #include <thread>
-#include <vector>
 
 #define PipboyInventoryObjects (*g_PipboyDataManager)->inventoryData.inventoryObjects
 
 EntryList LevelUpObj;
-
-struct EffectTest {
-	std::string			Name;
-	std::string			Description;
-	UInt32				FormID;
-	bool				HasDuration;
-	int					Type;
-};
-
-void ActiveEffect_TEST() {
-	std::vector<EffectTest> EffectsV;
-
-	auto TActiveEffects = (*g_player)->magicTarget.GetActiveEffects();
-	for (int i = 0; i < TActiveEffects->count; i++) {
-		ActiveEffect* Effect = TActiveEffects->entries[i];
-
-		if (Effect->flags & ActiveEffect::kFlag_Inactive)
-			continue;
-
-		if (Effect->data->setting->flags & EffectSetting::kFlag_HideInUI)
-			continue;
-
-		TESForm* SourceForm;
-		if (Effect->unk60)
-			SourceForm = Effect->unk60;
-		else if (Effect->unk48)
-			SourceForm = Effect->unk48;
-
-		EffectTest NewEffect;
-		for (auto iter : EffectsV) {
-			if (SourceForm->formID == iter.FormID) {
-				NewEffect = iter;
-				break;
-			}
-		}
-
-		_LogMessageNT("Effect Name: %s", Effect->data->setting->GetFullName());
-		if (Effect->unk60)
-			_LogMessageNT("Source Item: %s", Effect->unk60->GetFullName());
-		else if (Effect->unk48)
-			_LogMessageNT("Source Spell: %s", Effect->unk48->GetFullName());
-		_LogMessageNT("%f | %f | %f | %f", Effect->unk78, Effect->unk7C, Effect->unk80, Effect->data->unk00);
-		_LogMessageNT("");
-	}
-}
 
 void OpenLevelUpMenu(int ID, int Level, int PointsBase, int PointsUsed) {
     LevelUpObj = EntryList(ID, Level, PointsBase, PointsUsed);
@@ -83,122 +38,371 @@ namespace BSRegex {
 }
 
 namespace GFX {
-    bool RepairList_Sort(RepairMenuEntry Entry1, RepairMenuEntry Entry2) {
-        const char* Name1 = Entry1.text.c_str();
-        const char* Name2 = Entry2.text.c_str();
-        int Length = max(strlen(Name1), strlen(Name2));
-
-        for (int i = 0; i < Length; i++)
-            if (Entry1.text[i] != Entry2.text[i])
-                return (Entry1.text[i] < Entry2.text[i]);
-
-        if (Entry1.text != Entry2.text)
-            return (Entry1.text < Entry2.text);
-
-        return (Entry1.Condition > Entry2.Condition);
-    }
-
 	class ActiveEffects : public GFxFunctionHandler {
+	private:
+		UInt32 GetType(TESForm* Form) {
+			switch (Form->formType) {
+			case kFormType_ARMO:
+				return 43;
+
+			case kFormType_ALCH:
+			case kFormType_ENCH:
+			case kFormType_INGR:
+			case kFormType_SCRL:
+			case kFormType_SPEL: {
+				MagicItem* SourceItem = DYNAMIC_CAST(Form, TESForm, MagicItem);
+				for (auto iter : Forms::ObjectTypes) {
+					for (int i = 0; i < SourceItem->keywordForm.numKeywords; i++) {
+						if (iter.first->formID == SourceItem->keywordForm.keywords[i]->formID)
+							return iter.second;
+					}
+				}
+
+				return 50;
+			}
+
+			default:
+				_LogWarning("GFx::ActiveEffects - Unhandled Form Type: %i", Form->formType);
+				break;
+			}
+
+			return 59;
+		}
+
+		bool ShouldShowMaximum(ActorValueInfo* ActorValue) {
+			bool IsHealth = (ActorValue->formID == 0x2D4);
+			bool IsAction = (ActorValue->formID == 0x2D5);
+			bool IsCarryW = (ActorValue->formID == 0x2DC);
+			return (IsHealth || IsAction || IsCarryW);
+		}
+
+		bool ShouldShowPercent(ActorValueInfo* ActorValue) {
+			bool IsHealthRate	= (ActorValue->formID == 0x2D7);
+			bool IsActionRate	= (ActorValue->formID == 0x28D);
+			bool IsResist		= ((ActorValue->formID >= 0x2E3) && (0x2EB >= ActorValue->formID));
+			return (IsHealthRate || IsActionRate || IsResist);
+		}
+
+		bool ShouldMultiply(ActorValueInfo* ActorValue) {
+			bool IsHealthRate = (ActorValue->formID == 0x2D7);
+			return (IsHealthRate);
+		}
+
+		void AddValueEffect(std::stringstream &Result, EffectEntry Effect, ActorValueInfo* ActorValue, std::string Name) {
+			bool Recover	= (Effect.Setting->flags & EffectSetting::kFlag_Recover);
+
+			bool Max		= Recover && ShouldShowMaximum(ActorValue);
+			bool Percent	= Recover && ShouldShowPercent(ActorValue);
+			bool Multiply	= Percent && ShouldMultiply(ActorValue);
+
+			float Weight = (Effect.Setting->primaryActorValue->formID == ActorValue->formID) ? 
+				1.0 : Effect.Setting->secondaryAVWeight;
+
+			int Magnitude	= (int)roundf(Effect.Magnitude * Weight * ((Multiply) ? 100.0 : 1.0));
+
+			StringToUpper(Name);
+			Result << ((Max) ? "MAX " : "") << Name << ((Recover) ? " " : "/s ") << Magnitude << ((Percent) ? "%" : "");
+		}
+
+		bool SortEntry(EffectEntry Effect, UInt32 FormID, std::vector<EffectEntry>& Result) {
+			switch (Effect.Setting->archetype) {
+			case EffectSetting::kArch_ValueModifier: {
+				if ((FormID == Effect.Setting->primaryActorValue->formID) || (FormID == 0)) {
+					for (int i = 0; i < Result.size(); i++) {
+						if (Result[i].Setting->archetype == Effect.Setting->archetype) {
+							if (Result[i].Setting->primaryActorValue->formID == Effect.Setting->primaryActorValue->formID) {
+								Result[i].Magnitude += Effect.Magnitude;
+								return true;
+							}
+						}
+					}
+
+					Result.emplace_back(Effect);
+					return true;
+				}
+				break;
+			}
+
+			case EffectSetting::kArch_DualValueModifier: {
+				// Maybe do more based on the secondary value?
+				if ((FormID == Effect.Setting->primaryActorValue->formID) || (FormID == 0)) {
+					for (int i = 0; i < Result.size(); i++) {
+						if (Result[i].Setting->archetype == Effect.Setting->archetype) {
+							if (Result[i].Setting->primaryActorValue->formID == Effect.Setting->primaryActorValue->formID) {
+								Result[i].Magnitude += Effect.Magnitude;
+								return true;
+							}
+						}
+					}
+
+					Result.emplace_back(Effect);
+					return true;
+				}
+
+				break;
+			}
+
+			case EffectSetting::kArch_PeakValueModifier: {
+				if ((FormID == Effect.Setting->primaryActorValue->formID) || (FormID == 0)) {
+					for (int i = 0; i < Result.size(); i++) {
+						if (Result[i].Setting->archetype == Effect.Setting->archetype) {
+							if (Result[i].Setting->primaryActorValue->formID == Effect.Setting->primaryActorValue->formID) {
+								if (Effect.Magnitude > Result[i].Magnitude) {
+									Result[i].Magnitude	= Effect.Magnitude;
+									Result[i].Duration	= Effect.Duration;
+								}
+
+								return true;
+							}
+						}
+					}
+
+					Result.emplace_back(Effect);
+					return true;
+				}
+				break;
+			}
+
+			case EffectSetting::kArch_Script:
+			case EffectSetting::kArch_Cloak: {
+				if (FormID == 0) {
+					for (int i = 0; i < Result.size(); i++) {
+						if (Result[i].Setting->archetype == Effect.Setting->archetype) {
+							if (!_stricmp(Result[i].Setting->description.c_str(), Effect.Setting->description.c_str())) {
+								return true;
+							}
+						}
+					}
+
+					Result.emplace_back(Effect);
+					return true;
+				}
+
+				break;
+			}
+
+			case EffectSetting::kArch_Chameleon: {
+				if (FormID == 0) {
+					for (int i = 0; i < Result.size(); i++) {
+						if (Result[i].Setting->archetype == Effect.Setting->archetype) {
+							BGSPerk* StealthPerk1 = Result[i].Setting->perkToApply;
+							BGSPerk* StealthPerk2 = Effect.Setting->perkToApply;
+							if (!StealthPerk1 || !StealthPerk2)
+								return true;
+
+							if (StealthPerk1->formID == StealthPerk2->formID)
+								return true;
+
+							BSString DescriptionText1, DescriptionText2;
+							TESDescription* DescriptionForm1 = DYNAMIC_CAST(StealthPerk1, BGSPerk, TESDescription);
+							TESDescription* DescriptionForm2 = DYNAMIC_CAST(StealthPerk2, BGSPerk, TESDescription);
+							CALL_MEMBER_FN(DescriptionForm1, Get)(&DescriptionText1, nullptr);
+							CALL_MEMBER_FN(DescriptionForm2, Get)(&DescriptionText2, nullptr);
+
+							if (!_stricmp(DescriptionText1.Get(), DescriptionText2.Get()))
+								return true;
+						}
+					}
+
+					Result.emplace_back(Effect);
+					return true;
+				}
+
+				break;
+			}
+
+			default:
+				_LogWarning("TestEffectEntry: Unhandled Effect Archetype: %i", Effect.Setting->archetype);
+				break;
+			}
+
+			if (FormID == 0) {
+				Result.emplace_back(Effect);
+				return true;
+			}
+
+			return false;
+		}
+
+		void SortEntries(std::vector<EffectEntry>& Effects) {
+			std::vector<EffectEntry> Result;
+
+			for (auto iterSortList : Forms::EffectSortOrder) {
+				for (auto iterSort : iterSortList) {
+					for (auto iterEffect = Effects.begin(); iterEffect != Effects.end();) {
+						if (SortEntry((*iterEffect), iterSort, Result))
+							iterEffect = Effects.erase(iterEffect);
+						else iterEffect++;
+					}
+				}
+			}
+
+			Effects.clear();
+			Effects.insert(Effects.end(), Result.begin(), Result.end());
+		}
+
+		std::string GetDescription(std::vector<EffectEntry> Effects) {
+			std::stringstream Result;
+			std::string Seperator = ", ";
+
+			bool SkipSeparator = false;
+			for (auto iter = Effects.begin(); iter != Effects.end(); ) {
+				switch (iter->Setting->archetype) {
+				case EffectSetting::kArch_ValueModifier:
+				case EffectSetting::kArch_DualValueModifier:
+				case EffectSetting::kArch_PeakValueModifier: {
+					ActorValueInfo* ActorValue1 = iter->Setting->primaryActorValue;
+					ActorValueInfo* ActorValue2 = iter->Setting->secondaryActorValue;
+
+					std::string Name1 = ActorValue1->avAbbreviation.c_str();
+					if (Name1.empty())
+						Name1 = ActorValue1->avName;
+
+					AddValueEffect(Result, (*iter), ActorValue1, Name1);
+
+					if (ActorValue2) {
+						std::string Name2 = ActorValue2->avAbbreviation.c_str();
+						if (Name2.empty())
+							Name2 = ActorValue2->avName;
+
+						if (_stricmp(Name1.c_str(), Name2.c_str()) != 0) {
+							Result << Seperator;
+							AddValueEffect(Result, (*iter), ActorValue2, Name2);
+						}
+					}
+
+					break;
+				}
+
+				case EffectSetting::kArch_Script:
+				case EffectSetting::kArch_Cloak: {
+					std::string Effect = iter->Setting->description.c_str();
+					while (ispunct(Effect.back()))
+						Effect.pop_back();
+
+					if (Effect.empty()) {
+						SkipSeparator = true;
+						break;
+					}
+
+					StringToUpper(Effect);
+					Result << Effect;
+					break;
+				}
+
+				case EffectSetting::kArch_Chameleon: {
+					BGSPerk* StealthPerk = iter->Setting->perkToApply;
+					if (!StealthPerk) {
+						SkipSeparator = true;
+						break;
+					}
+
+					BSString DescriptionText;
+					TESDescription* DescriptionForm = DYNAMIC_CAST(StealthPerk, BGSPerk, TESDescription);
+					CALL_MEMBER_FN(DescriptionForm, Get)(&DescriptionText, nullptr);
+
+					std::string Effect = DescriptionText.Get();
+
+					while (ispunct(Effect.back()))
+						Effect.pop_back();
+
+					if (Effect.empty()) {
+						SkipSeparator = true;
+						break;
+					}
+
+					StringToUpper(Effect);
+					Result << Effect;
+				}
+
+				default:
+					break;
+				}
+
+				iter++;
+				if ((iter != Effects.end()) && !SkipSeparator)
+					Result << Seperator;
+				SkipSeparator = false;
+			}
+
+			return Result.str();
+		}
+
 	public:
 		virtual void Invoke(Args* args) {
-			ActiveEffect_TEST();
-
 			GFxMovieRoot* root = args->movie->movieRoot;
 			root->CreateArray(args->result);
 
-			GFxValue DataObj, ActiveEffects;
-			root->GetVariable(&DataObj, "root.Menu_mc.DataObj");
-			DataObj.GetMember("ActiveEffects", &ActiveEffects);
-
+			auto ActiveEffectsT = (*g_player)->magicTarget.GetActiveEffects();
 			std::vector<ActiveEffectEntry> ActiveEffectsV;
-			for (int i = 0; i < ActiveEffects.GetArraySize(); i++) {
-				GFxValue Entry, Text, Effects, Type;
-				ActiveEffects.GetElement(i,	&Entry);
-				Entry.GetMember("text",		&Text);
-				Entry.GetMember("effects",	&Effects);
-				Entry.GetMember("type",		&Type);
 
-				std::vector<EffectEntry> EffectsV;
-				for (int j = 0; j < Effects.GetArraySize(); j++) {
-					GFxValue Effect;
-					Effects.GetElement(j, &Effect);
+			for (int i = 0; i < ActiveEffectsT->count; i++) {
+				ActiveEffect*	Effect	= ActiveEffectsT->entries[i];
+				EffectSetting*	Setting	= Effect->data->setting;
 
-					GFxValue Text, Duration, Value, ShowAsPercent;
-					Effect.GetMember("text",			&Text);
-					Effect.GetMember("duration",		&Duration);
-					Effect.GetMember("value",			&Value);
-					Effect.GetMember("showAsPercent",	&ShowAsPercent);
+				if (!Effect || !Setting)
+					continue;
 
-					EffectEntry nEffectEntry;
-					nEffectEntry.text			= Text.GetString();
-					nEffectEntry.Duration		= Duration.GetNumber();
-					nEffectEntry.Value			= Value.GetNumber();
-					nEffectEntry.ShowAsPercent	= ShowAsPercent.GetBool();
+				if ((Effect->flags & ActiveEffect::kFlag_Inactive) || (Setting->flags & EffectSetting::kFlag_HideInUI))
+					continue;
 
-					EffectsV.emplace_back(nEffectEntry);
-				}
+				TESForm* Source = (Effect->sourceItem) ? Effect->sourceItem : Effect->sourceSpell;
+				if (!Source)
+					return;
 
-				std::sort(EffectsV.begin(), EffectsV.end(),
-					[](EffectEntry E1, EffectEntry E2) {
-						const char* Name1 = E1.text.c_str();
-						const char* Name2 = E2.text.c_str();
-						int Length = max(strlen(Name1), strlen(Name2));
+				EffectEntry newEffect;
+				newEffect.Setting	= Setting;
+				newEffect.FormID	= Setting->formID;
+				newEffect.Magnitude	= Effect->magnitude;
+				newEffect.Duration	= Effect->duration;
 
-						for (int i = 0; i < Length; i++)
-							if (E1.text[i] != E2.text[i])
-								return (E1.text[i] < E2.text[i]);
-
-						if (E1.text != E2.text)
-							return (E1.text < E2.text);
-
-						return (E1.Value > E2.Value);
+				bool SkipEffect = false;
+				for (int i = 0; i < ActiveEffectsV.size(); i++) {
+					if (ActiveEffectsV[i].FormID == Source->formID) {
+						(Setting->flags & EffectSetting::kFlag_Detrimental) ?
+							ActiveEffectsV[i].EffectsD.emplace_back(newEffect) : 
+							ActiveEffectsV[i].EffectsB.emplace_back(newEffect);
+						SkipEffect = true;
 					}
-				);
-
-				std::stringstream Description;
-				bool HasDuration = false;
-				
-				for (auto iter : EffectsV) {
-					for (auto& C : iter.text)
-						C = toupper(C);
-
-					Description << iter.text << " " << round(iter.Value) << ((iter.ShowAsPercent) ? "% " : " ");
-					HasDuration = ((iter.Duration > 0) || HasDuration);
 				}
 
-				ActiveEffectEntry ActiveEffect;
-				ActiveEffect.text			= Text.GetString();
-				ActiveEffect.Description	= Description.str();
-				ActiveEffect.HasDuration	= HasDuration;
-				ActiveEffect.Type			= Type.GetUInt();
-
-				ActiveEffectsV.emplace_back(ActiveEffect);
+				if (!SkipEffect) {
+					ActiveEffectEntry newActiveEffect;
+					newActiveEffect.Name	= Source->GetFullName();
+					newActiveEffect.FormID	= Source->formID;
+					(Setting->flags & EffectSetting::kFlag_Detrimental) ?
+						newActiveEffect.EffectsD.emplace_back(newEffect) :
+						newActiveEffect.EffectsB.emplace_back(newEffect);
+					newActiveEffect.Type	= GetType(Source);
+					ActiveEffectsV.emplace_back(newActiveEffect);
+				}
 			}
 
 			std::sort(ActiveEffectsV.begin(), ActiveEffectsV.end(),
-				[](ActiveEffectEntry E1, ActiveEffectEntry E2) {
-					if (E1.Type != E2.Type)
-						return (E1.Type < E2.Type);
-
-					const char* Name1 = E1.text.c_str();
-					const char* Name2 = E2.text.c_str();
-					int Length = max(strlen(Name1), strlen(Name2));
-
-					for (int i = 0; i < Length; i++)
-						if (E1.text[i] != E2.text[i])
-							return (E1.text[i] < E2.text[i]);
-
-					return (E1.text < E2.text);
+				[](ActiveEffectEntry const& E1, ActiveEffectEntry const& E2) {
+					SortGeneric(E1, E2, Type);
+					SortStrings(E1, E2, Name);
+					return false;
 				}
 			);
 
 			for (auto iter : ActiveEffectsV) {
+				SortEntries(iter.EffectsB); SortEntries(iter.EffectsD);
+				iter.EffectsB.insert(iter.EffectsB.end(), iter.EffectsD.begin(), iter.EffectsD.end());
+
+				bool HasDuration = false;
+				for (auto iterEffect : iter.EffectsB) {
+					if (iterEffect.Duration > 0) {
+						HasDuration = true;
+						break;
+					}
+				}
+
 				GFxValue Entry;
 				root->CreateObject(&Entry);
-				SetGFxValue(&Entry, root,	"text",			iter.text);
-				SetGFxValue(&Entry, root,	"Original",		iter.text);
-				SetGFxValue(&Entry, root,	"Description",	iter.Description);
-				SetGFxValue(&Entry,			"HasDuration",	iter.HasDuration);
+				SetGFxValue(&Entry, root,	"text",			iter.Name.c_str());
+				SetGFxValue(&Entry, root,	"Description",	GetDescription(iter.EffectsB).c_str());
+				SetGFxValue(&Entry,			"HasDuration",	HasDuration);
 				SetGFxValue(&Entry,			"Type",			iter.Type);
 				args->result->PushBack(&Entry);
 			}
@@ -691,8 +895,22 @@ namespace GFX {
                 }
             }
 
-            std::sort(RepairV.begin(), RepairV.end(), &RepairList_Sort);
-            std::sort(RepairI.begin(), RepairI.end(), &RepairList_Sort);
+            std::sort(RepairV.begin(), RepairV.end(),
+				[](RepairMenuEntry const& E1, RepairMenuEntry const& E2) {
+					SortStrings(E1, E2, text);
+					SortGeneric(E1, E2, Condition);
+					return false;
+				}
+			);
+
+			std::sort(RepairI.begin(), RepairI.end(),
+				[](RepairMenuEntry const& E1, RepairMenuEntry const& E2) {
+					SortStrings(E1, E2, text);
+					SortGeneric(E1, E2, Condition);
+					return false;
+				}
+			);
+
             RepairV.insert(RepairV.end(), RepairI.begin(), RepairI.end());
 
             for (auto iter : RepairV) {

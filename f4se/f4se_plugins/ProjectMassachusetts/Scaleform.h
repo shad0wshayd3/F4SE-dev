@@ -10,18 +10,19 @@ struct RepairMenuEntry {
     float           Condition;
 };
 
-struct ActiveEffectEntry {
-	std::string		text;
-	std::string		Description;
-	bool			HasDuration;
-	int				Type;
+struct EffectEntry {
+	EffectSetting				* Setting;
+	UInt32						FormID;
+	float						Magnitude;
+	float						Duration;
 };
 
-struct EffectEntry {
-	std::string		text;
-	float			Duration;
-	float			Value;
-	bool			ShowAsPercent;
+struct ActiveEffectEntry {
+	std::string					Name;
+	std::vector<EffectEntry>	EffectsB;
+	std::vector<EffectEntry>	EffectsD;
+	UInt32						FormID;
+	UInt32						Type;
 };
 
 namespace Menus {

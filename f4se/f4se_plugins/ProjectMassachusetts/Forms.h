@@ -5,6 +5,7 @@
 #include "f4se/PluginAPI.h"
 #include "f4se_globals/Globals.h"
 
+#include <unordered_map>
 #include <vector>
 
 extern PluginHandle                 g_PluginHandle;
@@ -15,11 +16,14 @@ extern F4SESerializationInterface*  g_Serialization;
 
 typedef std::vector<ActorValueInfo*>                AVVector;
 typedef std::vector<BGSPerk*>                       PerkVector;
+typedef std::vector<UInt32>							UInt32Vector;
+typedef std::vector<UInt32Vector>                   UInt32VectorVector;
 typedef std::vector<std::string>                    StringVector;
 typedef std::vector<StringVector>                   StringVectorVector;
 typedef std::vector<GFxValue>                       EntryVector;
 typedef std::vector<BGSPerkRankArray::Data>         PerkRankVector;
 typedef std::vector<PerkRankVector>                 PerkRankMap;
+typedef std::vector<std::pair<BGSKeyword*, UInt32>>	KeywordMap;
 typedef std::map<ActorValueInfo*, ActorValueInfo*>  ActorValueMap;
 
 class Forms {
@@ -131,6 +135,9 @@ public:
     static PerkVector               ListMaster;
 
     static StringVectorVector       ListSortOrder;
+	static UInt32VectorVector		EffectSortOrder;
+
+	static KeywordMap				ObjectTypes;
 
     static ActorValueMap            RegisteredDependents;
     static PerkRankMap              RegisteredActors;
