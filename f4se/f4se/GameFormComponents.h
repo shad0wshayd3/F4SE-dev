@@ -344,7 +344,7 @@ class TESTexture : public BaseFormComponent
 public:
 	virtual UInt32			Unk_07(void);
 	virtual void			Unk_08(void); 	//virtual void			GetNormalMapName(BSString * out);	// might have const char * retn type
-	virtual void			Unk_09(void);	//virtual const char *	GetSearchDir(void);	
+	virtual void			Unk_09(void);	//virtual const char *	GetSearchDir(void);
 
 	BSFixedString	str;	// 08 StringCache::Ref
 };
@@ -484,7 +484,6 @@ public:
     UInt32  numPerkRanks;   // 10
     UInt32  pad14;          // 14
 };
-
 
 // 10
 class BGSPropertySheet : public BaseFormComponent
@@ -1404,12 +1403,12 @@ public:
 		UInt64	unk10[(0x78 - 0x08) >> 3];
 
 		MEMBER_FN_PREFIX(Evaluator);
-		DEFINE_MEMBER_FN(ctor, void, 0x0072A650, TESForm * a1, TESForm * a2, UInt64 unk1); // a1 might be player or subject, not sure yet
+		DEFINE_MEMBER_FN(ctor, void, 0x0072A770, TESForm * a1, TESForm * a2, UInt64 unk1); // a1 might be player or subject, not sure yet
 	};
 
 	MEMBER_FN_PREFIX(Condition);
 	// DB2ACB0447C58B663FE4E9C862B96256D0C2716D+15
-	DEFINE_MEMBER_FN(Evaluate, bool, 0x0072C410, Evaluator * eval); // Evaluates only a single condition
+	DEFINE_MEMBER_FN(Evaluate, bool, 0x0072C530, Evaluator * eval); // Evaluates only a single condition
 };
 STATIC_ASSERT(offsetof(Condition, referenceType) == 0x31);
 STATIC_ASSERT(sizeof(Condition) == 0x38);

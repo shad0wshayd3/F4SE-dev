@@ -38,7 +38,7 @@ extern RelocAddr <_LookupFormByID> LookupFormByID;
 extern RelocPtr <IFormFactory*> g_formFactoryList;
 
 /**** form types ***************************************************************
-*	
+*
 *
 *	Code	id	name
 	NONE	0
@@ -761,14 +761,14 @@ public:
 		kFlag_Hardcoded                 = (1 << 31)     // 31 | Hardcoded
 	};
 
-	UInt32			unk170;                  // 170
-	UInt32			numDependentAVs;         // 174
-	UInt32			unk178;                  // 178
-	UInt32			unk17C;                  // 17C
-	UInt32			unk180;                  // 180
-	float			defaultBase;             // 184
-	UInt32			unk188;                  // 188
-	UInt32			unk18C;                  // 18C
+	UInt32    unk170;                       // 170
+	UInt32    numDependentAVs;              // 174
+	UInt32    unk178;                       // 178
+	UInt32    unk17C;                       // 17C
+	UInt32    unk180;                       // 180
+	float     defaultBase;                  // 184
+	UInt32    unk188;                       // 188
+	UInt32    unk18C;                       // 18C
 };
 STATIC_ASSERT(offsetof(ActorValueInfo, avName) == 0x68);
 STATIC_ASSERT(sizeof(ActorValueInfo) == 0x190);
@@ -810,7 +810,7 @@ public:
 		float		unk0C;				// 0C
 		float		unk10;				// 10
 		SInt32		unk14;				// 14 - 0xFFFFFFFF
-		UInt32		unk18;				// 18 
+		UInt32		unk18;				// 18
 		UInt32		unk1C;				// 1C
 	};
 
@@ -952,7 +952,7 @@ public:
 	TESFullName				fullName;		// 20
 	BGSModelMaterialSwap	materialSwap;	// 30
 
-	enum 
+	enum
 	{
 		kFlagPlayable	= 1 << 0,
 		kFlagMale		= 1 << 1,
@@ -1109,7 +1109,7 @@ public:
 	SpellItem				* equipAbility;
 	TESImageSpaceModifier	* imageSpaceModifier;	// 150
 	BGSPerk					* perkToApply;
-	UInt64					castingSoundLevel;	
+	UInt64					castingSoundLevel;
 	UInt64					unk168[3];
 	UInt64					unk180;
 	UInt32					unk188;
@@ -1313,25 +1313,25 @@ public:
 		{
 			union
 			{
-				struct 
+				struct
 				{
 					float	v1;
 					float	v2;
 				} f;
 
-				struct 
+				struct
 				{
 					UInt32	v1;
 					UInt32	v2;
 				} i;
 
-				struct 
+				struct
 				{
 					UInt32	formId;
 					float	v2;
 				} ff;
 
-				struct 
+				struct
 				{
 					UInt32	formId;
 					UInt32	v2;
@@ -1368,7 +1368,7 @@ public:
 				kOpFlag_Set_Float = kOpFlag_Set,
 				kOpFlag_Add_Float = (kOpFlag_Add | kOpFlag_Set),
 				kOpFlag_Mul_Add_Float = (kOpFlag_Mul | kOpFlag_Set),
-				
+
 				kOpFlag_Set_Form_Float = (kOpFlag_Dual | kOpFlag_Form),
 				kOpFlag_Add_Form_Float = (kOpFlag_Add | kOpFlag_Dual | kOpFlag_Form),
 				kOpFlag_Mul_Add_Form_Float = (kOpFlag_Mul | kOpFlag_Dual | kOpFlag_Form)
@@ -1504,8 +1504,8 @@ public:
 
 	BGSLocation*			parent;			// 050
 	UInt64					unk58;			// 058
-	BGSMusicType*			musicType;		// 060 
-	BGSEncounterZone*		encounterZone;	// 068 
+	BGSMusicType*			musicType;		// 060
+	BGSEncounterZone*		encounterZone;	// 068
 	UInt32					unk70;			// 070
 	float					worldRadius;	// 074
 	float					unk78;	// init to 1.0
@@ -1602,7 +1602,7 @@ public:
 	UInt32					unkEC;				// EC
 
 	MEMBER_FN_PREFIX(TESObjectCELL);
-	DEFINE_MEMBER_FN(GetHavokWorld, bhkWorld*, 0x003B4880);
+	DEFINE_MEMBER_FN(GetHavokWorld, bhkWorld*, 0x003B49A0);
 };
 STATIC_ASSERT(offsetof(TESObjectCELL, objectList) == 0x70);
 STATIC_ASSERT(offsetof(TESObjectCELL, worldSpace) == 0xC8);
@@ -1851,8 +1851,8 @@ class TESQuest : public BGSStoryManagerTreeForm
 {
 public:
 
-	enum { kTypeID = kFormType_QUST };	
-	
+	enum { kTypeID = kFormType_QUST };
+
 	TESFullName	fullName;	// 28
 	UInt64	unk38[(0xF0 - 0x38) >> 3];	// 038
 	UInt32	unkF0;		// 0F0
@@ -1878,6 +1878,13 @@ public:
 			flags &= ~0x800;
 		}
 	}
+
+	MEMBER_FN_PREFIX(TESQuest);
+	// broken address
+	DEFINE_MEMBER_FN(ForceRefTo, UInt32, 0x00375050, UInt32 aliasId, TESObjectREFR * reference);
+	DEFINE_MEMBER_FN(NewGame_Internal, UInt8, 0x005D70C0, UInt8 * unk1, UInt8 unk2);
+
+	UInt8 NewGame_Hook(UInt8 * unk1, UInt8 unk2);
 };
 STATIC_ASSERT(offsetof(TESQuest, type) == 0xF7);
 

@@ -1,7 +1,7 @@
 #include "f4se/NiObjects.h"
 #include "f4se/NiExtraData.h"
 
-RelocAddr <_WorldToScreen> WorldToScreen_Internal(0x00AE2720);
+RelocAddr <_WorldToScreen> WorldToScreen_Internal(0x00AE2840);
 
 void NiRefObject::IncRef(void)
 {
@@ -38,25 +38,4 @@ NiExtraData * NiObjectNET::GetExtraData(const BSFixedString & name)
 bool NiObjectNET::AddExtraData(NiExtraData * extraData)
 {
 	return CALL_MEMBER_FN(this, Internal_AddExtraData)(extraData);
-}
-
-// Return true in the functor to halt traversal
-template<typename T>
-bool NiAVObject::Visit(T& functor)
-{
-	if (functor(this))
-		return true;
-
-	NiPointer<NiNode> node(GetAsNiNode());
-	if (node) {
-		for (UInt32 i = 0; i < node->m_children.m_emptyRunStart; i++) {
-			NiPointer<NiAVObject> object(node->m_children.m_data[i]);
-			if (object) {
-				if (object->Visit(functor))
-					return true;
-			}
-		}
-	}
-
-	return false;
 }

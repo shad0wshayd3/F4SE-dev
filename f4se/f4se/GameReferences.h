@@ -186,7 +186,7 @@ public:
 	virtual void	Unk_C3();
 
 	enum { kTypeID = kFormType_REFR };
-	
+
 	// parents
 	BSHandleRefObject							handleRefObject;		// 20
 	BSTEventSink <BSActiveGraphIfInactiveEvent>	activeGraphIfInactive;	// 30
@@ -241,12 +241,12 @@ public:
 	UInt32 CreateRefHandle(void);
 
 	MEMBER_FN_PREFIX(TESObjectREFR);
-	DEFINE_MEMBER_FN(GetReferenceName, const char *, 0x0040B640);
-	DEFINE_MEMBER_FN(GetWorldspace, TESWorldSpace*, 0x0040F170);
-	DEFINE_MEMBER_FN(GetInventoryWeight, float, 0x00400350);
-	DEFINE_MEMBER_FN(GetCarryWeight, float, 0x00D870D0);
+	DEFINE_MEMBER_FN(GetReferenceName, const char *, 0x0040B760);
+	DEFINE_MEMBER_FN(GetWorldspace, TESWorldSpace*, 0x0040F290);
+	DEFINE_MEMBER_FN(GetInventoryWeight, float, 0x00400470);
+	DEFINE_MEMBER_FN(GetCarryWeight, float, 0x00D871F0);
 	// 7055D6CB4B64E11E63908512704F8871CEC025D3+11E
-	DEFINE_MEMBER_FN_1(ForEachAlias, void, 0x003F7840, IAliasFunctor * functor);
+	DEFINE_MEMBER_FN_1(ForEachAlias, void, 0x003F7960, IAliasFunctor * functor);
 };
 STATIC_ASSERT(offsetof(TESObjectREFR, parentCell) == 0xB8);
 STATIC_ASSERT(offsetof(TESObjectREFR, baseForm) == 0xE0);
@@ -417,7 +417,7 @@ public:
 			UInt32	unk3AC;				// 3AC
 			UInt64	unk3B0[(0x3C8 - 0x3B0) >> 3];
 			float*	unk3C8;				// 3C8
-			UInt64  unk3D0[(0x490 - 0x3D0) >> 3];				
+			UInt64  unk3D0[(0x490 - 0x3D0) >> 3];
 
 			enum
 			{
@@ -432,7 +432,7 @@ public:
 		Data08 * unk08;	// 08
 
 		MEMBER_FN_PREFIX(MiddleProcess);
-		DEFINE_MEMBER_FN(UpdateEquipment, void, 0x00E60740, Actor * actor, UInt32 flags); 
+		DEFINE_MEMBER_FN(UpdateEquipment, void, 0x00E60860, Actor * actor, UInt32 flags);
 	};
 	MiddleProcess * middleProcess;					// 300
 	UInt64	unk308[(0x338-0x308)/8];
@@ -476,9 +476,9 @@ public:
 	bool GetEquippedExtraData(UInt32 slotIndex, ExtraDataList ** extraData);
 
 	MEMBER_FN_PREFIX(Actor);
-	DEFINE_MEMBER_FN(QueueUpdate, void, 0x00D8A0D0, bool bDoFaceGen, UInt32 unk2, bool DoQueue, UInt32 flags); // 0, 0, 1, 0
-	DEFINE_MEMBER_FN(IsHostileToActor, bool, 0x00D90F60, Actor * actor);
-	DEFINE_MEMBER_FN(UpdateEquipment, void, 0x00408150); 
+	DEFINE_MEMBER_FN(QueueUpdate, void, 0x00D8A1F0, bool bDoFaceGen, UInt32 unk2, bool DoQueue, UInt32 flags); // 0, 0, 1, 0
+	DEFINE_MEMBER_FN(IsHostileToActor, bool, 0x00D91080, Actor * actor);
+	DEFINE_MEMBER_FN(UpdateEquipment, void, 0x00408270);
 };
 STATIC_ASSERT(offsetof(Actor, equipData) == 0x428);
 STATIC_ASSERT(offsetof(Actor, actorFlags2) == 0x43C);

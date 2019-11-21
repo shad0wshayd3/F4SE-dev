@@ -245,14 +245,14 @@ public:
 private:
 	// GameMenuBase:BSInputEventUser override should be the only one calling this function
 	friend class GameMenuBase;
-	DEFINE_MEMBER_FN_1(Impl_OnGameMenuBaseButtonEvent, bool, 0x0210F610, ButtonEvent * button);
+	DEFINE_MEMBER_FN_1(Impl_OnGameMenuBaseButtonEvent, bool, 0x0210F730, ButtonEvent * button);
 };
 
 // 30
 class PlayerInputHandler : public BSInputEventUser
 {
 public:
-	PlayerInputHandler() : BSInputEventUser(true), 
+	PlayerInputHandler() : BSInputEventUser(true),
 		unk10(0), unk18(0), unk19(0), unk1A(0), unk1C(0), unk20(0), unk21(0), unk22(0), unk24(0), unk28(0), unk2C(0) { }
 
 	virtual void Unk_09() { };
@@ -263,7 +263,7 @@ public:
 	UInt8	unk19;	// 19
 	UInt16	unk1A;	// 1A
 	UInt32	unk1C;	// 1C
-	UInt8	unk20;  // 20 
+	UInt8	unk20;  // 20
 	UInt8	unk21;	// 21 unk21 == 1 has something to do with an additional vfunc
 	UInt16	unk22;	// 22
 	UInt32	unk24;	// 24

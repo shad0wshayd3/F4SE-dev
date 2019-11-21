@@ -85,7 +85,7 @@ public:
 	virtual bool				Unk_27() { return false; };
 
 	MEMBER_FN_PREFIX(NiObject);
-	DEFINE_MEMBER_FN(Internal_IsEqual, bool, 0x01B94970, NiObject * object);
+	DEFINE_MEMBER_FN(Internal_IsEqual, bool, 0x01B94A90, NiObject * object);
 };
 
 // 28
@@ -108,7 +108,7 @@ public:
 	bool HasExtraData(const BSFixedString & name) { return GetExtraData(name) != nullptr; }
 
 	MEMBER_FN_PREFIX(NiObjectNET);
-	DEFINE_MEMBER_FN(Internal_AddExtraData, bool, 0x01B977A0, NiExtraData * extraData);
+	DEFINE_MEMBER_FN(Internal_AddExtraData, bool, 0x01B978C0, NiExtraData * extraData);
 };
 
 // 120
@@ -196,12 +196,28 @@ public:
 	float			unk118;				// 118
 	UInt32			unk11C;				// 11C
 
-	// Moved to NiObjects.cpp, fixes C2027.
-	template<typename T>
-	bool Visit(T& functor);
-
 	MEMBER_FN_PREFIX(NiAVObject);
-	DEFINE_MEMBER_FN(GetAVObjectByName, NiAVObject*, 0x01C93860, BSFixedString * name, bool unk1, bool unk2);
-	DEFINE_MEMBER_FN(SetScenegraphChange, void, 0x01BA46A0);
+	DEFINE_MEMBER_FN(GetAVObjectByName, NiAVObject*, 0x01C93980, BSFixedString * name, bool unk1, bool unk2);
+	DEFINE_MEMBER_FN(SetScenegraphChange, void, 0x01BA47C0);
 };
 STATIC_ASSERT(sizeof(NiAVObject) == 0x120);
+
+template<typename T>
+bool VisitNiAVObject(T& functor, NiAVObject* avObject)
+{
+	if (functor(avObject))
+		return true;
+
+	NiPointer<NiNode> node(avObject->GetAsNiNode());
+	if (node) {
+		for (UInt32 i = 0; i < node->m_children.m_emptyRunStart; i++) {
+			NiPointer<NiAVObject> object(node->m_children.m_data[i]);
+			if (object) {
+				if (VisitNiAVObject(functor, object))
+					return true;
+			}
+		}
+	}
+
+	return false;
+}

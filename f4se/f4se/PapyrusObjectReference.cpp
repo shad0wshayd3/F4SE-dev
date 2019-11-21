@@ -583,7 +583,7 @@ namespace papyrusObjectReference {
 			if(!rootNode[i])
 				continue;
 
-			rootNode[i]->Visit([&](NiAVObject * object)
+			VisitNiAVObject([&](NiAVObject* object)
 			{
 				BSGeometry * geometry = object->GetAsBSGeometry();
 				if(geometry) 
@@ -644,7 +644,7 @@ namespace papyrusObjectReference {
 					
 				}
 				return false;
-			});
+			}, rootNode[i]);
 		}
 
 		VMArray<RemapData> result;

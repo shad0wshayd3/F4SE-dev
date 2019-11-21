@@ -140,7 +140,7 @@ public:
 			virtual void Unk_02();
 			virtual void Unk_03();
 			virtual void Load(void * unk1);
-			
+
 			BSFixedString	diffuse;		// 20
 			BSFixedString	normal;			// 28
 			BSFixedString	specular;		// 30
@@ -214,7 +214,7 @@ public:
 			} channel; // 18
 			UInt32 bgra;
 		} color;
-		
+
 		SInt16	colorID;	// 1C - ID of the color from the template's list
 		UInt16	pad1E;		// 1E
 	};
@@ -413,7 +413,7 @@ public:
 	UInt64					unk520[(0x548-0x520)/8];	// 520
 
 	MEMBER_FN_PREFIX(CharacterCreation);
-	DEFINE_MEMBER_FN(LoadPreset, void, 0x00CACC20, UInt32 presetIndex); // Loads preset by index onto the actor
+	DEFINE_MEMBER_FN(LoadPreset, void, 0x00CACD40, UInt32 presetIndex); // Loads preset by index onto the actor
 };
 
 // ??
@@ -437,7 +437,7 @@ public:
 	UInt8		unk34F0;							// Reset bit?
 
 	MEMBER_FN_PREFIX(BSFaceGenManager);
-	DEFINE_MEMBER_FN(ApplyDynamicData, void, 0x00678D20, BSTriShape * trishape);
+	DEFINE_MEMBER_FN(ApplyDynamicData, void, 0x00678E40, BSTriShape * trishape);
 };
 STATIC_ASSERT(offsetof(BSFaceGenManager, unk3230) == 0x3230);
 STATIC_ASSERT(offsetof(BSFaceGenManager, unk3478) == 0x3478);
