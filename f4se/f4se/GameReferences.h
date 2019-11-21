@@ -118,7 +118,7 @@ public:
 	virtual void	Unk_7F();
 	virtual void	Unk_80();
 	virtual void	Unk_81();
-	virtual void	Unk_82();
+	virtual void	* Unk_82();
 	virtual void	Unk_83();
 	virtual void	Unk_84();
 	virtual void	Unk_85();
@@ -415,7 +415,9 @@ public:
 			UInt32	furnitureHandle1;	// 3A4
 			UInt32	furnitureHandle2;	// 3A8
 			UInt32	unk3AC;				// 3AC
-			UInt64	unk3B0[(0x490 - 0x3B0) >> 3];
+			UInt64	unk3B0[(0x3C8 - 0x3B0) >> 3];
+			float*	unk3C8;				// 3C8
+			UInt64  unk3D0[(0x490 - 0x3D0) >> 3];				
 
 			enum
 			{
@@ -451,11 +453,21 @@ public:
 	};
 
 	tArray<Data350>	unk350;				// 350
-	UInt64	unk368[(0x418-0x368)/8];
+	UInt64			unk368[(0x418-0x368)/8];
 	TESRace			* race;				// 418
 	UInt64			unk420;				// 420
 	ActorEquipData	* equipData;		// 428
-	UInt64	unk430[(0x490-0x430)/8];	// 430
+	UInt64			unk430;				// 430
+	UInt32			unk438;				// 438
+	UInt32			actorFlags2;		// 43C
+
+	enum ActorFlags2
+	{
+		kIsTrespassing = 1 << 12,
+		kIsInKillMove = 1 << 14,
+	};
+
+	UInt64			unk440[(0x490 - 0x440) / 8];
 
 	bool IsPlayerTeammate()
 	{
@@ -469,7 +481,11 @@ public:
 	DEFINE_MEMBER_FN(UpdateEquipment, void, 0x00408150); 
 };
 STATIC_ASSERT(offsetof(Actor, equipData) == 0x428);
+STATIC_ASSERT(offsetof(Actor, actorFlags2) == 0x43C);
 STATIC_ASSERT(offsetof(Actor::MiddleProcess::Data08, equipData) == 0x288);
+STATIC_ASSERT(offsetof(Actor::MiddleProcess::Data08, unk3C8) == 0x3C8);
+STATIC_ASSERT(offsetof(Actor::MiddleProcess::Data08, unk3D0) == 0x3D0);
+STATIC_ASSERT(offsetof(Actor::MiddleProcess::Data08, unk490) == 0x490);
 
 // E10
 class PlayerCharacter : public Actor

@@ -177,7 +177,7 @@ public:
 	tArray<BGSPerk*>					arrPERK;	// Form Type 95
 	UnkFormArray						arrBPTD;	// Form Type 96
 	UnkFormArray						arrADDN;	// Form Type 97
-	UnkFormArray						arrAVIF;	// Form Type 98
+	tArray<ActorValueInfo*>				arrAVIF;	// Form Type 98
 	UnkFormArray						arrCAMS;	// Form Type 99
 	UnkFormArray						arrCPTH;	// Form Type 100
 	UnkFormArray						arrVTYP;	// Form Type 101

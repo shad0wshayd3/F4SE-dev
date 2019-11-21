@@ -744,9 +744,11 @@ public:
 	void            * derived_func_ptr;		// 108 - address of offset F0
 #endif
 
-	UInt32    unk110[(0x16C - 0x110) / 4];  // 110
+	UInt32    unk110[(0x160 - 0x110) / 4];  // 110
 
-	UInt32    avFlags;                      // 16C
+	BSFixedString	avAbbreviation;			// 160
+
+	UInt32			avFlags;                // 16C
 	enum AVFlags
 	{
 		kFlag_DefaultBase_0             = (1 << 10),    // 10 | Default Base: 0
@@ -759,16 +761,17 @@ public:
 		kFlag_Hardcoded                 = (1 << 31)     // 31 | Hardcoded
 	};
 
-	UInt32    unk170;                       // 170
-	UInt32    numDependentAVs;              // 174
-	UInt32    unk178;                       // 178
-	UInt32    unk17C;                       // 17C
-	UInt32    unk180;                       // 180
-	float     defaultBase;                  // 184
-	UInt32    unk188;                       // 188
-	UInt32    unk18C;                       // 18C
+	UInt32			unk170;                  // 170
+	UInt32			numDependentAVs;         // 174
+	UInt32			unk178;                  // 178
+	UInt32			unk17C;                  // 17C
+	UInt32			unk180;                  // 180
+	float			defaultBase;             // 184
+	UInt32			unk188;                  // 188
+	UInt32			unk18C;                  // 18C
 };
 STATIC_ASSERT(offsetof(ActorValueInfo, avName) == 0x68);
+STATIC_ASSERT(sizeof(ActorValueInfo) == 0x190);
 
 // 80
 class BGSMaterialType : public TESForm
@@ -1014,57 +1017,110 @@ public:
 		kFlag_NoDeathDispel				= 1 << 28,
 	};
 
-	TESFullName				fullName;		// 20
-	BGSMenuDisplayObject	menuObject;		// 30
-	BGSKeywordForm			keywordForm;	// 40
-	UInt64					unk060[2]; // 60
-	UInt32					flags; // 70
+	enum Archetypes {
+		kArch_ValueModifier         = 0,
+		kArch_Script                = 1,
+		kArch_Dispel                = 2,
+		kArch_CureDisease           = 3,
+		kArch_Absorb                = 4,
+		kArch_DualValueModifier     = 5,
+		kArch_Calm                  = 6,
+		kArch_Demoralize            = 7,
+		kArch_Frenzy                = 8,
+		kArch_Disarm                = 9,
+		kArch_CommandSummoned       = 10,
+		kArch_Invisibility          = 11,
+		kArch_Light                 = 12,
+		kArch_Darkness              = 13,
+		kArch_Nighteye              = 14,
+		kArch_Lock                  = 15,
+		kArch_Open                  = 16,
+		kArch_BoundWeapon           = 17,
+		kArch_SummonCreature        = 18,
+		kArch_DetectLife            = 19,
+		kArch_Telekinesis           = 20,
+		kArch_Paralysis             = 21,
+		kArch_Reanimate             = 22,
+		kArch_SoulTrap              = 23,
+		kArch_TurnUndead            = 24,
+		kArch_Guide                 = 25,
+		kArch_CureParalysis         = 27,
+		kArch_CureAddiction         = 28,
+		kArch_CurePoison            = 29,
+		kArch_Concussion            = 30,
+		kArch_Stimpak               = 31,
+		kArch_AccumulateMagnitude   = 32,
+		kArch_Stagger               = 33,
+		kArch_PeakValueModifier     = 34,
+		kArch_Cloak                 = 35,
+		kArch_SlowTime              = 37,
+		kArch_Rally                 = 38,
+		kArch_EnhanceWeapon         = 39,
+		kArch_SpawnHazard           = 40,
+		kArch_Etherealize           = 41,
+		kArch_Banish                = 42,
+		kArch_SpawnScriptedRef      = 43,
+		kArch_Disguise              = 44,
+		kArch_Damage                = 45,
+		kArch_Immunity              = 46,
+		kArch_PermanentReanimate    = 47,
+		kArch_Jetpack               = 48,
+		kArch_Chameleon             = 49,
+	};
+
+	TESFullName				fullName;				// 20
+	BGSMenuDisplayObject	menuObject;				// 30
+	BGSKeywordForm			keywordForm;			// 40
+	UInt64					unk060[2];				// 60
+	UInt32					flags;					// 70
 	float					unk074;
-	TESForm*				unk078;	// primary object? (SpellItem, TESObjectLIGH, BGSDamageType, BGSHazard)
+	TESForm					* associatedItem;
 	UInt64					unk080;
-	ActorValueInfo*			actorValInfo88; // 088
+	ActorValueInfo			* resistValue;			// 88
 	UInt8					unk090;
 	UInt8					pad092[3];
-	TESObjectLIGH*			light98;
+	TESObjectLIGH			* castingLight;
 	float					unkA0;
 	UInt32					padA4;
-	TESEffectShader*		effectShaderA8;
+	TESEffectShader			* effectShaderA8;
 	UInt64					unkB0;
 	UInt64					unkB8;
 	float					unkC0;
 	float					unkC4;
 	float					unkC8;
-	float					unkCC;
-	UInt32					unk0D0; 
+	float					secondaryAVWeight;
+	UInt32					archetype;
 	UInt32					pad0D4;
-	ActorValueInfo*			actorValInfoD8;
-	BGSProjectile*			projectileE0;
-	BGSExplosion*			explosionE8;
-	UInt32					unkF0; // init to 3 cast type?
-	UInt32					unkF4; // init to 5 delivery type?
-	ActorValueInfo*			actorValInfoF8;
-	UInt64					unk100;
-	BGSArtObject*			art108;
-	BGSImpactDataSet*		impact110;
-	UInt32					unk118;
+	ActorValueInfo			* primaryActorValue;
+	BGSProjectile			* projectile;
+	BGSExplosion			* explosion;
+	UInt32					castingType;
+	UInt32					deliveryType;
+	ActorValueInfo			* secondaryActorValue;
+	BGSArtObject			* castingArt;
+	BGSArtObject			* hitEffectArt;
+	BGSImpactDataSet		* impactData;
+	float					skillUsageModifier;
 	UInt32					pad11C;
-	UInt64					unk120;
-	float					unk128; // initialized to  3F800000 dual casting scale?
+	BGSArtObject			* enchantArt;
+	float					unk128;					// initialized to  3F800000 dual casting scale?
 	UInt32					pad12C;
-	UInt64					unk130[4];
-	TESImageSpaceModifier*	spaceModifier150; // 150
-	BGSPerk*				perk158;
-	UInt64					unk160;	// initialized to 1		
+	UInt64					unk130[3];
+	SpellItem				* equipAbility;
+	TESImageSpaceModifier	* imageSpaceModifier;	// 150
+	BGSPerk					* perkToApply;
+	UInt64					castingSoundLevel;	
 	UInt64					unk168[3];
 	UInt64					unk180;
 	UInt32					unk188;
 	UInt32					unk18C;
 	UInt64					unk190;
-	void*					unk198;	// pointer to something
+	BSFixedString			description;					// pointer to something
 	UInt64					unk1A0;
 	void*					unk1A8;
 };
-STATIC_ASSERT(offsetof(EffectSetting, unk160) == 0x160);
+STATIC_ASSERT(offsetof(EffectSetting, castingSoundLevel) == 0x160);
+STATIC_ASSERT(offsetof(EffectSetting, description) == 0x198);
 STATIC_ASSERT(sizeof(EffectSetting) == 0x1B0);
 
 // 50

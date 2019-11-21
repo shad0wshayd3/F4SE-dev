@@ -433,6 +433,8 @@ public:
 	void		* unk3478;							// 3478
 	UInt64		unk3480[(0x34A8 - 0x3480) >> 3];	// 3238
 	NiAVObject	* camera;							// 34A8 - NiCamera (WorldRoot Camera)
+	UInt64		unk34B0[(0x34F0 - 0x34B0) >> 3];
+	UInt8		unk34F0;							// Reset bit?
 
 	MEMBER_FN_PREFIX(BSFaceGenManager);
 	DEFINE_MEMBER_FN(ApplyDynamicData, void, 0x00678D20, BSTriShape * trishape);
@@ -440,6 +442,7 @@ public:
 STATIC_ASSERT(offsetof(BSFaceGenManager, unk3230) == 0x3230);
 STATIC_ASSERT(offsetof(BSFaceGenManager, unk3478) == 0x3478);
 STATIC_ASSERT(offsetof(BSFaceGenManager, camera) == 0x34A8);
+STATIC_ASSERT(offsetof(BSFaceGenManager, unk34F0) == 0x34F0);
 
 extern RelocPtr <BSFaceGenManager*> g_faceGenManager;
 extern RelocPtr <CharacterCreation*> g_characterCreation;
