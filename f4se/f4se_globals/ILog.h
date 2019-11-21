@@ -1,69 +1,66 @@
 #pragma once
 
-class ILog {
+#include <fstream>
+#include <string>
+
+class GLog {
 public:
-    static void     Open(const char* logName);
+					~GLog();
 
-    static void     MessageNT(const char* messageText, va_list args, const char* messagePrefix = NULL);
-    static void     MessageTS(const char* messageText, va_list args, const char* messagePrefix = NULL);
-
-    static int      m_indentLevel;
+	void			Open(std::string logName);
+	void			Message(const char* prefix, const char* message, va_list args, bool timestamp);
+	void			Indent();
+	void			Outdent();
 
 private:
-    static void     PrintMessage(const char* message);
+	void			Write(const char* message);
 
-    static void     SeekCursor(int position);
-    static void     PrintSpaces(int numSpaces);
-    static void     PrintText(const char* buf);
-    static void     NewLine();
-    static int      TabSize();
-
-    static FILE*    m_logFile;
-    
-    static int      m_cursorPos;
+	std::ofstream	m_logFile;
+	int				m_indentLevel;
 };
 
+extern GLog g_Log;
+
 inline void _LogIndent() {
-    ILog::m_indentLevel++;
+	g_Log.Indent();
 }
 
 inline void _LogOutdent() {
-    if (ILog::m_indentLevel)
-        ILog::m_indentLevel--;
+	g_Log.Outdent();
 }
 
-inline void _LogMessage(const char* messageText, ...) {
-    va_list args; va_start(args, messageText);
-    ILog::MessageTS(messageText, args);
+inline void _LogMessage(const char* message, ...) {
+    va_list args; va_start(args, message);
+	g_Log.Message("", message, args, true);
     va_end(args);
 }
 
-inline void _LogWarning(const char* messageText, ...) {
-    va_list args; va_start(args, messageText);
-    ILog::MessageTS(messageText, args, "Warning: ");
+inline void _LogWarning(const char* message, ...) {
+    va_list args; va_start(args, message);
+	g_Log.Message("Warning: ", message, args, true);
     va_end(args);
 }
 
-inline void _LogError(const char* messageText, ...) {
-    va_list args; va_start(args, messageText);
-    ILog::MessageTS(messageText, args, "Error: ");
+inline void _LogError(const char* message, ...) {
+    va_list args; va_start(args, message);
+	g_Log.Message("Error: ", message, args, true);
     va_end(args);
 }
 
-inline void _LogMessageNT(const char* messageText, ...) {
-    va_list args; va_start(args, messageText);
-    ILog::MessageNT(messageText, args);
+inline void _LogMessageNT(const char* message, ...) {
+	va_list args; va_start(args, message);
+	g_Log.Message("", message, args, false);
     va_end(args);
 }
 
-inline void _LogWarningNT(const char* messageText, ...) {
-    va_list args; va_start(args, messageText);
-    ILog::MessageNT(messageText, args, "Warning: ");
+inline void _LogWarningNT(const char* message, ...) {
+	va_list args; va_start(args, message);
+	g_Log.Message("Warning: ", message, args, false);
     va_end(args);
 }
 
-inline void _LogErrorNT(const char* messageText, ...) {
-    va_list args; va_start(args, messageText);
-    ILog::MessageNT(messageText, args, "Error: ");
+inline void _LogErrorNT(const char* message, ...) {
+	va_list args; va_start(args, message);
+	g_Log.Message("Error: ", message, args, false);
     va_end(args);
 }

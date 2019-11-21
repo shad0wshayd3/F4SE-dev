@@ -241,7 +241,3 @@ void GFxLogElements::Visit(UInt32 idx, GFxValue* value) {
 	_LogIndent(); GFxLogMembers LM(value);
 	value->VisitMembers(&LM); _LogOutdent();
 }
-
-void GFxLogMembersBasic::Visit(const char* member, GFxValue* value) {
-    _LogMessageNT(member);
-}

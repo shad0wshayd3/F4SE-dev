@@ -24,10 +24,10 @@ public:
 	UInt16  unk34;		// 34
 	UInt32  unk38;		// 38
 	UInt64  unk40;		// 40
-	TESForm	* unk48;	// 48 // MagicItem
+	TESForm	* sourceSpell;	// 48
 
 	struct Data {
-		float			unk00;		// 00 // Also Magnitude?
+		float			unk00;		// 00
 		UInt32			unk04;		// 04
 		UInt32			unk08;		// 08
 		EffectSetting	* setting;	// 10
@@ -37,20 +37,21 @@ public:
 	Data	* data;		// 50
 
 	UInt64  unk58;		// 58
-	TESForm	* unk60;	// 60 // Source Item
+	TESForm	* sourceItem;	// 60
 	UInt64	unk68;		// 68
 	UInt64	unk70;		// 70
-	float	unk78;		// 78 // Elapsed
-	float	unk7C;		// 7C // Duration
-	float	unk80;		// 80 // Magnitude
+	float	elapsed;		// 78
+	float	duration;		// 7C
+	float	magnitude;		// 80
 	UInt32	flags;		// 84
 	UInt32	unk88;		// 88
 	UInt16	unk8C;		// 8C
 	UInt32	unk90;		// 90
 	// ...
 };
-STATIC_ASSERT(offsetof(ActiveEffect, unk48) == 0x48);
+STATIC_ASSERT(offsetof(ActiveEffect, sourceSpell) == 0x48);
 STATIC_ASSERT(offsetof(ActiveEffect, data) == 0x50);
+STATIC_ASSERT(offsetof(ActiveEffect, sourceItem) == 0x60);
 STATIC_ASSERT(offsetof(ActiveEffect::Data, setting) == 0x10);
 
 class ExtraCharge : public BSExtraData {

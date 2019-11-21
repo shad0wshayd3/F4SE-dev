@@ -13,4 +13,3 @@
 
 void InitializePlugin(const char* logName);
 void InitializePlugin(const char* logName, const char* configPath);
-void InitializePlugin(const char* logName, const char* configPath, const char* configPrefix);

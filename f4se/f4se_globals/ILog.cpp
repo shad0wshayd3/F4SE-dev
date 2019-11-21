@@ -1,136 +1,82 @@
 #include "ILog.h"
 
-#include "common/IFileStream.h"
-
 #include <chrono>
-#include <iomanip>
+#include <filesystem>
 #include <ShlObj.h>
 #include <sstream>
 
 // ------------------------------------------------------------------------------------------------
-// ILog
+// GLog
 // ------------------------------------------------------------------------------------------------
 
-void ILog::Open(const char* logName) {
-    char logPath[MAX_PATH], relativePath[MAX_PATH];
-
-    sprintf_s(relativePath, sizeof(relativePath), "\\My Games\\Fallout4\\F4SE\\%s.log", logName);
-    HRESULT err = SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS | CSIDL_FLAG_CREATE, NULL, SHGFP_TYPE_CURRENT, logPath);
-    if (!SUCCEEDED(err))
-        HALT("Could not create log file.");
-
-    strcat_s(logPath, sizeof(logPath), relativePath);
-    IFileStream::MakeAllDirs(logPath);
-
-    m_logFile = _fsopen(logPath, "w", _SH_DENYWR);
-
-    if (!m_logFile) {
-        UInt32 id = 0;
-        char name[1024];
-
-        do {
-            sprintf_s(name, sizeof(name), "%s%d", logPath, id);
-            id++;
-
-            m_logFile = NULL;
-            m_logFile = _fsopen(name, "w", _SH_DENYWR);
-        } while (!m_logFile && (id < 5));
-    }
+GLog::~GLog() {
+	if (m_logFile.is_open())
+		m_logFile.close();
 }
 
-void ILog::MessageNT(const char* messageText, va_list args, const char* messagePrefix) {
-    std::stringstream MessageStream;
+void GLog::Open(std::string logName) {
+	PWSTR documentsPath;
+	HRESULT hr = SHGetKnownFolderPath(FOLDERID_Documents, 0, NULL, &documentsPath);
 
-    if (messagePrefix)
-        MessageStream << messagePrefix;
+	if (!SUCCEEDED(hr))
+		HALT("Couldn't get My Documents folder.");
 
-    char formatBuf[8192];
-    vsprintf_s(formatBuf, sizeof(formatBuf), messageText, args);
+	auto path = std::filesystem::path(documentsPath);
+	path.append("My Games\\Fallout4\\F4SE");
+	path.append(logName + ".log");
 
-    MessageStream << formatBuf;
-    PrintMessage(MessageStream.str().c_str());
+	m_logFile.open(path, std::ofstream::trunc);
+	if (!m_logFile.is_open()) {
+		int index = 0;
+
+		do {
+			path.remove_filename();
+			path.append(logName + std::to_string(index) + ".log");
+			index++;
+
+			m_logFile.open(path, std::ofstream::trunc);
+
+		} while (!m_logFile.is_open());
+	}
 }
 
-void ILog::MessageTS(const char* messageText, va_list args, const char* messagePrefix) {
-    std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    tm Timestamp; localtime_s(&Timestamp, &now);
+void GLog::Message(const char* prefix, const char* message, va_list args, bool timestamp) {
+	std::stringstream stream;
 
-    std::stringstream MessageStream;
-    MessageStream << std::put_time(&Timestamp, "[%m/%d/%Y - %I:%M:%S%p] ");
+	if (timestamp) {
+		auto time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+		tm Timestamp; localtime_s(&Timestamp, &time);
 
-    if (messagePrefix)
-        MessageStream << messagePrefix;
+		stream << std::put_time(&Timestamp, "[%m/%d/%Y - %I:%M:%S%p] ");
+	}
+
+	if (prefix) {
+		stream << prefix;
+	}
 
     char formatBuf[8192];
-    vsprintf_s(formatBuf, sizeof(formatBuf), messageText, args);
+    vsprintf_s(formatBuf, sizeof(formatBuf), message, args);
 
-    MessageStream << formatBuf;
-    PrintMessage(MessageStream.str().c_str());
+	stream << formatBuf;
+    Write(stream.str().c_str());
+}
+
+void GLog::Indent() {
+	m_indentLevel++;
+}
+
+void GLog::Outdent() {
+	if (m_indentLevel)
+		m_indentLevel--;
 }
 
 // ------------------------------------------------------------------------------------------------
 // Internal Functions
 // ------------------------------------------------------------------------------------------------
 
-void ILog::PrintMessage(const char* message) {
-    SeekCursor(m_indentLevel * 4);
-    PrintText(message);
-    NewLine();
+void GLog::Write(const char* message) {
+	for (int i = 0; i < m_indentLevel; i++)
+		m_logFile << "    ";
+	m_logFile << message << "\n";
+	m_logFile.flush();
 }
-
-void ILog::SeekCursor(int position) {
-    if (position > m_cursorPos)
-        PrintSpaces(position - m_cursorPos);
-}
-
-void ILog::PrintSpaces(int numSpaces) {
-    int	originalNumSpaces = numSpaces;
-
-    if (m_logFile) {
-        while (numSpaces > 0) {
-            numSpaces--;
-            fputc(' ', m_logFile);
-        }
-    }
-
-    m_cursorPos += originalNumSpaces;
-}
-
-void ILog::PrintText(const char* buf) {
-    if (m_logFile) {
-        fputs(buf, m_logFile);
-        fflush(m_logFile);
-    }
-
-    const char* traverse = buf;
-    char data;
-
-    while (data = *traverse++) {
-        if (data == '\t')
-            m_cursorPos += TabSize();
-        else
-            m_cursorPos++;
-    }
-}
-
-void ILog::NewLine() {
-    if (m_logFile) {
-        fputc('\n', m_logFile);
-        fflush(m_logFile);
-    }
-
-    m_cursorPos = 0;
-}
-
-int ILog::TabSize() {
-    return ((~m_cursorPos) & 3) + 1;
-}
-
-// ------------------------------------------------------------------------------------------------
-// Initialize
-// ------------------------------------------------------------------------------------------------
-
-int     ILog::m_indentLevel = 0;
-
-FILE*   ILog::m_logFile       = NULL;
-int     ILog::m_cursorPos     = 0;

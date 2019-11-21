@@ -8,29 +8,27 @@
 // addresses
 // ------------------------------------------------------------------------------------------------
 
-
 RelocAddr   <_DoTokenReplacement>           DoTokenReplacement                  (0x000C0C70);   // 'welcomeText'                                                            | if (qword_) if (sub(qword))
 RelocAddr   <_GetItemByHandleID>            GetItemByHandleID_Internal          (0x001A3650);
 RelocAddr   <_GetFormByHandleID>            GetFormByHandleID_Internal          (0x001A3740);
-RelocAddr   <_UpdateInstanceData>           UpdateInstanceData                  (0x002F7A30);
-RelocAddr   <_ApplyImagespaceModifier>      ApplyImagespaceModifier             (0x00396720);
-RelocAddr   <_RemoveImagespaceModifier>     RemoveImagespaceModifier            (0x00396B30);
 RelocAddr   <_ExtractArgs>                  ExtractArgs                         (0x004E36B0);   // literally every ObScriptCommand with arguments
 RelocAddr   <_CalculateDamageResist>        CalculateDamageResist               (0x0065FAC0);   // 'fPhysicalDamageBase'                                                    | dword xref xref
 RelocAddr   <_GetXPForLevel>                GetXPForLevel                       (0x00664A10);
+RelocAddr	<_ResetFaceMorph>				ResetFaceMorph						(0x00668660);
 RelocAddr   <_Notification>                 Notification_internal               (0x00AE1D70);
 RelocAddr   <_PopulateItemCard>             PopulateItemCard                    (0x00AED710);
 RelocAddr   <_ContainerMenuInvoke>          ContainerMenuInvoke                 (0x00B0A280);   // const BarterMenu::`vftable'                                              | xref4, sub_2
 RelocAddr   <_ExamineMenuInvoke>            ExamineMenuInvoke                   (0x00B18090);
-RelocAddr   <_InitializeButtonBar>          InitializeButtonBar                 (0x00B325B0);
 RelocAddr   <_LevelUpPrompt>                LevelUpPrompt                       (0x00B3A5A0);   // 'UILevelUpText'                                                          | sub_2
 RelocAddr   <_PipboyMenuInvoke>             PipboyMenuInvoke                    (0x00B93F60);   // const PipboyMenu::`vftable'                                              | xref4, sub_2
+RelocAddr	<_IsInAir>						IsInAir								(0x00D72810);
 RelocAddr   <_AddPerk>                      AddPerk                             (0x00DA60E0);
 RelocAddr   <_RemovePerk>                   RemovePerk                          (0x00DA61F0);
 RelocAddr   <_HasPerk>                      HasPerk                             (0x00DA64E0);
 RelocAddr   <_EquipItem>                    EquipItem_Internal                  (0x00E1BBB0);
 RelocAddr   <_UnequipItem>                  UnequipItem_Internal                (0x00E1BF90);
 RelocAddr   <_PlayIdle>                     PlayIdle_Internal                   (0x00E353F0);
+RelocAddr	<_ShowWaitMenu>					ShowWaitMenu						(0x00E9C0C0);
 RelocAddr   <_GetItemCount>                 GetItemCount                        (0x013FB5E0);
 RelocAddr   <_ExtraChargeVtbl>              ExtraChargeVtbl                     (0x02C52218);
 RelocAddr   <_ExtraObjectHealthVtbl>        ExtraObjectHealthVtbl               (0x02C524B8);

@@ -35,6 +35,24 @@
 #define GetExtraDataValue(ExtraData, Type, name)\
     (GetExtraDataByType(ExtraData, Type)->##name##)
 
+#define SortGeneric(Entry1, Entry2, Member)\
+	if (Entry1.##Member## != Entry2.##Member##)\
+		return (Entry1.##Member## < Entry2.##Member##)
+
+#define SortStrings(Entry1, Entry2, Member)\
+	const char* Name1 = Entry1.##Member##.c_str();\
+	const char* Name2 = Entry2.##Member##.c_str();\
+    int Length = max(strlen(Name1), strlen(Name2));\
+    for (int z = 0; z < Length; z++)\
+        if (Name1[z] != Name2[z])\
+            return (Name1[z] < Name2[z]);\
+    if (Name1 != Name2)\
+        return (Name1 < Name2)
+
+#define StringToUpper(Str)\
+	for (auto& chr : Str)\
+		chr = toupper(chr)
+
 void                        Notification(const char* Message, ...);
 void                        NotificationSound(const char* Message, const char* Sound, ...);
 bool                        strifind(const std::string& str, const std::string& search);
@@ -86,11 +104,4 @@ public:
 	GFxLogElements(GFxValue* value) : m_value(value) { }
 	virtual void			Visit(UInt32 idx, GFxValue* val);
 	GFxValue*				m_value;
-};
-
-class GFxLogMembersBasic : public GFxValue::ObjectInterface::ObjVisitor {
-public:
-    GFxLogMembersBasic() { }
-    virtual bool            ShowDisplayMembers(void) override { return true; }
-    virtual void            Visit(const char* member, GFxValue* value) override;
 };
