@@ -16,6 +16,7 @@
 #include "f4se/NiObjects.h"
 #include "f4se/NiNodes.h"
 #include "f4se/NiMaterials.h"
+#include "f4se/NiFunctions.h"
 #include "f4se/bhkWorld.h"
 
 #include "f4se/Serialization.h"
@@ -341,7 +342,7 @@ namespace papyrusObjectReference {
 			for(int i = 0; i < inventory->items.count; i++) {
 				BGSInventoryItem item;
 				inventory->items.GetNthItem(i, item);
-				
+
 				results.Push(&item.form);
 			}
 
@@ -443,8 +444,8 @@ namespace papyrusObjectReference {
 					results.Push(&point);
 				}
 			}
-		}		
-		
+		}
+
 		return results;
 	}
 
@@ -474,7 +475,7 @@ namespace papyrusObjectReference {
 		if(workshopItemDefault) {
 			keyword = DYNAMIC_CAST(workshopItemDefault->form, TESForm, BGSKeyword);
 		}
-		
+
 		// No workshop keyword is bad
 		if(!keyword) {
 			return false;
@@ -496,7 +497,7 @@ namespace papyrusObjectReference {
 		if(!extraData) {
 			return false;
 		}
-		
+
 		for(UInt32 i = 0; i < extraData->points.count; i++)
 		{
 			BSConnectPoint::Parents::ConnectPoint * connectPoint = extraData->points[i];
@@ -586,7 +587,7 @@ namespace papyrusObjectReference {
 			VisitNiAVObject([&](NiAVObject* object)
 			{
 				BSGeometry * geometry = object->GetAsBSGeometry();
-				if(geometry) 
+				if(geometry)
 				{
 					NiPointer<BSShaderProperty> shaderProperty = ni_cast(geometry->shaderProperty, BSShaderProperty);
 					if(shaderProperty)
@@ -641,7 +642,7 @@ namespace papyrusObjectReference {
 							success.emplace(std::make_pair(materialLookup, lastColorIndex));
 						}
 					}
-					
+
 				}
 				return false;
 			}, rootNode[i]);

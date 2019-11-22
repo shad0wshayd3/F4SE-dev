@@ -110,9 +110,9 @@ bool Forms::Load() {
     InventoryWeight         = LookupType(0x000B01,  "MiscAV:InventoryWeight",           ActorValueInfo);
 	SkillPointBonus         = LookupType(0x000B02,  "MiscAV:SkillPointBonus",           ActorValueInfo);
 
-	ItemCondMaxHealth       = LookupType(0x000C00,  "Condition:MaxHealth",              ActorValueInfo);
-    ItemCondMinHealth       = LookupType(0x000C01,  "Condition:MinHealth",              ActorValueInfo);
-    ItemCondStartCond       = LookupType(0x000C02,  "Condition:StartCond",              ActorValueInfo);
+	ItemCondMaxHealth       = LookupType(0x000C00,  "Condition:ConditionMax",           ActorValueInfo);
+    ItemCondMinHealth       = LookupType(0x000C01,  "Condition:ConditionMin",           ActorValueInfo);
+    ItemCondStartCond       = LookupType(0x000C02,  "Condition:ConditionInitial",       ActorValueInfo);
 
     StimpakOrder            = LookupType(0x02F9B8,  "MiscForm:StimpakOrder",            BGSListForm);
     DoctorsBag              = LookupType(0x0AD82B,  "MiscForm:DoctorsBag",              AlchemyItem);

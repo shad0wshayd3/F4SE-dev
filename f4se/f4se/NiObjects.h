@@ -201,23 +201,3 @@ public:
 	DEFINE_MEMBER_FN(SetScenegraphChange, void, 0x01BA47C0);
 };
 STATIC_ASSERT(sizeof(NiAVObject) == 0x120);
-
-template<typename T>
-bool VisitNiAVObject(T& functor, NiAVObject* avObject)
-{
-	if (functor(avObject))
-		return true;
-
-	NiPointer<NiNode> node(avObject->GetAsNiNode());
-	if (node) {
-		for (UInt32 i = 0; i < node->m_children.m_emptyRunStart; i++) {
-			NiPointer<NiAVObject> object(node->m_children.m_data[i]);
-			if (object) {
-				if (VisitNiAVObject(functor, object))
-					return true;
-			}
-		}
-	}
-
-	return false;
-}

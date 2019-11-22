@@ -702,5 +702,8 @@
     <ClInclude Include="PapyrusArmorAddon.h">
       <Filter>papyrus\functions</Filter>
     </ClInclude>
+    <ClInclude Include="NiFunctions.h">
+      <Filter>netimmerse</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

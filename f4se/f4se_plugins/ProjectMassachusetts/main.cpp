@@ -71,7 +71,7 @@ extern "C" {
     }
 
     bool F4SEPlugin_Query(const F4SEInterface* F4SE, PluginInfo* Info) {
-        InitializePlugin(PLUGIN_NAME);
+        InitializePlugin(PLUGIN_NAME, CONFIG_FILE_NAME);
 
         _LogMessage("%s log opened (PC-64)", PLUGIN_NAME);
         _LogMessage("This is a plugin log only and does not contain information on any other part of the game, including crashes.");

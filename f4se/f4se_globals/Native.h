@@ -51,7 +51,6 @@ extern RelocAddr    <_GetFormByHandleID>            GetFormByHandleID_Internal;
 extern RelocAddr    <_ExtractArgs>                  ExtractArgs;
 extern RelocAddr    <_CalculateDamageResist>        CalculateDamageResist;
 extern RelocAddr    <_GetXPForLevel>                GetXPForLevel;
-extern RelocAddr	<_ResetFaceMorph>				ResetFaceMorph;
 extern RelocAddr    <_Notification>                 Notification_internal;
 extern RelocAddr    <_PopulateItemCard>             PopulateItemCard;
 extern RelocAddr    <_ContainerMenuInvoke>          ContainerMenuInvoke;
@@ -97,27 +96,27 @@ void HookPopulateItemCard(void(*hookFunc)(GFxValue*, BGSInventoryItem*, UInt16, 
 // ------------------------------------------------------------------------------------------------
 
 // Alphabetically sorted, except TESHitEvent
-DECLARE_EVENT_DISPATCHER(TESActivateEvent,                                  0x00441B70);
-DECLARE_EVENT_DISPATCHER(TESBookReadEvent,                                  0x00441D50);
-DECLARE_EVENT_DISPATCHER(TESCellAttachDetachEvent,                          0x00441DF0);
-DECLARE_EVENT_DISPATCHER(TESCellFullyLoadedEvent,                           0x00441E90);
-DECLARE_EVENT_DISPATCHER(TESContainerChangedEvent,                          0x00442390);
-DECLARE_EVENT_DISPATCHER(TESEnterSneakingEvent,                             0x004426B0);
-DECLARE_EVENT_DISPATCHER(TESEquipEvent,                                     0x00442750);
-DECLARE_EVENT_DISPATCHER(TESGrabReleaseEvent,                               0x00442BB0);
-DECLARE_EVENT_DISPATCHER(TESLimbCrippleEvent,                               0x00442CF0);
-DECLARE_EVENT_DISPATCHER(TESLockChangedEvent,                               0x00442ED0);
-DECLARE_EVENT_DISPATCHER(TESMagicEffectApplyEvent,                          0x00442F70);
-DECLARE_EVENT_DISPATCHER(TESSleepStartEvent,                                0x00443BF0);
-DECLARE_EVENT_DISPATCHER(TESSleepStopEvent,                                 0x00443C90);
-DECLARE_EVENT_DISPATCHER(TESWaitStartEvent,                                 0x004442D0);
-DECLARE_EVENT_DISPATCHER(TESWaitStopEvent,                                  0x00444370);
-DECLARE_EVENT_DISPATCHER(TESHitEvent,                                       0x00444550);
+DECLARE_EVENT_DISPATCHER(TESActivateEvent,                                  0x00441C90);	// 'Unable to initialize script virtual machine' | sub_1 past qword, sub_1, sub_3
+DECLARE_EVENT_DISPATCHER(TESBookReadEvent,                                  0x00441E70);	// down 3
+DECLARE_EVENT_DISPATCHER(TESCellAttachDetachEvent,                          0x00441F10);	// down 1
+DECLARE_EVENT_DISPATCHER(TESCellFullyLoadedEvent,                           0x00441FB0);	// down 1
+DECLARE_EVENT_DISPATCHER(TESContainerChangedEvent,                          0x004424B0);	// down 8
+DECLARE_EVENT_DISPATCHER(TESEnterSneakingEvent,                             0x004427D0);	// down 5
+DECLARE_EVENT_DISPATCHER(TESEquipEvent,                                     0x00442870);	// down 1
+DECLARE_EVENT_DISPATCHER(TESGrabReleaseEvent,                               0x00442CD0);	// down 7
+DECLARE_EVENT_DISPATCHER(TESLimbCrippleEvent,                               0x00442E10);	// down 2
+DECLARE_EVENT_DISPATCHER(TESLockChangedEvent,                               0x00442FF0);	// down 3
+DECLARE_EVENT_DISPATCHER(TESMagicEffectApplyEvent,                          0x00443090);	// down 1
+DECLARE_EVENT_DISPATCHER(TESSleepStartEvent,                                0x00443D10);	// down 20
+DECLARE_EVENT_DISPATCHER(TESSleepStopEvent,                                 0x00443DB0);	// down 1
+DECLARE_EVENT_DISPATCHER(TESWaitStartEvent,                                 0x004443F0);	// down 10
+DECLARE_EVENT_DISPATCHER(TESWaitStopEvent,                                  0x00444490);	// down 1
+DECLARE_EVENT_DISPATCHER(TESHitEvent,                                       0x00444670);	// down 3 (last)
 
-// const BSTGlobalEvent::EventSource<T>::`vftable'
-DECLARE_GLOBAL_EVENT_DISPATCHER(CurrentRadiationSourceCount,                0x05A65FD8);
-DECLARE_GLOBAL_EVENT_DISPATCHER(PipboyLightEvent,                           0x05A66310);
-DECLARE_GLOBAL_EVENT_DISPATCHER(PlayerAmmoCountEvent,                       0x05A60530);
-DECLARE_GLOBAL_EVENT_DISPATCHER(PlayerWeaponReloadEvent,                    0x05A60540);
+// const BSTGlobalEvent::EventSource<T>::`vftable' (Requires ClassInformer)
+DECLARE_GLOBAL_EVENT_DISPATCHER(CurrentRadiationSourceCount,                0x05A66008);
+DECLARE_GLOBAL_EVENT_DISPATCHER(PipboyLightEvent,                           0x05A66340);
+DECLARE_GLOBAL_EVENT_DISPATCHER(PlayerAmmoCountEvent,                       0x05A60560);
+DECLARE_GLOBAL_EVENT_DISPATCHER(PlayerWeaponReloadEvent,                    0x05A60570);
 
-DECLARE_SINGLETON_EVENT_DISPATCHER(WeaponFiredEvent,                        0x058E3E60);    // 'Weapon Equip Slot' | rax, qword ptr cs:unk_14*
+DECLARE_SINGLETON_EVENT_DISPATCHER(WeaponFiredEvent,                        0x058E3E90);    // 'Weapon Equip Slot' | rax, qword ptr cs:unk_14*
