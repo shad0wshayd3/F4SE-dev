@@ -192,7 +192,7 @@ bool Forms::Load() {
 
     tArray<BGSPerk*> Perks = (*g_dataHandler)->arrPERK;
     for (int i = 0; i < Perks.count; i++) {
-        if (Perks[i]->playable && !Perks[i]->hidden && (Perks[i]->numRanks > 0)) {
+        if (!Perks[i]->hidden && (Perks[i]->numRanks > 0)) {
             ((Perks[i]->trait) ? ListTraits : ListPerks).emplace_back(Perks[i]);
             ListMaster.emplace_back(Perks[i]);
         }

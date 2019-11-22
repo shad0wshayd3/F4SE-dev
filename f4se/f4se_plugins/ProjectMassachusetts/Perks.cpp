@@ -305,6 +305,9 @@ GFxValue* EntryList::BuildEntryList(GFxMovieRoot* root, GFxValue* Result) {
         PerkEntryList PerksV, PerksI;
 
         for (auto iter : List) {
+			if (!iter->playable)
+				continue;
+
             if (HasPerk(Player, iter))
                 continue;
 
