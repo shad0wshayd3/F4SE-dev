@@ -551,13 +551,42 @@ class SpellItem : public MagicItem
 public:
 	enum { kTypeID = kFormType_SPEL };
 
+	enum SpellType : UInt32 {
+		kSpell = 0,
+		kDisease,
+		kPower,
+		kLesserPower,
+		kAbility,
+		kPoison,
+		kEnchantment,
+		kAlchemy,
+		kIngredient,
+		kUnknown9,
+		kAddiction,
+		kVoice,
+		kStaff,
+		kScroll,
+	};
+
 	BGSEquipType				equipType;		// 0D0
 	BGSMenuDisplayObject		displayObject;	// 0E0
 	TESDescription				description;	// 0F0
-	UInt64						unk108[5];		// 108
+
+	struct Data {
+		UInt32					baseCost;
+		UInt32					flags;
+		SpellType				type;
+		float					castTime;
+		UInt32					castType;
+		UInt32					targetType;
+		float					castDuration;
+		float					range;
+		BGSPerk*				halfCostPerk;
+	};
+	Data						data;			// 108
 };
 STATIC_ASSERT(offsetof(SpellItem, description) == 0x0F0);
-STATIC_ASSERT(offsetof(SpellItem, unk108) == 0x108);
+STATIC_ASSERT(offsetof(SpellItem, data) == 0x108);
 STATIC_ASSERT(sizeof(SpellItem) == 0x130);
 
 // Seemingly unused in the game. No entries in the DataHandler
