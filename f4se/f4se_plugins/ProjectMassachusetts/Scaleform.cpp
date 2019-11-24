@@ -350,6 +350,12 @@ namespace GFX {
 				if (!Source)
 					return;
 
+				// Perks are almost all abilities, and shouldn't show up, so we filter out abilities
+				SpellItem* SpellSource = DYNAMIC_CAST(Source, TESForm, SpellItem);
+				if (SpellSource)
+					if (SpellSource->data.type == SpellItem::kAbility)
+						continue;
+
 				EffectEntry newEffect;
 				newEffect.Setting	= Setting;
 				newEffect.FormID	= Setting->formID;
