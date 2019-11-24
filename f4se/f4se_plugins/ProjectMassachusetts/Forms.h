@@ -96,9 +96,11 @@ public:
     static ActorValueInfo*          Unarmed_Secondary;
 
     static ActorValueInfo*          ActionPointsMult;
-    static ActorValueInfo*          SkillPointBonus;
-
-    static ActorValueInfo*          InventoryWeight;
+	static ActorValueInfo*			InventoryWeight;
+	static ActorValueInfo*			PipboyLightEnabled;
+	static ActorValueInfo*			RadiationSourceCount;
+	static ActorValueInfo*			SkillPointBonus;
+    
     static ActorValueInfo*          Dehydration;
     static ActorValueInfo*          Starvation;
     static ActorValueInfo*          SleepDeprivation;

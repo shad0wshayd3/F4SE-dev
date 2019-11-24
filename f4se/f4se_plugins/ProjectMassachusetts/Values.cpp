@@ -154,7 +154,11 @@ void Values::RegisterValues() {
         for (auto iter : Forms::ListSkillMods)
             RaceList[i]->propertySheet.sheet->Push({ iter, 0 });
 
-        RaceList[i]->propertySheet.sheet->Push({ Forms::InventoryWeight, 0 });
+		RaceList[i]->propertySheet.sheet->Push({ Forms::ActionPointsMult,		1.0 });
+        RaceList[i]->propertySheet.sheet->Push({ Forms::InventoryWeight,		0.0 });
+		RaceList[i]->propertySheet.sheet->Push({ Forms::PipboyLightEnabled,		0.0 });
+		RaceList[i]->propertySheet.sheet->Push({ Forms::RadiationSourceCount,	0.0 });
+		RaceList[i]->propertySheet.sheet->Push({ Forms::SkillPointBonus,		0.0 });
     }
 
     // Add Perks to NPCs

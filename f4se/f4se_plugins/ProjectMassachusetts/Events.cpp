@@ -138,7 +138,7 @@ TESWaitStopEventHandler g_TESWaitStopEventHandler;
 
 EventResult CurrentRadiationSourceCountHandler::ReceiveEvent(CurrentRadiationSourceCount* evn, void* dispatcher) {
     if (evn) {
-        // Player.SetAV(RadiationSourceCount, evn->count);
+		SetValue((*g_player), Forms::RadiationSourceCount, evn->count);
     }
 
     return kEvent_Continue;
@@ -147,7 +147,7 @@ CurrentRadiationSourceCountHandler g_CurrentRadiationSourceCountHandler;
 
 EventResult PipboyLightEventHandler::ReceiveEvent(PipboyLightEvent* evn, void* dispatcher) {
     if (evn) {
-        // Player.SetAV(PipboyLightEnabled, evn->enabled);
+        SetValue((*g_player), Forms::PipboyLightEnabled, evn->enabled);
     }
 
     return kEvent_Continue;

@@ -108,6 +108,8 @@ bool Forms::Load() {
 
 	ActionPointsMult        = LookupType(0x000B00,  "MiscAV:ActionPointsMult",          ActorValueInfo);
     InventoryWeight         = LookupType(0x000B01,  "MiscAV:InventoryWeight",           ActorValueInfo);
+	PipboyLightEnabled		= LookupType(0x000000,	"MiscAV:PipboyLightEnabled",		ActorValueInfo);
+	RadiationSourceCount	= LookupType(0x000000,	"MiscAV:RadiationSourceCount",		ActorValueInfo);
 	SkillPointBonus         = LookupType(0x000B02,  "MiscAV:SkillPointBonus",           ActorValueInfo);
 
 	ItemCondMaxHealth       = LookupType(0x000C00,  "Condition:ConditionMax",           ActorValueInfo);
@@ -324,9 +326,11 @@ void Forms::Unload() {
     Unarmed_Secondary       = nullptr;
 
     ActionPointsMult        = nullptr;
+	InventoryWeight         = nullptr;
+	PipboyLightEnabled		= nullptr;
+	RadiationSourceCount	= nullptr;
     SkillPointBonus         = nullptr;
-
-    InventoryWeight         = nullptr;
+    
     Dehydration             = nullptr;
     Starvation              = nullptr;
     SleepDeprivation        = nullptr;
@@ -433,8 +437,10 @@ bool Forms::CheckLoadedForms() {
     CheckForm(Unarmed_Damage,           kFormType_AVIF, avName);
     CheckForm(Unarmed_Secondary,        kFormType_AVIF, avName);
     CheckForm(ActionPointsMult,         kFormType_AVIF, avName);
-    CheckForm(SkillPointBonus,          kFormType_AVIF, avName);
     CheckForm(InventoryWeight,          kFormType_AVIF, avName);
+	CheckForm(PipboyLightEnabled,       kFormType_AVIF, avName);
+	CheckForm(RadiationSourceCount,     kFormType_AVIF, avName);
+	CheckForm(SkillPointBonus,          kFormType_AVIF, avName);
     CheckForm(Dehydration,              kFormType_AVIF, avName);
     CheckForm(Starvation,               kFormType_AVIF, avName);
     CheckForm(SleepDeprivation,         kFormType_AVIF, avName);
@@ -517,8 +523,10 @@ ActorValueInfo*     Forms::Survival_UsageMod            = nullptr;
 ActorValueInfo*     Forms::Unarmed_Damage               = nullptr;
 ActorValueInfo*     Forms::Unarmed_Secondary            = nullptr;
 ActorValueInfo*     Forms::ActionPointsMult             = nullptr;
-ActorValueInfo*     Forms::SkillPointBonus              = nullptr;
+ActorValueInfo*     Forms::PipboyLightEnabled           = nullptr;
+ActorValueInfo*     Forms::RadiationSourceCount         = nullptr;
 ActorValueInfo*     Forms::InventoryWeight              = nullptr;
+ActorValueInfo*     Forms::SkillPointBonus              = nullptr;
 ActorValueInfo*     Forms::Dehydration                  = nullptr;
 ActorValueInfo*     Forms::Starvation                   = nullptr;
 ActorValueInfo*     Forms::SleepDeprivation             = nullptr;
