@@ -40,7 +40,10 @@ void GLog::Open(std::string logName) {
 	}
 }
 
-void GLog::Message(const char* prefix, const char* message, va_list args, bool timestamp) {
+void GLog::Message(const char* prefix, const char* message, va_list args, bool timestamp, int logLevel) {
+	if (logLevel > m_logLevel)
+		return;
+
 	std::stringstream stream;
 
 	if (timestamp) {
@@ -59,15 +62,6 @@ void GLog::Message(const char* prefix, const char* message, va_list args, bool t
 
 	stream << formatBuf;
     Write(stream.str().c_str());
-}
-
-void GLog::Indent() {
-	m_indentLevel++;
-}
-
-void GLog::Outdent() {
-	if (m_indentLevel)
-		m_indentLevel--;
 }
 
 // ------------------------------------------------------------------------------------------------
