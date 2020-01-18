@@ -4,13 +4,13 @@
 #define CheckForm(Form, FormType, Name)\
     if (##Form##) {\
         _LogMessageNT("Variable: %s", #Form);\
-        _LogIndent();\
-        _LogMessageNT("%s is FormType: %i. Should be %i.", #Form, ##Form##->formType, FormType);\
+        _DebugIndent();\
+        _DebugMessageNT("%s is FormType: %i. Should be %i.", #Form, ##Form##->formType, FormType);\
         if (##Form##->formType == ##FormType##) {\
-            _LogMessageNT("%s reporting name as: %s", #Form, ##Form##->##Name##);\
+            _DebugMessageNT("%s reporting name as: %s", #Form, ##Form##->##Name##);\
         }\
-        _LogOutdent();\
-        _LogMessageNT("");\
+        _DebugOutdent();\
+        _DebugMessageNT("");\
     }\
     else {\
         return false;\
@@ -402,7 +402,8 @@ bool Forms::CheckForPlugin() {
 
 bool Forms::CheckLoadedForms() {
     _LogMessage("Forms::CheckLoadedForms() - Starting.");
-    _LogMessageNT("");
+    _LogMessage("Look for \"Finished.\" to know when the check is complete.");
+    _DebugMessageNT("");
 
     ITimeKeeper CheckLoadedFormsTimer = ITimeKeeper();
 

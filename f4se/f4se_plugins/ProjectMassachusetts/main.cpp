@@ -37,6 +37,8 @@ extern "C" {
                     HALT("Game Plugin error.");
                 }
 
+                // Register New Menus
+                _DebugMessage("Registering Menus...");
                 if ((*g_ui) != nullptr) {
                     (*g_ui)->menuOpenCloseEventSource.AddEventSink(&g_MenuOpenCloseEventHandler);
                 
@@ -47,15 +49,25 @@ extern "C" {
                         (*g_ui)->Register("RepairMenu", CreateRepairMenu);
                 }
 
-                GetEventDispatcher<TESContainerChangedEvent>    ()->AddEventSink(&g_TESContainerChangedEventHandler);
-                GetEventDispatcher<TESInitScriptEvent>          ()->AddEventSink(&g_TESInitScriptEventHandler);
-                GetEventDispatcher<TESSleepStartEvent>          ()->AddEventSink(&g_TESSleepStartEventHandler);
-                GetEventDispatcher<TESSleepStopEvent>           ()->AddEventSink(&g_TESSleepStopEventHandler);
-                GetEventDispatcher<TESWaitStartEvent>           ()->AddEventSink(&g_TESWaitStartEventHandler);
-                GetEventDispatcher<TESWaitStopEvent>            ()->AddEventSink(&g_TESWaitStopEventHandler);
+                // Register Events
+                _DebugMessage("Registering Events...");
+                GetEventDispatcher<TESContainerChangedEvent>            ()->AddEventSink(&g_TESContainerChangedEventHandler);
+                GetEventDispatcher<TESInitScriptEvent>                  ()->AddEventSink(&g_TESInitScriptEventHandler);
+                GetEventDispatcher<TESSleepStartEvent>                  ()->AddEventSink(&g_TESSleepStartEventHandler);
+                GetEventDispatcher<TESSleepStopEvent>                   ()->AddEventSink(&g_TESSleepStopEventHandler);
+                GetEventDispatcher<TESWaitStartEvent>                   ()->AddEventSink(&g_TESWaitStartEventHandler);
+                GetEventDispatcher<TESWaitStopEvent>                    ()->AddEventSink(&g_TESWaitStopEventHandler);
 
-                GetSingletonEventDispatcher(WeaponFiredEvent).AddEventSink(&g_WeaponFiredEventHandler);
+                //GetGlobalEventDispatcher<CurrentRadiationSourceCount>   ().AddEventSink(&g_CurrentRadiationSourceCountHandler);
+                //GetGlobalEventDispatcher<PipboyLightEvent>              ().AddEventSink(&g_PipboyLightEventHandler);
+
+                GetSingletonEventDispatcher(WeaponFiredEvent)           .AddEventSink(&g_WeaponFiredEventHandler);
+
+                // Register Values
+                _DebugMessage("Registering Values...");
                 Values::RegisterValues();
+
+                _DebugMessage("Finished Registration.");
             }
 
             else {
@@ -72,9 +84,11 @@ extern "C" {
 
     bool F4SEPlugin_Query(const F4SEInterface* F4SE, PluginInfo* Info) {
         InitializePlugin(PLUGIN_NAME, CONFIG_FILE_NAME);
-
+        _LogLevel(ISettings::GetInteger("General:LogLevel", 0));
+        
         _LogMessage("%s log opened (PC-64)", PLUGIN_NAME);
         _LogMessage("This is a plugin log only and does not contain information on any other part of the game, including crashes.");
+        _DebugMessage("Debug output enabled.");
 
         Info->infoVersion   = PluginInfo::kInfoVersion;
         Info->name          = PLUGIN_NAME;
@@ -159,13 +173,14 @@ extern "C" {
             return false;
         }
 
+        _DebugMessage("Hooking Functions...");
         HookContainerMenuInvoke(ContainerMenuInvoke_Hook);
         HookExamineMenuInvoke(ExamineMenuInvoke_Hook);
         HookPipboyMenuInvoke(PipboyMenuInvoke_Hook);
         HookPopulateItemCard(PopulateItemCard_Hook);
 
-        g_branchTrampoline.Write6Branch(LevelUpPrompt.GetUIntPtr(), (uintptr_t)LevelUpMenuPrompt_Hook);
         g_branchTrampoline.Write6Branch(CalculateDamageResist.GetUIntPtr(), (uintptr_t)DamageResistFormula);
+        g_branchTrampoline.Write6Branch(LevelUpPrompt.GetUIntPtr(),         (uintptr_t)LevelUpMenuPrompt_Hook);
 
         _LogMessage("Plugin loaded successfully.");
         return true;
