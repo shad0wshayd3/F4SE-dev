@@ -138,7 +138,7 @@ TESWaitStopEventHandler g_TESWaitStopEventHandler;
 
 EventResult CurrentRadiationSourceCountHandler::ReceiveEvent(CurrentRadiationSourceCount* evn, void* dispatcher) {
     if (evn) {
-		SetValue((*g_player), Forms::RadiationSourceCount, evn->count);
+        SetValue((*g_player), Forms::RadiationSourceCount, evn->count);
     }
 
     return kEvent_Continue;

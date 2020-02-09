@@ -7,9 +7,9 @@ struct WeaponConditionData {
     WeaponConditionData(TESObjectREFR* refr);
     WeaponConditionData(Actor* actor);
 
-    TESForm*                        Form;
-    ExtraDataList*                  extraData;
-    TESObjectWEAP::InstanceData*    instance;
+    TESForm* Form;
+    ExtraDataList* extraData;
+    TESObjectWEAP::InstanceData* instance;
 };
 
 float GetWeaponConditionMaximum(WeaponConditionData Data);

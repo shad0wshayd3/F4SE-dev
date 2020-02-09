@@ -1,8 +1,7 @@
 #pragma once
- 
+
 class VirtualMachine;
 
-namespace papyrusEquipSlot
-{
-	void RegisterFuncs(VirtualMachine* vm);
+namespace papyrusEquipSlot {
+    void RegisterFuncs(VirtualMachine* vm);
 }

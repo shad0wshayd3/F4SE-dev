@@ -5,7 +5,6 @@ struct StaticFunctionTag;
 
 #include "f4se/GameTypes.h"
 
-namespace papyrusForm
-{
-	void RegisterFuncs(VirtualMachine* vm);
+namespace papyrusForm {
+    void RegisterFuncs(VirtualMachine* vm);
 }

@@ -2,7 +2,6 @@
 
 class VirtualMachine;
 
-namespace papyrusArmor
-{
-	void RegisterFuncs(VirtualMachine* vm);
+namespace papyrusArmor {
+    void RegisterFuncs(VirtualMachine* vm);
 }

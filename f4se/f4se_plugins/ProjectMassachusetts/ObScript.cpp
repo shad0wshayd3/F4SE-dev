@@ -38,8 +38,8 @@ bool Cmd_GetWeaponHealth_Execute(EXECUTE_ARGS) {
         thisObj = (*g_player);
 
     WeaponConditionData Data;
-    BSFixedString       objName = CALL_MEMBER_FN(thisObj, GetReferenceName)();
-    std::string         name    = objName.c_str();
+    BSFixedString objName = CALL_MEMBER_FN(thisObj, GetReferenceName)();
+    std::string name = objName.c_str();
 
     switch (thisObj->baseForm->formType) {
     case kFormType_ACHR:
@@ -80,8 +80,7 @@ bool Cmd_GetWeaponHealth_Execute(EXECUTE_ARGS) {
     if (Current >= 0) {
         float Percent = (Current / Maximum) * 100;
         Console_Print("%s Condition >> %0.2f / %0.2f (%0.2f%%)", name.c_str(), Current, Maximum, Percent);
-    }
-    else {
+    } else {
         Console_Print("%s does not have Condition. Recieved %0.2f", name.c_str(), Current);
     }
 
@@ -100,8 +99,8 @@ bool Cmd_SetWeaponHealth_Execute(EXECUTE_ARGS) {
         value = 0.0;
 
     WeaponConditionData Data;
-    BSFixedString       objName = CALL_MEMBER_FN(thisObj, GetReferenceName)();
-    std::string         name    = objName.c_str();
+    BSFixedString objName = CALL_MEMBER_FN(thisObj, GetReferenceName)();
+    std::string name = objName.c_str();
 
     switch (thisObj->baseForm->formType) {
     case kFormType_ACHR:
@@ -141,8 +140,7 @@ bool Cmd_SetWeaponHealth_Execute(EXECUTE_ARGS) {
 
     if (Current >= 0) {
         Console_Print("Set %s Condition to %0.2f", name.c_str(), Current);
-    }
-    else {
+    } else {
         Console_Print("%s does not have Condition to set.", name.c_str());
     }
 
@@ -164,16 +162,16 @@ bool Cmd_ShowLevelUpMenu_Execute(EXECUTE_ARGS) {
 
     switch (menuID) {
     case 1:
-        OpenLevelUpMenu(EntryList::kMenuID_Skills,  GetLevel((*g_player)), points, 0);
+        OpenLevelUpMenu(EntryList::kMenuID_Skills, GetLevel((*g_player)), points, 0);
         break;
     case 2:
-        OpenLevelUpMenu(EntryList::kMenuID_Perks,   GetLevel((*g_player)), points, 0);
+        OpenLevelUpMenu(EntryList::kMenuID_Perks, GetLevel((*g_player)), points, 0);
         break;
     case 3:
-        OpenLevelUpMenu(EntryList::kMenuID_Traits,  GetLevel((*g_player)), points, 0);
+        OpenLevelUpMenu(EntryList::kMenuID_Traits, GetLevel((*g_player)), points, 0);
         break;
     case 4:
-        OpenLevelUpMenu(EntryList::kMenuID_Tags,    GetLevel((*g_player)), points, 0);
+        OpenLevelUpMenu(EntryList::kMenuID_Tags, GetLevel((*g_player)), points, 0);
         break;
 
     case 5: {

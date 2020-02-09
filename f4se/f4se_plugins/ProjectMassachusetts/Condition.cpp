@@ -3,25 +3,22 @@
 
 //#include <cmath>
 
-#define HasExtraData(ExtraData, Type)\
-    ExtraData->HasType(kExtraData_##Type##)
+#define HasExtraData(ExtraData, Type) ExtraData->HasType(kExtraData_##Type##)
 
-#define SetExtraData(ExtraData, Type, name, value)\
-    (((Extra##Type##*)ExtraData->GetByType(kExtraData_##Type##))->##name##) = value;
+#define SetExtraData(ExtraData, Type, name, value) (((Extra##Type##*)ExtraData->GetByType(kExtraData_##Type##))->##name##) = value;
 
-#define CreateHealthData(ExtraData, Type, value)\
-    ExtraData->Add(kExtraData_##Type##, Extra##Type##::Create(value))
+#define CreateHealthData(ExtraData, Type, value) ExtraData->Add(kExtraData_##Type##, Extra##Type## ::Create(value))
 
 // ------------------------------------------------------------------------------------------------
 // WeaponCondition
 // ------------------------------------------------------------------------------------------------
 
-WeaponConditionData::WeaponConditionData() : Form(nullptr), extraData(nullptr), instance(nullptr) { }
+WeaponConditionData::WeaponConditionData(): Form(nullptr), extraData(nullptr), instance(nullptr) {}
 
 WeaponConditionData::WeaponConditionData(TESForm* form, ExtraDataList* extradata) {
-    Form        = form;
-    extraData   = extradata;
-    instance    = nullptr;
+    Form = form;
+    extraData = extradata;
+    instance = nullptr;
 
     if (extraData)
         if (HasExtraData(extraData, InstanceData))
@@ -30,9 +27,9 @@ WeaponConditionData::WeaponConditionData(TESForm* form, ExtraDataList* extradata
 
 WeaponConditionData::WeaponConditionData(TESObjectREFR* refr) {
     if (refr) {
-        Form        = refr->baseForm;
-        extraData   = refr->extraDataList;
-        instance    = nullptr;
+        Form = refr->baseForm;
+        extraData = refr->extraDataList;
+        instance = nullptr;
 
         if (extraData)
             if (HasExtraData(extraData, InstanceData))
@@ -42,9 +39,9 @@ WeaponConditionData::WeaponConditionData(TESObjectREFR* refr) {
 
 WeaponConditionData::WeaponConditionData(Actor* actor) {
     if (actor) {
-        Form        = GetEquippedWeaponForm(actor);
-        extraData   = GetEquippedWeaponExtraData(actor);
-        instance    = GetEquippedWeaponInstanceData(actor);
+        Form = GetEquippedWeaponForm(actor);
+        extraData = GetEquippedWeaponExtraData(actor);
+        instance = GetEquippedWeaponInstanceData(actor);
     }
 }
 
@@ -173,7 +170,7 @@ void ModWeaponCondition(Actor* actor) {
 
     WeaponConditionData Data(actor);
 
-    float Value = 0.2; //GetValue(actor, Forms::ConditionRate);
+    float Value = 0.2;    //GetValue(actor, Forms::ConditionRate);
     if (0 > Value)
         Value = 0.2;
     ModWeaponCondition(Data, (Value * -1.0));
@@ -188,16 +185,17 @@ void ModWeaponCondition(Actor* actor) {
 // ------------------------------------------------------------------------------------------------
 
 TESForm* GetEquippedWeaponForm(Actor* actor) {
-    for (auto iter : { 0x20, 0x21, 0x25, 0x29 }) {
+    for (auto iter: {0x20, 0x21, 0x25, 0x29}) {
         if (actor->equipData->slots[iter].item != nullptr)
             return actor->equipData->slots[iter].item;
     }
 
-    return nullptr;;
+    return nullptr;
+    ;
 }
 
 TESObjectWEAP::InstanceData* GetEquippedWeaponInstanceData(Actor* actor) {
-    for (auto iter : { 0x20, 0x21, 0x25, 0x29 }) {
+    for (auto iter: {0x20, 0x21, 0x25, 0x29}) {
         if (actor->equipData->slots[iter].item != nullptr)
             return CastInstanceData(actor->equipData->slots[iter].instanceData, TESObjectWEAP);
     }
@@ -207,7 +205,7 @@ TESObjectWEAP::InstanceData* GetEquippedWeaponInstanceData(Actor* actor) {
 
 ExtraDataList* GetEquippedWeaponExtraData(Actor* actor) {
     ExtraDataList* Result = nullptr;
-    for (auto iter : { 0x20, 0x21, 0x25, 0x29 }) {
+    for (auto iter: {0x20, 0x21, 0x25, 0x29}) {
         if (actor->equipData->slots[iter].item != nullptr) {
             actor->GetEquippedExtraData(iter, &Result);
             break;
@@ -247,15 +245,14 @@ void InitializeWeaponCondition(WeaponConditionData Data) {
             if (Data.instance->modifiers) {
                 for (int i = 0; i < Data.instance->modifiers->count; i++) {
                     auto iter = Data.instance->modifiers->entries[i];
-                    MaxHealth   = (iter.avInfo == Forms::ItemCondMaxHealth) ? iter.unk08 : MaxHealth;
-                    MinHealth   = (iter.avInfo == Forms::ItemCondMinHealth) ? iter.unk08 : MinHealth;
-                    StartCond   = (iter.avInfo == Forms::ItemCondStartCond) ? iter.unk08 : StartCond;
+                    MaxHealth = (iter.avInfo == Forms::ItemCondMaxHealth) ? iter.unk08 : MaxHealth;
+                    MinHealth = (iter.avInfo == Forms::ItemCondMinHealth) ? iter.unk08 : MinHealth;
+                    StartCond = (iter.avInfo == Forms::ItemCondStartCond) ? iter.unk08 : StartCond;
                 }
             }
         }
 
-        float InitialHealth = (StartCond > 0) ? StartCond :
-            ((rand() % int(MaxHealth - MinHealth) + MinHealth) / MaxHealth);
+        float InitialHealth = (StartCond > 0) ? StartCond : ((rand() % int(MaxHealth - MinHealth) + MinHealth) / MaxHealth);
 
         CreateHealthData(Data.extraData, Health, 0);
         CreateHealthData(Data.extraData, Charge, MaxHealth);
@@ -318,7 +315,6 @@ void InitializeInventoryItemCondition(TESObjectREFR* refr, TESForm* Form) {
                             default:
                                 break;
                             }
-                            
                         }
 
                         iterCount++;

@@ -2,7 +2,6 @@
 
 class VirtualMachine;
 
-namespace papyrusArmorAddon
-{
-	void RegisterFuncs(VirtualMachine* vm);
+namespace papyrusArmorAddon {
+    void RegisterFuncs(VirtualMachine* vm);
 }

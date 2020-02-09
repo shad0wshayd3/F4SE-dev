@@ -27,395 +27,390 @@ void OpenLevelUpMenu(int ID, int Level, int PointsBase, int PointsUsed) {
 namespace BSRegex {
     using namespace std::regex_constants;
 
-	std::regex Face("(face='\\$[A-Za-z0-9_]+')",										ECMAScript | icase);
-	std::regex Size("(size='(([0-1]?[0-9])|(2[0-3]))')",								ECMAScript | icase);
-	std::regex Color("(color='#[A-Fa-f0-9]+')",											ECMAScript | icase);
-    std::regex Alias("(<(Alias|BaseName|Global|Relationship|Token)+[A-Z0-9=_. ]*>)",	ECMAScript | icase);
-	std::regex Pagebreak("([<\\[](br|pagebreak)+[\\]>])",								ECMAScript | icase);
+    std::regex Face("(face='\\$[A-Za-z0-9_]+')", ECMAScript | icase);
+    std::regex Size("(size='(([0-1]?[0-9])|(2[0-3]))')", ECMAScript | icase);
+    std::regex Color("(color='#[A-Fa-f0-9]+')", ECMAScript | icase);
+    std::regex Alias("(<(Alias|BaseName|Global|Relationship|Token)+[A-Z0-9=_. ]*>)", ECMAScript | icase);
+    std::regex Pagebreak("([<\\[](br|pagebreak)+[\\]>])", ECMAScript | icase);
 
     std::regex SingleLine("(\r?\n)");
     std::regex DoubleLine("(\r?\n)(\r?\n)+");
-}
+}    // namespace BSRegex
 
 namespace GFX {
-	class ActiveEffects : public GFxFunctionHandler {
-	private:
-		UInt32 GetType(TESForm* Form) {
-			switch (Form->formType) {
-			case kFormType_ARMO:
-				return 43;
-
-			case kFormType_ALCH:
-			case kFormType_ENCH:
-			case kFormType_INGR:
-			case kFormType_SCRL:
-			case kFormType_SPEL: {
-				MagicItem* SourceItem = DYNAMIC_CAST(Form, TESForm, MagicItem);
-				for (auto iter : Forms::ObjectTypes) {
-					for (int i = 0; i < SourceItem->keywordForm.numKeywords; i++) {
-						if (iter.first->formID == SourceItem->keywordForm.keywords[i]->formID)
-							return iter.second;
-					}
-				}
-
-				return 50;
-			}
-
-			default:
-				_LogWarning("GFx::ActiveEffects - Unhandled Form Type: %i", Form->formType);
-				break;
-			}
-
-			return 59;
-		}
-
-		bool ShouldShowMaximum(ActorValueInfo* ActorValue) {
-			bool IsHealth = (ActorValue->formID == 0x2D4);
-			bool IsAction = (ActorValue->formID == 0x2D5);
-			bool IsCarryW = (ActorValue->formID == 0x2DC);
-			return (IsHealth || IsAction || IsCarryW);
-		}
-
-		bool ShouldShowPercent(ActorValueInfo* ActorValue) {
-			bool IsHealthRate	= (ActorValue->formID == 0x2D7);
-			bool IsActionRate	= (ActorValue->formID == 0x28D);
-			bool IsResist		= ((ActorValue->formID >= 0x2E3) && (0x2EB >= ActorValue->formID));
-			return (IsHealthRate || IsActionRate || IsResist);
-		}
-
-		bool ShouldMultiply(ActorValueInfo* ActorValue) {
-			bool IsHealthRate = (ActorValue->formID == 0x2D7);
-			return (IsHealthRate);
-		}
-
-		void AddValueEffect(std::stringstream &Result, EffectEntry Effect, ActorValueInfo* ActorValue, std::string Name) {
-			bool Recover	= (Effect.Setting->flags & EffectSetting::kFlag_Recover);
-
-			bool Max		= Recover && ShouldShowMaximum(ActorValue);
-			bool Percent	= Recover && ShouldShowPercent(ActorValue);
-			bool Multiply	= Percent && ShouldMultiply(ActorValue);
-
-			float Weight = (Effect.Setting->primaryActorValue->formID == ActorValue->formID) ? 
-				1.0 : Effect.Setting->secondaryAVWeight;
-
-			int Magnitude	= (int)roundf(Effect.Magnitude * Weight * ((Multiply) ? 100.0 : 1.0));
-
-			StringToUpper(Name);
-			Result << ((Max) ? "MAX " : "") << Name << ((Recover) ? " " : "/s ") << Magnitude << ((Percent) ? "%" : "");
-		}
-
-		bool SortEntry(EffectEntry Effect, UInt32 FormID, std::vector<EffectEntry>& Result) {
-			switch (Effect.Setting->archetype) {
-			case EffectSetting::kArch_ValueModifier: {
-				if ((FormID == Effect.Setting->primaryActorValue->formID) || (FormID == 0)) {
-					for (int i = 0; i < Result.size(); i++) {
-						if (Result[i].Setting->archetype == Effect.Setting->archetype) {
-							if (Result[i].Setting->primaryActorValue->formID == Effect.Setting->primaryActorValue->formID) {
-								Result[i].Magnitude += Effect.Magnitude;
-								return true;
-							}
-						}
-					}
-
-					Result.emplace_back(Effect);
-					return true;
-				}
-				break;
-			}
-
-			case EffectSetting::kArch_DualValueModifier: {
-				// Maybe do more based on the secondary value?
-				if ((FormID == Effect.Setting->primaryActorValue->formID) || (FormID == 0)) {
-					for (int i = 0; i < Result.size(); i++) {
-						if (Result[i].Setting->archetype == Effect.Setting->archetype) {
-							if (Result[i].Setting->primaryActorValue->formID == Effect.Setting->primaryActorValue->formID) {
-								Result[i].Magnitude += Effect.Magnitude;
-								return true;
-							}
-						}
-					}
-
-					Result.emplace_back(Effect);
-					return true;
-				}
-
-				break;
-			}
-
-			case EffectSetting::kArch_PeakValueModifier: {
-				if ((FormID == Effect.Setting->primaryActorValue->formID) || (FormID == 0)) {
-					for (int i = 0; i < Result.size(); i++) {
-						if (Result[i].Setting->archetype == Effect.Setting->archetype) {
-							if (Result[i].Setting->primaryActorValue->formID == Effect.Setting->primaryActorValue->formID) {
-								if (Effect.Magnitude > Result[i].Magnitude) {
-									Result[i].Magnitude	= Effect.Magnitude;
-									Result[i].Duration	= Effect.Duration;
-								}
-
-								return true;
-							}
-						}
-					}
-
-					Result.emplace_back(Effect);
-					return true;
-				}
-				break;
-			}
-
-			case EffectSetting::kArch_Script:
-			case EffectSetting::kArch_Cloak: {
-				if (FormID == 0) {
-					for (int i = 0; i < Result.size(); i++) {
-						if (Result[i].Setting->archetype == Effect.Setting->archetype) {
-							if (!_stricmp(Result[i].Setting->description.c_str(), Effect.Setting->description.c_str())) {
-								return true;
-							}
-						}
-					}
-
-					Result.emplace_back(Effect);
-					return true;
-				}
-
-				break;
-			}
-
-			case EffectSetting::kArch_Chameleon: {
-				if (FormID == 0) {
-					for (int i = 0; i < Result.size(); i++) {
-						if (Result[i].Setting->archetype == Effect.Setting->archetype) {
-							BGSPerk* StealthPerk1 = Result[i].Setting->perkToApply;
-							BGSPerk* StealthPerk2 = Effect.Setting->perkToApply;
-							if (!StealthPerk1 || !StealthPerk2)
-								return true;
-
-							if (StealthPerk1->formID == StealthPerk2->formID)
-								return true;
-
-							BSString DescriptionText1, DescriptionText2;
-							TESDescription* DescriptionForm1 = DYNAMIC_CAST(StealthPerk1, BGSPerk, TESDescription);
-							TESDescription* DescriptionForm2 = DYNAMIC_CAST(StealthPerk2, BGSPerk, TESDescription);
-							CALL_MEMBER_FN(DescriptionForm1, Get)(&DescriptionText1, nullptr);
-							CALL_MEMBER_FN(DescriptionForm2, Get)(&DescriptionText2, nullptr);
-
-							if (!_stricmp(DescriptionText1.Get(), DescriptionText2.Get()))
-								return true;
-						}
-					}
-
-					Result.emplace_back(Effect);
-					return true;
-				}
-
-				break;
-			}
-
-			default:
-				_LogWarning("TestEffectEntry: Unhandled Effect Archetype: %i", Effect.Setting->archetype);
-				break;
-			}
-
-			if (FormID == 0) {
-				Result.emplace_back(Effect);
-				return true;
-			}
-
-			return false;
-		}
-
-		void SortEntries(std::vector<EffectEntry>& Effects) {
-			std::vector<EffectEntry> Result;
-
-			for (auto iterSortList : Forms::EffectSortOrder) {
-				for (auto iterSort : iterSortList) {
-					for (auto iterEffect = Effects.begin(); iterEffect != Effects.end();) {
-						if (SortEntry((*iterEffect), iterSort, Result))
-							iterEffect = Effects.erase(iterEffect);
-						else iterEffect++;
-					}
-				}
-			}
-
-			Effects.clear();
-			Effects.insert(Effects.end(), Result.begin(), Result.end());
-		}
-
-		std::string GetDescription(std::vector<EffectEntry> Effects) {
-			std::stringstream Result;
-			std::string Seperator = ", ";
-
-			bool SkipSeparator = false;
-			for (auto iter = Effects.begin(); iter != Effects.end(); ) {
-				switch (iter->Setting->archetype) {
-				case EffectSetting::kArch_ValueModifier:
-				case EffectSetting::kArch_DualValueModifier:
-				case EffectSetting::kArch_PeakValueModifier: {
-					ActorValueInfo* ActorValue1 = iter->Setting->primaryActorValue;
-					ActorValueInfo* ActorValue2 = iter->Setting->secondaryActorValue;
-
-					std::string Name1 = ActorValue1->avAbbreviation.c_str();
-					if (Name1.empty())
-						Name1 = ActorValue1->avName;
-
-					AddValueEffect(Result, (*iter), ActorValue1, Name1);
-
-					if (ActorValue2) {
-						std::string Name2 = ActorValue2->avAbbreviation.c_str();
-						if (Name2.empty())
-							Name2 = ActorValue2->avName;
-
-						if (_stricmp(Name1.c_str(), Name2.c_str()) != 0) {
-							Result << Seperator;
-							AddValueEffect(Result, (*iter), ActorValue2, Name2);
-						}
-					}
-
-					break;
-				}
-
-				case EffectSetting::kArch_Script:
-				case EffectSetting::kArch_Cloak: {
-					std::string Effect = iter->Setting->description.c_str();
-					while (ispunct(Effect.back()))
-						Effect.pop_back();
-
-					if (Effect.empty()) {
-						SkipSeparator = true;
-						break;
-					}
-
-					StringToUpper(Effect);
-					Result << Effect;
-					break;
-				}
-
-				case EffectSetting::kArch_Chameleon: {
-					BGSPerk* StealthPerk = iter->Setting->perkToApply;
-					if (!StealthPerk) {
-						SkipSeparator = true;
-						break;
-					}
-
-					BSString DescriptionText;
-					TESDescription* DescriptionForm = DYNAMIC_CAST(StealthPerk, BGSPerk, TESDescription);
-					CALL_MEMBER_FN(DescriptionForm, Get)(&DescriptionText, nullptr);
-
-					std::string Effect = DescriptionText.Get();
-
-					while (ispunct(Effect.back()))
-						Effect.pop_back();
-
-					if (Effect.empty()) {
-						SkipSeparator = true;
-						break;
-					}
-
-					StringToUpper(Effect);
-					Result << Effect;
-				}
-
-				default:
-					break;
-				}
-
-				iter++;
-				if ((iter != Effects.end()) && !SkipSeparator)
-					Result << Seperator;
-				SkipSeparator = false;
-			}
-
-			return Result.str();
-		}
-
-	public:
-		virtual void Invoke(Args* args) {
-			GFxMovieRoot* root = args->movie->movieRoot;
-			root->CreateArray(args->result);
-
-			auto ActiveEffectsT = (*g_player)->magicTarget.GetActiveEffects();
-			std::vector<ActiveEffectEntry> ActiveEffectsV;
-
-			for (int i = 0; i < ActiveEffectsT->count; i++) {
-				ActiveEffect*	Effect	= ActiveEffectsT->entries[i];
-				EffectSetting*	Setting	= Effect->data->setting;
-
-				if (!Effect || !Setting)
-					continue;
-
-				if ((Effect->flags & ActiveEffect::kFlag_Inactive) || (Setting->flags & EffectSetting::kFlag_HideInUI))
-					continue;
-
-				TESForm* Source = (Effect->sourceItem) ? Effect->sourceItem : Effect->sourceSpell;
-				if (!Source)
-					return;
-
-				// Perks are almost all abilities, and shouldn't show up, so we filter out abilities
-				SpellItem* SpellSource = DYNAMIC_CAST(Source, TESForm, SpellItem);
-				if (SpellSource)
-					if (SpellSource->data.type == SpellItem::kAbility)
-						continue;
-
-				EffectEntry newEffect;
-				newEffect.Setting	= Setting;
-				newEffect.FormID	= Setting->formID;
-				newEffect.Magnitude	= Effect->magnitude;
-				newEffect.Duration	= Effect->duration;
-
-				bool SkipEffect = false;
-				for (int i = 0; i < ActiveEffectsV.size(); i++) {
-					if (ActiveEffectsV[i].FormID == Source->formID) {
-						(Setting->flags & EffectSetting::kFlag_Detrimental) ?
-							ActiveEffectsV[i].EffectsD.emplace_back(newEffect) : 
-							ActiveEffectsV[i].EffectsB.emplace_back(newEffect);
-						SkipEffect = true;
-					}
-				}
-
-				if (!SkipEffect) {
-					ActiveEffectEntry newActiveEffect;
-					newActiveEffect.Name	= Source->GetFullName();
-					newActiveEffect.FormID	= Source->formID;
-					(Setting->flags & EffectSetting::kFlag_Detrimental) ?
-						newActiveEffect.EffectsD.emplace_back(newEffect) :
-						newActiveEffect.EffectsB.emplace_back(newEffect);
-					newActiveEffect.Type	= GetType(Source);
-					ActiveEffectsV.emplace_back(newActiveEffect);
-				}
-			}
-
-			std::sort(ActiveEffectsV.begin(), ActiveEffectsV.end(),
-				[](ActiveEffectEntry const& E1, ActiveEffectEntry const& E2) {
-					SortGeneric(E1, E2, Type);
-					SortStrings(E1, E2, Name);
-					return false;
-				}
-			);
-
-			for (auto iter : ActiveEffectsV) {
-				SortEntries(iter.EffectsB); SortEntries(iter.EffectsD);
-				iter.EffectsB.insert(iter.EffectsB.end(), iter.EffectsD.begin(), iter.EffectsD.end());
-
-				bool HasDuration = false;
-				for (auto iterEffect : iter.EffectsB) {
-					if (iterEffect.Duration > 0) {
-						HasDuration = true;
-						break;
-					}
-				}
-
-				GFxValue Entry;
-				root->CreateObject(&Entry);
-				SetGFxValue(&Entry, root,	"text",			iter.Name.c_str());
-				SetGFxValue(&Entry, root,	"Description",	GetDescription(iter.EffectsB).c_str());
-				SetGFxValue(&Entry,			"HasDuration",	HasDuration);
-				SetGFxValue(&Entry,			"Type",			iter.Type);
-				args->result->PushBack(&Entry);
-			}
-		}
-	};
-
-    class AddPerks : public GFxFunctionHandler {
+    class ActiveEffects: public GFxFunctionHandler {
+    private:
+        UInt32 GetType(TESForm* Form) {
+            switch (Form->formType) {
+            case kFormType_ARMO:
+                return 43;
+
+            case kFormType_ALCH:
+            case kFormType_ENCH:
+            case kFormType_INGR:
+            case kFormType_SCRL:
+            case kFormType_SPEL: {
+                MagicItem* SourceItem = DYNAMIC_CAST(Form, TESForm, MagicItem);
+                for (auto iter: Forms::ObjectTypes) {
+                    for (int i = 0; i < SourceItem->keywordForm.numKeywords; i++) {
+                        if (iter.first->formID == SourceItem->keywordForm.keywords[i]->formID)
+                            return iter.second;
+                    }
+                }
+
+                return 50;
+            }
+
+            default:
+                _LogWarning("GFx::ActiveEffects - Unhandled Form Type: %i", Form->formType);
+                break;
+            }
+
+            return 59;
+        }
+
+        bool ShouldShowMaximum(ActorValueInfo* ActorValue) {
+            bool IsHealth = (ActorValue->formID == 0x2D4);
+            bool IsAction = (ActorValue->formID == 0x2D5);
+            bool IsCarryW = (ActorValue->formID == 0x2DC);
+            return (IsHealth || IsAction || IsCarryW);
+        }
+
+        bool ShouldShowPercent(ActorValueInfo* ActorValue) {
+            bool IsHealthRate = (ActorValue->formID == 0x2D7);
+            bool IsActionRate = (ActorValue->formID == 0x28D);
+            bool IsResist = ((ActorValue->formID >= 0x2E3) && (0x2EB >= ActorValue->formID));
+            return (IsHealthRate || IsActionRate || IsResist);
+        }
+
+        bool ShouldMultiply(ActorValueInfo* ActorValue) {
+            bool IsHealthRate = (ActorValue->formID == 0x2D7);
+            return (IsHealthRate);
+        }
+
+        void AddValueEffect(std::stringstream& Result, EffectEntry Effect, ActorValueInfo* ActorValue, std::string Name) {
+            bool Recover = (Effect.Setting->flags & EffectSetting::kFlag_Recover);
+
+            bool Max = Recover && ShouldShowMaximum(ActorValue);
+            bool Percent = Recover && ShouldShowPercent(ActorValue);
+            bool Multiply = Percent && ShouldMultiply(ActorValue);
+
+            float Weight = (Effect.Setting->primaryActorValue->formID == ActorValue->formID) ? 1.0 : Effect.Setting->secondaryAVWeight;
+
+            int Magnitude = (int)roundf(Effect.Magnitude * Weight * ((Multiply) ? 100.0 : 1.0));
+
+            StringToUpper(Name);
+            Result << ((Max) ? "MAX " : "") << Name << ((Recover) ? " " : "/s ") << Magnitude << ((Percent) ? "%" : "");
+        }
+
+        bool SortEntry(EffectEntry Effect, UInt32 FormID, std::vector<EffectEntry>& Result) {
+            switch (Effect.Setting->archetype) {
+            case EffectSetting::kArch_ValueModifier: {
+                if ((FormID == Effect.Setting->primaryActorValue->formID) || (FormID == 0)) {
+                    for (int i = 0; i < Result.size(); i++) {
+                        if (Result[i].Setting->archetype == Effect.Setting->archetype) {
+                            if (Result[i].Setting->primaryActorValue->formID == Effect.Setting->primaryActorValue->formID) {
+                                Result[i].Magnitude += Effect.Magnitude;
+                                return true;
+                            }
+                        }
+                    }
+
+                    Result.emplace_back(Effect);
+                    return true;
+                }
+                break;
+            }
+
+            case EffectSetting::kArch_DualValueModifier: {
+                // Maybe do more based on the secondary value?
+                if ((FormID == Effect.Setting->primaryActorValue->formID) || (FormID == 0)) {
+                    for (int i = 0; i < Result.size(); i++) {
+                        if (Result[i].Setting->archetype == Effect.Setting->archetype) {
+                            if (Result[i].Setting->primaryActorValue->formID == Effect.Setting->primaryActorValue->formID) {
+                                Result[i].Magnitude += Effect.Magnitude;
+                                return true;
+                            }
+                        }
+                    }
+
+                    Result.emplace_back(Effect);
+                    return true;
+                }
+
+                break;
+            }
+
+            case EffectSetting::kArch_PeakValueModifier: {
+                if ((FormID == Effect.Setting->primaryActorValue->formID) || (FormID == 0)) {
+                    for (int i = 0; i < Result.size(); i++) {
+                        if (Result[i].Setting->archetype == Effect.Setting->archetype) {
+                            if (Result[i].Setting->primaryActorValue->formID == Effect.Setting->primaryActorValue->formID) {
+                                if (Effect.Magnitude > Result[i].Magnitude) {
+                                    Result[i].Magnitude = Effect.Magnitude;
+                                    Result[i].Duration = Effect.Duration;
+                                }
+
+                                return true;
+                            }
+                        }
+                    }
+
+                    Result.emplace_back(Effect);
+                    return true;
+                }
+                break;
+            }
+
+            case EffectSetting::kArch_Script:
+            case EffectSetting::kArch_Cloak: {
+                if (FormID == 0) {
+                    for (int i = 0; i < Result.size(); i++) {
+                        if (Result[i].Setting->archetype == Effect.Setting->archetype) {
+                            if (!_stricmp(Result[i].Setting->description.c_str(), Effect.Setting->description.c_str())) {
+                                return true;
+                            }
+                        }
+                    }
+
+                    Result.emplace_back(Effect);
+                    return true;
+                }
+
+                break;
+            }
+
+            case EffectSetting::kArch_Chameleon: {
+                if (FormID == 0) {
+                    for (int i = 0; i < Result.size(); i++) {
+                        if (Result[i].Setting->archetype == Effect.Setting->archetype) {
+                            BGSPerk* StealthPerk1 = Result[i].Setting->perkToApply;
+                            BGSPerk* StealthPerk2 = Effect.Setting->perkToApply;
+                            if (!StealthPerk1 || !StealthPerk2)
+                                return true;
+
+                            if (StealthPerk1->formID == StealthPerk2->formID)
+                                return true;
+
+                            BSString DescriptionText1, DescriptionText2;
+                            TESDescription* DescriptionForm1 = DYNAMIC_CAST(StealthPerk1, BGSPerk, TESDescription);
+                            TESDescription* DescriptionForm2 = DYNAMIC_CAST(StealthPerk2, BGSPerk, TESDescription);
+                            CALL_MEMBER_FN(DescriptionForm1, Get)(&DescriptionText1, nullptr);
+                            CALL_MEMBER_FN(DescriptionForm2, Get)(&DescriptionText2, nullptr);
+
+                            if (!_stricmp(DescriptionText1.Get(), DescriptionText2.Get()))
+                                return true;
+                        }
+                    }
+
+                    Result.emplace_back(Effect);
+                    return true;
+                }
+
+                break;
+            }
+
+            default:
+                _LogWarning("TestEffectEntry: Unhandled Effect Archetype: %i", Effect.Setting->archetype);
+                break;
+            }
+
+            if (FormID == 0) {
+                Result.emplace_back(Effect);
+                return true;
+            }
+
+            return false;
+        }
+
+        void SortEntries(std::vector<EffectEntry>& Effects) {
+            std::vector<EffectEntry> Result;
+
+            for (auto iterSortList: Forms::EffectSortOrder) {
+                for (auto iterSort: iterSortList) {
+                    for (auto iterEffect = Effects.begin(); iterEffect != Effects.end();) {
+                        if (SortEntry((*iterEffect), iterSort, Result))
+                            iterEffect = Effects.erase(iterEffect);
+                        else
+                            iterEffect++;
+                    }
+                }
+            }
+
+            Effects.clear();
+            Effects.insert(Effects.end(), Result.begin(), Result.end());
+        }
+
+        std::string GetDescription(std::vector<EffectEntry> Effects) {
+            std::stringstream Result;
+            std::string Seperator = ", ";
+
+            bool SkipSeparator = false;
+            for (auto iter = Effects.begin(); iter != Effects.end();) {
+                switch (iter->Setting->archetype) {
+                case EffectSetting::kArch_ValueModifier:
+                case EffectSetting::kArch_DualValueModifier:
+                case EffectSetting::kArch_PeakValueModifier: {
+                    ActorValueInfo* ActorValue1 = iter->Setting->primaryActorValue;
+                    ActorValueInfo* ActorValue2 = iter->Setting->secondaryActorValue;
+
+                    std::string Name1 = ActorValue1->avAbbreviation.c_str();
+                    if (Name1.empty())
+                        Name1 = ActorValue1->avName;
+
+                    AddValueEffect(Result, (*iter), ActorValue1, Name1);
+
+                    if (ActorValue2) {
+                        std::string Name2 = ActorValue2->avAbbreviation.c_str();
+                        if (Name2.empty())
+                            Name2 = ActorValue2->avName;
+
+                        if (_stricmp(Name1.c_str(), Name2.c_str()) != 0) {
+                            Result << Seperator;
+                            AddValueEffect(Result, (*iter), ActorValue2, Name2);
+                        }
+                    }
+
+                    break;
+                }
+
+                case EffectSetting::kArch_Script:
+                case EffectSetting::kArch_Cloak: {
+                    std::string Effect = iter->Setting->description.c_str();
+                    while (ispunct(Effect.back()))
+                        Effect.pop_back();
+
+                    if (Effect.empty()) {
+                        SkipSeparator = true;
+                        break;
+                    }
+
+                    StringToUpper(Effect);
+                    Result << Effect;
+                    break;
+                }
+
+                case EffectSetting::kArch_Chameleon: {
+                    BGSPerk* StealthPerk = iter->Setting->perkToApply;
+                    if (!StealthPerk) {
+                        SkipSeparator = true;
+                        break;
+                    }
+
+                    BSString DescriptionText;
+                    TESDescription* DescriptionForm = DYNAMIC_CAST(StealthPerk, BGSPerk, TESDescription);
+                    CALL_MEMBER_FN(DescriptionForm, Get)(&DescriptionText, nullptr);
+
+                    std::string Effect = DescriptionText.Get();
+
+                    while (ispunct(Effect.back()))
+                        Effect.pop_back();
+
+                    if (Effect.empty()) {
+                        SkipSeparator = true;
+                        break;
+                    }
+
+                    StringToUpper(Effect);
+                    Result << Effect;
+                }
+
+                default:
+                    break;
+                }
+
+                iter++;
+                if ((iter != Effects.end()) && !SkipSeparator)
+                    Result << Seperator;
+                SkipSeparator = false;
+            }
+
+            return Result.str();
+        }
+
+    public:
+        virtual void Invoke(Args* args) {
+            GFxMovieRoot* root = args->movie->movieRoot;
+            root->CreateArray(args->result);
+
+            auto ActiveEffectsT = (*g_player)->magicTarget.GetActiveEffects();
+            std::vector<ActiveEffectEntry> ActiveEffectsV;
+
+            for (int i = 0; i < ActiveEffectsT->count; i++) {
+                ActiveEffect* Effect = ActiveEffectsT->entries[i];
+                EffectSetting* Setting = Effect->data->setting;
+
+                if (!Effect || !Setting)
+                    continue;
+
+                if ((Effect->flags & ActiveEffect::kFlag_Inactive) || (Setting->flags & EffectSetting::kFlag_HideInUI))
+                    continue;
+
+                TESForm* Source = (Effect->sourceItem) ? Effect->sourceItem : Effect->sourceSpell;
+                if (!Source)
+                    return;
+
+                // Perks are almost all abilities, and shouldn't show up, so we filter out abilities
+                SpellItem* SpellSource = DYNAMIC_CAST(Source, TESForm, SpellItem);
+                if (SpellSource)
+                    if (SpellSource->data.type == SpellItem::kAbility)
+                        continue;
+
+                EffectEntry newEffect;
+                newEffect.Setting = Setting;
+                newEffect.FormID = Setting->formID;
+                newEffect.Magnitude = Effect->magnitude;
+                newEffect.Duration = Effect->duration;
+
+                bool SkipEffect = false;
+                for (int i = 0; i < ActiveEffectsV.size(); i++) {
+                    if (ActiveEffectsV[i].FormID == Source->formID) {
+                        (Setting->flags & EffectSetting::kFlag_Detrimental) ? ActiveEffectsV[i].EffectsD.emplace_back(newEffect) : ActiveEffectsV[i].EffectsB.emplace_back(newEffect);
+                        SkipEffect = true;
+                    }
+                }
+
+                if (!SkipEffect) {
+                    ActiveEffectEntry newActiveEffect;
+                    newActiveEffect.Name = Source->GetFullName();
+                    newActiveEffect.FormID = Source->formID;
+                    (Setting->flags & EffectSetting::kFlag_Detrimental) ? newActiveEffect.EffectsD.emplace_back(newEffect) : newActiveEffect.EffectsB.emplace_back(newEffect);
+                    newActiveEffect.Type = GetType(Source);
+                    ActiveEffectsV.emplace_back(newActiveEffect);
+                }
+            }
+
+            std::sort(ActiveEffectsV.begin(), ActiveEffectsV.end(), [](ActiveEffectEntry const& E1, ActiveEffectEntry const& E2) {
+                SortGeneric(E1, E2, Type);
+                SortStrings(E1, E2, Name);
+                return false;
+            });
+
+            for (auto iter: ActiveEffectsV) {
+                SortEntries(iter.EffectsB);
+                SortEntries(iter.EffectsD);
+                iter.EffectsB.insert(iter.EffectsB.end(), iter.EffectsD.begin(), iter.EffectsD.end());
+
+                bool HasDuration = false;
+                for (auto iterEffect: iter.EffectsB) {
+                    if (iterEffect.Duration > 0) {
+                        HasDuration = true;
+                        break;
+                    }
+                }
+
+                GFxValue Entry;
+                root->CreateObject(&Entry);
+                SetGFxValue(&Entry, root, "text", iter.Name.c_str());
+                SetGFxValue(&Entry, root, "Description", GetDescription(iter.EffectsB).c_str());
+                SetGFxValue(&Entry, "HasDuration", HasDuration);
+                SetGFxValue(&Entry, "Type", iter.Type);
+                args->result->PushBack(&Entry);
+            }
+        }
+    };
+
+    class AddPerks: public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
             GFxValue Element, FormID;
@@ -430,14 +425,12 @@ namespace GFX {
         }
     };
 
-    class AllowTextInput : public GFxFunctionHandler {
+    class AllowTextInput: public GFxFunctionHandler {
     public:
-        virtual void Invoke(Args* args) {
-            (*g_inputMgr)->AllowTextInput(args->args[0].GetBool());
-        }
+        virtual void Invoke(Args* args) { (*g_inputMgr)->AllowTextInput(args->args[0].GetBool()); }
     };
 
-    class CloseMenu : public GFxFunctionHandler {
+    class CloseMenu: public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
             BSFixedString MenuName(args->args[0].GetString());
@@ -445,14 +438,12 @@ namespace GFX {
         }
     };
 
-    class DoctorBagCount : public GFxFunctionHandler {
+    class DoctorBagCount: public GFxFunctionHandler {
     public:
-        virtual void Invoke(Args* args) {
-            args->result->SetUInt(GetItemCount((*g_player), Forms::DoctorsBag));
-        }
+        virtual void Invoke(Args* args) { args->result->SetUInt(GetItemCount((*g_player), Forms::DoctorsBag)); }
     };
 
-    class FilterSearch : public GFxFunctionHandler {
+    class FilterSearch: public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
             GFxValue Result[2];
@@ -479,8 +470,8 @@ namespace GFX {
                 if (strifind(name, q)) {
                     Item.SetMember("filterFlag", &filterFlag);
                     matchCount++;
-                }
-                else (Item.SetMember("filterFlag", &GFxValue(0)));
+                } else
+                    (Item.SetMember("filterFlag", &GFxValue(0)));
 
                 Result[0].PushBack(&Item);
             }
@@ -488,9 +479,9 @@ namespace GFX {
             if (matchCount == 0) {
                 GFxValue Default;
                 root->CreateObject(&Default);
-                SetGFxValue(&Default, root, "text",         "$NONE_MATCHING");
-                SetGFxValue(&Default,       "filterFlag",   filterFlag);
-                SetGFxValue(&Default,       "IsDefault",    true);
+                SetGFxValue(&Default, root, "text", "$NONE_MATCHING");
+                SetGFxValue(&Default, "filterFlag", filterFlag);
+                SetGFxValue(&Default, "IsDefault", true);
                 Result[0].PushBack(&Default);
             }
 
@@ -498,215 +489,213 @@ namespace GFX {
         }
     };
 
-	class ForceUnlock : public GFxFunctionHandler {
-	public:
-		virtual void Invoke(Args* args) {
-			//
-		}
-	};
-
-	class GetDescription : public GFxFunctionHandler {
+    class ForceUnlock: public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
-			GFxMovieRoot* root = args->movie->movieRoot;
-
-			GFxValue FormID;
-			args->args[0].GetMember("formID", &FormID);
-
-			std::string		Description;
-			bool			HasFeatured	= false;
-
-			TESForm* Form = LookupFormByID(FormID.GetUInt());
-			if (Form) {
-				if (Form->formType == kFormType_BOOK) {
-					TESObjectBOOK* Book = DYNAMIC_CAST(Form, TESForm, TESObjectBOOK);
-
-					BSString DescriptionText;
-					TESDescription* DescriptionForm = DYNAMIC_CAST(Book, TESObjectBOOK, TESDescription);
-					CALL_MEMBER_FN(DescriptionForm, Get)(&DescriptionText, nullptr);
-
-					Description = DescriptionText.Get();
-					if (Description.empty()) {
-						switch (Book->data.GetSanitizedType()) {
-						case TESObjectBOOK::Data::kType_Perk: {
-							if (Book->data.teaches.Perk) {
-								DescriptionForm = DYNAMIC_CAST(Book->data.teaches.Perk, BGSPerk, TESDescription);
-								CALL_MEMBER_FN(DescriptionForm, Get)(&DescriptionText, nullptr);
-								HasFeatured = true;
-							}
-
-							break;
-						}
-
-						case TESObjectBOOK::Data::kType_Spell: {
-							if (Book->data.teaches.Spell) {
-								DescriptionForm = DYNAMIC_CAST(Book->data.teaches.Spell, SpellItem, TESDescription);
-								CALL_MEMBER_FN(DescriptionForm, Get)(&DescriptionText, nullptr);
-								HasFeatured = true;
-							}
-
-							break;
-						}
-
-						default:
-							break;
-						}
-
-						Description = DescriptionText.Get();
-						if (Description.empty()) {
-							if (Book->featured.message) {
-								DescriptionForm = DYNAMIC_CAST(Book->featured.message, BGSMessage, TESDescription);
-								CALL_MEMBER_FN(DescriptionForm, Get)(&DescriptionText, nullptr);
-								HasFeatured = true;
-							}
-
-							Description = DescriptionText.Get();
-						}
-					}
-
-					if (!HasFeatured) {
-						if (std::regex_search(Description, BSRegex::Alias)) {
-							ExtraDataList* ExtraData = GetExtraDataListByIndex(args->args[1].GetUInt());
-							if (ExtraData) {
-								ExtraTextDisplayData* TextDisplayData = GetExtraDataByType(ExtraData, TextDisplayData);
-								if (TextDisplayData) {
-									DoTokenReplacement(TextDisplayData, DescriptionText);
-									Description = DescriptionText.Get();
-								}
-							}
-						}
-
-						Description = std::regex_replace(Description, BSRegex::Pagebreak,	"<br>");
-						Description = std::regex_replace(Description, BSRegex::SingleLine,	"<br>");
-						Description = std::regex_replace(Description, BSRegex::DoubleLine,	"<br>");
-						Description = std::regex_replace(Description, BSRegex::Face,		"face='$MAIN_Font'");
-						Description = std::regex_replace(Description, BSRegex::Size,		"size='24')");
-						Description = std::regex_replace(Description, BSRegex::Color,		"color='#FFFFFF'");
-					}
-
-					Book->bounds1;
-					Book->bounds2;
-				}
-			}
-
-			bool HasDescription = (HasFeatured || !Description.empty());
-			SetGFxValue(&args->args[0], root,	"Description",		Description);
-			SetGFxValue(&args->args[0],			"HasDescription",	HasDescription);
+            //
         }
     };
 
-    class HardcoreValues : public GFxFunctionHandler {
+    class GetDescription: public GFxFunctionHandler {
+    public:
+        virtual void Invoke(Args* args) {
+            GFxMovieRoot* root = args->movie->movieRoot;
+
+            GFxValue FormID;
+            args->args[0].GetMember("formID", &FormID);
+
+            std::string Description;
+            bool HasFeatured = false;
+
+            TESForm* Form = LookupFormByID(FormID.GetUInt());
+            if (Form) {
+                if (Form->formType == kFormType_BOOK) {
+                    TESObjectBOOK* Book = DYNAMIC_CAST(Form, TESForm, TESObjectBOOK);
+
+                    BSString DescriptionText;
+                    TESDescription* DescriptionForm = DYNAMIC_CAST(Book, TESObjectBOOK, TESDescription);
+                    CALL_MEMBER_FN(DescriptionForm, Get)(&DescriptionText, nullptr);
+
+                    Description = DescriptionText.Get();
+                    if (Description.empty()) {
+                        switch (Book->data.GetSanitizedType()) {
+                        case TESObjectBOOK::Data::kType_Perk: {
+                            if (Book->data.teaches.Perk) {
+                                DescriptionForm = DYNAMIC_CAST(Book->data.teaches.Perk, BGSPerk, TESDescription);
+                                CALL_MEMBER_FN(DescriptionForm, Get)(&DescriptionText, nullptr);
+                                HasFeatured = true;
+                            }
+
+                            break;
+                        }
+
+                        case TESObjectBOOK::Data::kType_Spell: {
+                            if (Book->data.teaches.Spell) {
+                                DescriptionForm = DYNAMIC_CAST(Book->data.teaches.Spell, SpellItem, TESDescription);
+                                CALL_MEMBER_FN(DescriptionForm, Get)(&DescriptionText, nullptr);
+                                HasFeatured = true;
+                            }
+
+                            break;
+                        }
+
+                        default:
+                            break;
+                        }
+
+                        Description = DescriptionText.Get();
+                        if (Description.empty()) {
+                            if (Book->featured.message) {
+                                DescriptionForm = DYNAMIC_CAST(Book->featured.message, BGSMessage, TESDescription);
+                                CALL_MEMBER_FN(DescriptionForm, Get)(&DescriptionText, nullptr);
+                                HasFeatured = true;
+                            }
+
+                            Description = DescriptionText.Get();
+                        }
+                    }
+
+                    if (!HasFeatured) {
+                        if (std::regex_search(Description, BSRegex::Alias)) {
+                            ExtraDataList* ExtraData = GetExtraDataListByIndex(args->args[1].GetUInt());
+                            if (ExtraData) {
+                                ExtraTextDisplayData* TextDisplayData = GetExtraDataByType(ExtraData, TextDisplayData);
+                                if (TextDisplayData) {
+                                    DoTokenReplacement(TextDisplayData, DescriptionText);
+                                    Description = DescriptionText.Get();
+                                }
+                            }
+                        }
+
+                        Description = std::regex_replace(Description, BSRegex::Pagebreak, "<br>");
+                        Description = std::regex_replace(Description, BSRegex::SingleLine, "<br>");
+                        Description = std::regex_replace(Description, BSRegex::DoubleLine, "<br>");
+                        Description = std::regex_replace(Description, BSRegex::Face, "face='$MAIN_Font'");
+                        Description = std::regex_replace(Description, BSRegex::Size, "size='24')");
+                        Description = std::regex_replace(Description, BSRegex::Color, "color='#FFFFFF'");
+                    }
+
+                    Book->bounds1;
+                    Book->bounds2;
+                }
+            }
+
+            bool HasDescription = (HasFeatured || !Description.empty());
+            SetGFxValue(&args->args[0], root, "Description", Description);
+            SetGFxValue(&args->args[0], "HasDescription", HasDescription);
+        }
+    };
+
+    class HardcoreValues: public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
             args->movie->movieRoot->CreateObject(args->result);
-            SetGFxValue(args->result, "H2O",        GetValueInt((*g_player), Forms::Dehydration));
-            SetGFxValue(args->result, "FOD",        GetValueInt((*g_player), Forms::Starvation));
-            SetGFxValue(args->result, "SLP",        GetValueInt((*g_player), Forms::SleepDeprivation));
-            SetGFxValue(args->result, "IsEnabled",  false);
+            SetGFxValue(args->result, "H2O", GetValueInt((*g_player), Forms::Dehydration));
+            SetGFxValue(args->result, "FOD", GetValueInt((*g_player), Forms::Starvation));
+            SetGFxValue(args->result, "SLP", GetValueInt((*g_player), Forms::SleepDeprivation));
+            SetGFxValue(args->result, "IsEnabled", false);
         }
     };
 
-	class InvFilter : public GFxFunctionHandler {
-	public:
-		virtual void Invoke(Args* args) {
-			GFxMovieRoot* root = args->movie->movieRoot;
-			root->CreateArray(args->result);
-
-			GFxValue DataObj, CurrentPage, CurrentTab;
-			root->GetVariable(&DataObj, "root.Menu_mc.DataObj");
-			DataObj.GetMember("CurrentPage",	&CurrentPage);
-			DataObj.GetMember("CurrentTab",		&CurrentTab);
-
-			switch (CurrentPage.GetUInt()) {
-			case PipboyMenu::kPage_Inventory:
-				switch (CurrentTab.GetUInt()) {
-				case PipboyMenu::kTab_Inv_Weapons:
-					args->result->SetUInt(PipboyMenu::kFilter_Weapons);
-					break;
-				case PipboyMenu::kTab_Inv_Apparel:
-					args->result->SetUInt(PipboyMenu::kFilter_Apparel);
-					break;
-				case PipboyMenu::kTab_Inv_Aid:
-					args->result->SetUInt(PipboyMenu::kFilter_Aid);
-					break;
-				case PipboyMenu::kTab_Inv_Misc:
-					args->result->SetUInt(PipboyMenu::kFilter_Misc);
-					break;
-				case PipboyMenu::kTab_Inv_Junk:
-					args->result->SetUInt(PipboyMenu::kFilter_Junk);
-					break;
-				case PipboyMenu::kTab_Inv_Mods:
-					args->result->SetUInt(PipboyMenu::kFilter_Mods);
-					break;
-				case PipboyMenu::kTab_Inv_Ammo:
-					args->result->SetUInt(PipboyMenu::kFilter_Ammo);
-					break;
-				case PipboyMenu::kTab_Inv_Keys:
-					args->result->SetUInt(PipboyMenu::kFilter_Keys);
-					break;
-				default:
-					_LogMessage("InvFilter: Unhandled Inventory Tab: %i", CurrentTab.GetUInt());
-					break;
-				}
-				break;
-
-			case PipboyMenu::kPage_Data:
-				args->result->SetUInt(PipboyMenu::kFilter_Notes);
-				break;
-
-			default:
-				_LogMessage("InvFilter: Unhandled Pipboy Page: %i", CurrentPage.GetUInt());
-				break;
-			}
-		}
-	};
-
-	class InvItems : public GFxFunctionHandler {
-	public:
-		virtual void Invoke(Args* args) {
-			GFxMovieRoot* root = args->movie->movieRoot;
-			root->CreateArray(args->result);
-
-			GFxValue DataObj, InvItems;
-			root->GetVariable(&DataObj, "root.Menu_mc.DataObj");
-			DataObj.GetMember("InvItems", &InvItems);
-
-			for (int i = 0; i < InvItems.GetArraySize(); i++) {
-				GFxValue Entry, FilterFlag, FormID;
-				InvItems.GetElement(i, &Entry);
-				Entry.GetMember("filterFlag", &FilterFlag);
-
-				switch (FilterFlag.GetUInt()) {
-				case PipboyMenu::kFilter_NOTE:
-					SetGFxValue(&Entry, "isHolotape", true);
-
-				case PipboyMenu::kFilter_BOOK:
-					SetGFxValue(&Entry, "filterFlag", PipboyMenu::kFilter_Notes);
-					break;
-
-				case PipboyMenu::kFilter_Misc:
-					Entry.GetMember("formID", &FormID);
-					if (LookupFormByID(FormID.GetUInt())->formType == FormType::kFormType_KEYM)
-						SetGFxValue(&Entry, "filterFlag", PipboyMenu::kFilter_Keys);
-					break;
-
-				default:
-					break;
-				}
-
-				args->result->PushBack(&Entry);
-			}
-		}
-	};
-
-    class LockpickLevel : public GFxFunctionHandler {
+    class InvFilter: public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
-            args->result->SetInt(GetValueInt((*g_player), Forms::Lockpick));
+            GFxMovieRoot* root = args->movie->movieRoot;
+            root->CreateArray(args->result);
+
+            GFxValue DataObj, CurrentPage, CurrentTab;
+            root->GetVariable(&DataObj, "root.Menu_mc.DataObj");
+            DataObj.GetMember("CurrentPage", &CurrentPage);
+            DataObj.GetMember("CurrentTab", &CurrentTab);
+
+            switch (CurrentPage.GetUInt()) {
+            case PipboyMenu::kPage_Inventory:
+                switch (CurrentTab.GetUInt()) {
+                case PipboyMenu::kTab_Inv_Weapons:
+                    args->result->SetUInt(PipboyMenu::kFilter_Weapons);
+                    break;
+                case PipboyMenu::kTab_Inv_Apparel:
+                    args->result->SetUInt(PipboyMenu::kFilter_Apparel);
+                    break;
+                case PipboyMenu::kTab_Inv_Aid:
+                    args->result->SetUInt(PipboyMenu::kFilter_Aid);
+                    break;
+                case PipboyMenu::kTab_Inv_Misc:
+                    args->result->SetUInt(PipboyMenu::kFilter_Misc);
+                    break;
+                case PipboyMenu::kTab_Inv_Junk:
+                    args->result->SetUInt(PipboyMenu::kFilter_Junk);
+                    break;
+                case PipboyMenu::kTab_Inv_Mods:
+                    args->result->SetUInt(PipboyMenu::kFilter_Mods);
+                    break;
+                case PipboyMenu::kTab_Inv_Ammo:
+                    args->result->SetUInt(PipboyMenu::kFilter_Ammo);
+                    break;
+                case PipboyMenu::kTab_Inv_Keys:
+                    args->result->SetUInt(PipboyMenu::kFilter_Keys);
+                    break;
+                default:
+                    _LogMessage("InvFilter: Unhandled Inventory Tab: %i", CurrentTab.GetUInt());
+                    break;
+                }
+                break;
+
+            case PipboyMenu::kPage_Data:
+                args->result->SetUInt(PipboyMenu::kFilter_Notes);
+                break;
+
+            default:
+                _LogMessage("InvFilter: Unhandled Pipboy Page: %i", CurrentPage.GetUInt());
+                break;
+            }
         }
     };
 
-	class ModSkills : public GFxFunctionHandler {
+    class InvItems: public GFxFunctionHandler {
+    public:
+        virtual void Invoke(Args* args) {
+            GFxMovieRoot* root = args->movie->movieRoot;
+            root->CreateArray(args->result);
+
+            GFxValue DataObj, InvItems;
+            root->GetVariable(&DataObj, "root.Menu_mc.DataObj");
+            DataObj.GetMember("InvItems", &InvItems);
+
+            for (int i = 0; i < InvItems.GetArraySize(); i++) {
+                GFxValue Entry, FilterFlag, FormID;
+                InvItems.GetElement(i, &Entry);
+                Entry.GetMember("filterFlag", &FilterFlag);
+
+                switch (FilterFlag.GetUInt()) {
+                case PipboyMenu::kFilter_NOTE:
+                    SetGFxValue(&Entry, "isHolotape", true);
+
+                case PipboyMenu::kFilter_BOOK:
+                    SetGFxValue(&Entry, "filterFlag", PipboyMenu::kFilter_Notes);
+                    break;
+
+                case PipboyMenu::kFilter_Misc:
+                    Entry.GetMember("formID", &FormID);
+                    if (LookupFormByID(FormID.GetUInt())->formType == FormType::kFormType_KEYM)
+                        SetGFxValue(&Entry, "filterFlag", PipboyMenu::kFilter_Keys);
+                    break;
+
+                default:
+                    break;
+                }
+
+                args->result->PushBack(&Entry);
+            }
+        }
+    };
+
+    class LockpickLevel: public GFxFunctionHandler {
+    public:
+        virtual void Invoke(Args* args) { args->result->SetInt(GetValueInt((*g_player), Forms::Lockpick)); }
+    };
+
+    class ModSkills: public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
             GFxValue Element, FormID, Value;
@@ -714,7 +703,7 @@ namespace GFX {
             for (int i = 0; i < args->args[0].GetArraySize(); i++) {
                 args->args[0].GetElement(i, &Element);
                 Element.GetMember("FormID", &FormID);
-                Element.GetMember("Value",  &Value);
+                Element.GetMember("Value", &Value);
 
                 ActorValueInfo* ActorValue = LookupTypeByID(FormID.GetUInt(), ActorValueInfo);
                 ModPermValue((*g_player), ActorValue, Value.GetNumber());
@@ -722,13 +711,13 @@ namespace GFX {
         }
     };
 
-    class PerksList : public GFxFunctionHandler {
+    class PerksList: public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
             GFxMovieRoot* root = args->movie->movieRoot;
             root->CreateArray(args->result);
 
-            for (auto iter : Forms::ListMaster) {
+            for (auto iter: Forms::ListMaster) {
                 if (!HasPerk((*g_player), iter))
                     continue;
 
@@ -741,14 +730,14 @@ namespace GFX {
                     Ranks = GetRankList(iter);
                     if (Ranks[0]->formID != iter->formID)
                         continue;
-                }
-                else Ranks.emplace_back(iter);
+                } else
+                    Ranks.emplace_back(iter);
 
                 GFxValue Descriptions;
                 root->CreateArray(&Descriptions);
-                
+
                 int NumRanks = 0;
-                for (auto iterRank : Ranks) {
+                for (auto iterRank: Ranks) {
                     if (HasPerk((*g_player), iterRank))
                         NumRanks++;
 
@@ -760,11 +749,11 @@ namespace GFX {
 
                 GFxValue Perk;
                 root->CreateObject(&Perk);
-                SetGFxValue(&Perk, root,    "text",         Name);
-                SetGFxValue(&Perk, root,    "IconPath",     GetPerkIconPath(iter));
-                SetGFxValue(&Perk,          "FormID",       iter->formID);
-                SetGFxValue(&Perk,          "MaxRank",      iter->numRanks);
-                SetGFxValue(&Perk,          "Rank",         NumRanks);
+                SetGFxValue(&Perk, root, "text", Name);
+                SetGFxValue(&Perk, root, "IconPath", GetPerkIconPath(iter));
+                SetGFxValue(&Perk, "FormID", iter->formID);
+                SetGFxValue(&Perk, "MaxRank", iter->numRanks);
+                SetGFxValue(&Perk, "Rank", NumRanks);
 
                 Perk.SetMember("Descriptions", &Descriptions);
                 args->result->PushBack(&Perk);
@@ -772,20 +761,18 @@ namespace GFX {
         }
     };
 
-    class PlaySoundUI : public GFxFunctionHandler {
+    class PlaySoundUI: public GFxFunctionHandler {
     public:
-        virtual void Invoke(Args* args) {
-            PlayUISound(args->args[0].GetString());
-        }
+        virtual void Invoke(Args* args) { PlayUISound(args->args[0].GetString()); }
     };
 
-    class PopulateRepairItemCard : public GFxFunctionHandler {
+    class PopulateRepairItemCard: public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
             GFxMovieRoot* root = args->movie->movieRoot;
 
             UInt32 HandleID = args->args[0].GetUInt();
-            UInt32 StackID  = args->args[1].GetUInt();
+            UInt32 StackID = args->args[1].GetUInt();
 
             BGSInventoryItem* Item = GetInventoryItemByHandleID(HandleID);
             if (!Item)
@@ -799,17 +786,17 @@ namespace GFX {
                 return;
 
             GFxValue CurrentCard, PreviewCard;
-            args->args[2].GetMember("Current_mc",   &CurrentCard);
-            args->args[2].GetMember("Preview_mc",   &PreviewCard);
+            args->args[2].GetMember("Current_mc", &CurrentCard);
+            args->args[2].GetMember("Preview_mc", &PreviewCard);
 
             GFxValue CurrentInfo, PreviewInfo;
-            CurrentCard.GetMember("InfoObj",        &CurrentInfo);
-            PreviewCard.GetMember("InfoObj",        &PreviewInfo);
+            CurrentCard.GetMember("InfoObj", &CurrentInfo);
+            PreviewCard.GetMember("InfoObj", &PreviewInfo);
 
             if (!CurrentInfo.IsArray() || !PreviewInfo.IsArray())
                 return;
 
-            SimpleCollector<InvItemStack> Test{ 0, { } };
+            SimpleCollector<InvItemStack> Test{0, {}};
             PopulateItemCard_Hook(&CurrentInfo, Item, StackID, &Test);
             PopulateItemCard_Hook(&PreviewInfo, Item, StackID, &Test);
 
@@ -827,14 +814,12 @@ namespace GFX {
         }
     };
 
-    class RadXCount : public GFxFunctionHandler {
+    class RadXCount: public GFxFunctionHandler {
     public:
-        virtual void Invoke(Args* args) {
-            args->result->SetUInt(GetItemCount((*g_player), Forms::RadX));
-        }
+        virtual void Invoke(Args* args) { args->result->SetUInt(GetItemCount((*g_player), Forms::RadX)); }
     };
 
-    class RadiationValues : public GFxFunctionHandler {
+    class RadiationValues: public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
             int Current = GetValueInt((*g_player), Forms::Rads);
@@ -842,14 +827,14 @@ namespace GFX {
             int Maximum = ISettings::GetInteger("Radiation::Threshold05", 1000);
 
             std::map<int, const char*> RadiationThreshold;
-            RadiationThreshold.emplace(200,     "Radiation::Threshold01");
-            RadiationThreshold.emplace(400,     "Radiation::Threshold02");
-            RadiationThreshold.emplace(600,     "Radiation::Threshold03");
-            RadiationThreshold.emplace(800,     "Radiation::Threshold04");
-            RadiationThreshold.emplace(1000,    "Radiation::Threshold05");
+            RadiationThreshold.emplace(200, "Radiation::Threshold01");
+            RadiationThreshold.emplace(400, "Radiation::Threshold02");
+            RadiationThreshold.emplace(600, "Radiation::Threshold03");
+            RadiationThreshold.emplace(800, "Radiation::Threshold04");
+            RadiationThreshold.emplace(1000, "Radiation::Threshold05");
 
             int Next = 0;
-            for (auto iter : RadiationThreshold) {
+            for (auto iter: RadiationThreshold) {
                 Next = ISettings::GetInteger(iter.second, iter.first);
                 if (Next > Current)
                     break;
@@ -859,11 +844,11 @@ namespace GFX {
             SetGFxValue(args->result, "Current", Current);
             SetGFxValue(args->result, "Resists", Resists);
             SetGFxValue(args->result, "Maximum", Maximum);
-            SetGFxValue(args->result, "Next",    Next);
+            SetGFxValue(args->result, "Next", Next);
         }
     };
 
-    class RepairList : public GFxFunctionHandler {
+    class RepairList: public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
             GFxMovieRoot* root = args->movie->movieRoot;
@@ -884,14 +869,15 @@ namespace GFX {
                             break;
 
                         RepairMenuEntry Entry;
-                        Entry.text          = GetTableValue(BSFixedString,  i,  "text");
-                        Entry.HandleID      = GetHandleIDByIndex(i);
-                        Entry.StackID       = GetStackIDByIndex(i);
-                        Entry.Condition     = Percent;
+                        Entry.text = GetTableValue(BSFixedString, i, "text");
+                        Entry.HandleID = GetHandleIDByIndex(i);
+                        Entry.StackID = GetStackIDByIndex(i);
+                        Entry.Condition = Percent;
 
                         if (Percent == 1.0)
                             RepairI.emplace_back(Entry);
-                        else RepairV.emplace_back(Entry);
+                        else
+                            RepairV.emplace_back(Entry);
                         break;
                     }
 
@@ -901,37 +887,33 @@ namespace GFX {
                 }
             }
 
-            std::sort(RepairV.begin(), RepairV.end(),
-				[](RepairMenuEntry const& E1, RepairMenuEntry const& E2) {
-					SortStrings(E1, E2, text);
-					SortGeneric(E1, E2, Condition);
-					return false;
-				}
-			);
+            std::sort(RepairV.begin(), RepairV.end(), [](RepairMenuEntry const& E1, RepairMenuEntry const& E2) {
+                SortStrings(E1, E2, text);
+                SortGeneric(E1, E2, Condition);
+                return false;
+            });
 
-			std::sort(RepairI.begin(), RepairI.end(),
-				[](RepairMenuEntry const& E1, RepairMenuEntry const& E2) {
-					SortStrings(E1, E2, text);
-					SortGeneric(E1, E2, Condition);
-					return false;
-				}
-			);
+            std::sort(RepairI.begin(), RepairI.end(), [](RepairMenuEntry const& E1, RepairMenuEntry const& E2) {
+                SortStrings(E1, E2, text);
+                SortGeneric(E1, E2, Condition);
+                return false;
+            });
 
             RepairV.insert(RepairV.end(), RepairI.begin(), RepairI.end());
 
-            for (auto iter : RepairV) {
+            for (auto iter: RepairV) {
                 GFxValue Entry;
                 root->CreateObject(&Entry);
-                SetGFxValue(&Entry, root,   "text",         iter.text);
-                SetGFxValue(&Entry,         "HandleID",     iter.HandleID);
-                SetGFxValue(&Entry,         "StackID",      iter.StackID);
-                SetGFxValue(&Entry,         "Condition",    iter.Condition);
+                SetGFxValue(&Entry, root, "text", iter.text);
+                SetGFxValue(&Entry, "HandleID", iter.HandleID);
+                SetGFxValue(&Entry, "StackID", iter.StackID);
+                SetGFxValue(&Entry, "Condition", iter.Condition);
                 args->result->PushBack(&Entry);
             }
         }
     };
 
-    class RepairMenuInit : public GFxFunctionHandler {
+    class RepairMenuInit: public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
             GFxMovieRoot* root = args->movie->movieRoot;
@@ -947,37 +929,35 @@ namespace GFX {
         }
     };
 
-    class SkillsList : public GFxFunctionHandler {
+    class SkillsList: public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
             GFxMovieRoot* root = args->movie->movieRoot;
             root->CreateArray(args->result);
 
-            for (auto iter : Forms::ListSkills) {
+            for (auto iter: Forms::ListSkills) {
                 BSString DescriptionText;
                 TESDescription* DescriptionForm = DYNAMIC_CAST(iter, ActorValueInfo, TESDescription);
                 CALL_MEMBER_FN(DescriptionForm, Get)(&DescriptionText, nullptr);
 
                 GFxValue Skill;
                 root->CreateObject(&Skill);
-                SetGFxValue(&Skill, root,   "text",         iter->GetFullName());
-                SetGFxValue(&Skill, root,   "Description",  DescriptionText.Get());
-                SetGFxValue(&Skill, root,   "IconPath",     GetSkillIconPath(iter));
-                SetGFxValue(&Skill,         "Value",        GetValueInt((*g_player), iter));
-                SetGFxValue(&Skill,         "Modifier",     GetTempMod((*g_player), iter));
+                SetGFxValue(&Skill, root, "text", iter->GetFullName());
+                SetGFxValue(&Skill, root, "Description", DescriptionText.Get());
+                SetGFxValue(&Skill, root, "IconPath", GetSkillIconPath(iter));
+                SetGFxValue(&Skill, "Value", GetValueInt((*g_player), iter));
+                SetGFxValue(&Skill, "Modifier", GetTempMod((*g_player), iter));
                 args->result->PushBack(&Skill);
             }
         }
     };
 
-    class StimpakCount : public GFxFunctionHandler {
+    class StimpakCount: public GFxFunctionHandler {
     public:
-        virtual void Invoke(Args* args) {
-            args->result->SetUInt(GetItemCount((*g_player), Forms::StimpakOrder));
-        }
+        virtual void Invoke(Args* args) { args->result->SetUInt(GetItemCount((*g_player), Forms::StimpakOrder)); }
     };
 
-    class TagSkills : public GFxFunctionHandler {
+    class TagSkills: public GFxFunctionHandler {
     public:
         virtual void Invoke(Args* args) {
             GFxValue Element, FormID;
@@ -1001,33 +981,29 @@ namespace GFX {
         }
     };
 
-    class UseDoctorBag : public GFxFunctionHandler {
-	public:
-		virtual void Invoke(Args* args) {
-			EquipItem((*g_player), Forms::DoctorsBag, false);
-		}
-	};
+    class UseDoctorBag: public GFxFunctionHandler {
+    public:
+        virtual void Invoke(Args* args) { EquipItem((*g_player), Forms::DoctorsBag, false); }
+    };
 
-	class UseRadX : public GFxFunctionHandler {
-	public:
-		virtual void Invoke(Args* args) {
-			EquipItem((*g_player), Forms::RadX, false);
-		}
-	};
+    class UseRadX: public GFxFunctionHandler {
+    public:
+        virtual void Invoke(Args* args) { EquipItem((*g_player), Forms::RadX, false); }
+    };
 
-	class UseStimpak : public GFxFunctionHandler {
-	public:
-		virtual void Invoke(Args* args) {
-			for (int i = 0; i < Forms::StimpakOrder->forms.count; i++) {
-				TESForm* Stimpak = Forms::StimpakOrder->forms[i];
-				if (GetItemCount((*g_player), Stimpak) > 0) {
-					EquipItem((*g_player), Stimpak, false);
-					break;
-				}
-			}
-		}
-	};
-}
+    class UseStimpak: public GFxFunctionHandler {
+    public:
+        virtual void Invoke(Args* args) {
+            for (int i = 0; i < Forms::StimpakOrder->forms.count; i++) {
+                TESForm* Stimpak = Forms::StimpakOrder->forms[i];
+                if (GetItemCount((*g_player), Stimpak) > 0) {
+                    EquipItem((*g_player), Stimpak, false);
+                    break;
+                }
+            }
+        }
+    };
+}    // namespace GFX
 
 namespace ItemCard {
     int GetMax(GFxValue* Entry) {
@@ -1060,9 +1036,9 @@ namespace ItemCard {
         std::string current = ValueStr.substr(delimiter + 1);
         std::string maximum = ValueStr.substr(0, delimiter);
 
-        SetGFxValue(Entry,  "value",    std::stoi(current));
-        SetGFxValue(Entry,  "max",      std::stoi(maximum));
-        SetGFxValue(Entry,  "IsMeter",  true);
+        SetGFxValue(Entry, "value", std::stoi(current));
+        SetGFxValue(Entry, "max", std::stoi(maximum));
+        SetGFxValue(Entry, "IsMeter", true);
     }
 
     void ReformatCondition(GFxValue* InfoObj, GFxMovieRoot* root, const char* title, bool ShowMax) {
@@ -1078,24 +1054,23 @@ namespace ItemCard {
                     int maximum = GetMax(&element);
                     if (maximum != -1) {
                         GFxValue MaxCondEntry;
-                        SetGFxValue(&MaxCondEntry, root,    "text",         "$MAX CND");
-                        SetGFxValue(&MaxCondEntry,          "value",        maximum);
-                        SetGFxValue(&MaxCondEntry,          "IsMeterMax",   true);
+                        SetGFxValue(&MaxCondEntry, root, "text", "$MAX CND");
+                        SetGFxValue(&MaxCondEntry, "value", maximum);
+                        SetGFxValue(&MaxCondEntry, "IsMeterMax", true);
                         InfoObj->PushBack(&MaxCondEntry);
                     }
                 }
             }
         }
     }
-}
+}    // namespace ItemCard
 
 namespace Menus {
-    const char* BlurMenu::sMenuName     = "BlurMenu";
-    const char* RepairMenu::sMenuName   = "RepairMenu";
+    const char* BlurMenu::sMenuName = "BlurMenu";
+    const char* RepairMenu::sMenuName = "RepairMenu";
 
-    BlurMenu::BlurMenu() : GameMenuBase() {
-        flags = kFlag_BlurBackground |
-                kFlag_DisableInteractive;
+    BlurMenu::BlurMenu(): GameMenuBase() {
+        flags = kFlag_BlurBackground | kFlag_DisableInteractive;
 
         depth = 0x08;
     }
@@ -1108,19 +1083,12 @@ namespace Menus {
         //
     }
 
-    void BlurMenu::DrawNextFrame(float unk0, void* unk1) {
-        __super::DrawNextFrame(unk0, unk1);
-    }
+    void BlurMenu::DrawNextFrame(float unk0, void* unk1) { __super::DrawNextFrame(unk0, unk1); }
 
-    RepairMenu::RepairMenu() : GameMenuBase() {
-        flags = kFlag_PauseGame                     |
-                kFlag_ShowCursor                    |
-                kFlag_PreventGameLoad               |
-                kFlag_HideOther                     |
-                kFlag_UpdateCursorOnPlatformChange  |
+    RepairMenu::RepairMenu(): GameMenuBase() {
+        flags = kFlag_PauseGame | kFlag_ShowCursor | kFlag_PreventGameLoad | kFlag_HideOther | kFlag_UpdateCursorOnPlatformChange |
                 //kFlag_ApplyDropDownFilter           |
-                kFlag_Unk10000                      |
-                kFlag_BlurBackground;
+                kFlag_Unk10000 | kFlag_BlurBackground;
 
         depth = 0x09;
 
@@ -1135,11 +1103,11 @@ namespace Menus {
 
             GFxValue BGSCodeObj;
             root->GetVariable(&BGSCodeObj, "root.Menu_mc.BGSCodeObj");
-            RegisterFunction<GFX::CloseMenu>                (&BGSCodeObj, root, "CloseMenu");
-            RegisterFunction<GFX::PlaySoundUI>              (&BGSCodeObj, root, "PlaySound");
-            RegisterFunction<GFX::PopulateRepairItemCard>   (&BGSCodeObj, root, "PopulateRepairItemCard");
-            RegisterFunction<GFX::RepairList>               (&BGSCodeObj, root, "RepairList");
-            RegisterFunction<GFX::RepairMenuInit>           (&BGSCodeObj, root, "RepairMenuInit");
+            RegisterFunction<GFX::CloseMenu>(&BGSCodeObj, root, "CloseMenu");
+            RegisterFunction<GFX::PlaySoundUI>(&BGSCodeObj, root, "PlaySound");
+            RegisterFunction<GFX::PopulateRepairItemCard>(&BGSCodeObj, root, "PopulateRepairItemCard");
+            RegisterFunction<GFX::RepairList>(&BGSCodeObj, root, "RepairList");
+            RegisterFunction<GFX::RepairMenuInit>(&BGSCodeObj, root, "RepairMenuInit");
             root->Invoke("root.Menu_mc.onCodeObjCreate", nullptr, nullptr, 0);
         }
     }
@@ -1152,27 +1120,16 @@ namespace Menus {
         //
     }
 
-    void RepairMenu::DrawNextFrame(float unk0, void* unk1) {
-        __super::DrawNextFrame(unk0, unk1);
-    }
-}
+    void RepairMenu::DrawNextFrame(float unk0, void* unk1) { __super::DrawNextFrame(unk0, unk1); }
+}    // namespace Menus
 
 namespace Threads {
     bool IsBlockingMenuOpen(bool AllowDialogueMenu) {
-        bool IsMenuOpenDialogue = AllowDialogueMenu ? false :
-            (*g_ui)->IsMenuOpen(BSFixedString("DialogueMenu"));
+        bool IsMenuOpenDialogue = AllowDialogueMenu ? false : (*g_ui)->IsMenuOpen(BSFixedString("DialogueMenu"));
 
-        return (
-            ((*g_ui)->numPauseGame >= 1)
-            || (*g_ui)->IsMenuOpen(BSFixedString("CookingMenu"))
-            || (*g_ui)->IsMenuOpen(BSFixedString("FaderMenu"))
-            || (*g_ui)->IsMenuOpen(BSFixedString("FavoritesMenu"))
-            || (*g_ui)->IsMenuOpen(BSFixedString("PowerArmorModMenu"))
-            || (*g_ui)->IsMenuOpen(BSFixedString("RobotModMenu"))
-            || (*g_ui)->IsMenuOpen(BSFixedString("VATSMenu"))
-            || (*g_ui)->IsMenuOpen(BSFixedString("WorkshopMenu"))
-            || IsMenuOpenDialogue
-            );
+        return (((*g_ui)->numPauseGame >= 1) || (*g_ui)->IsMenuOpen(BSFixedString("CookingMenu")) || (*g_ui)->IsMenuOpen(BSFixedString("FaderMenu")) ||
+                (*g_ui)->IsMenuOpen(BSFixedString("FavoritesMenu")) || (*g_ui)->IsMenuOpen(BSFixedString("PowerArmorModMenu")) || (*g_ui)->IsMenuOpen(BSFixedString("RobotModMenu")) ||
+                (*g_ui)->IsMenuOpen(BSFixedString("VATSMenu")) || (*g_ui)->IsMenuOpen(BSFixedString("WorkshopMenu")) || IsMenuOpenDialogue);
     }
 
     void LevelUpMenu() {
@@ -1240,7 +1197,7 @@ namespace Threads {
             Forms::PlayerLevelUp = false;
         }
     }
-}
+}    // namespace Threads
 
 void ContainerMenuInvoke_Hook(ContainerMenuBase* menu, GFxFunctionHandler::Args* args) {
     ContainerMenuInvoke_Original(menu, args);
@@ -1276,10 +1233,10 @@ void PipboyMenuInvoke_Hook(PipboyMenu* menu, GFxFunctionHandler::Args* args) {
     case PipboyMenu::kFunction_OnInvItemSelection: {
         int SelectedIndex = args->args[0].GetInt();
         if (SelectedIndex > -1) {
-            BGSInventoryItem*   Item    = GetInventoryItemByIndex(SelectedIndex);
-            UInt32              StackID = GetStackIDByIndex(SelectedIndex);
+            BGSInventoryItem* Item = GetInventoryItemByIndex(SelectedIndex);
+            UInt32 StackID = GetStackIDByIndex(SelectedIndex);
 
-            SimpleCollector<InvItemStack> Blank{ 0, { } };
+            SimpleCollector<InvItemStack> Blank{0, {}};
             PopulateItemCard_Custom(&args->args[1], Item, StackID, &Blank);
         }
 
@@ -1294,7 +1251,8 @@ void PipboyMenuInvoke_Hook(PipboyMenu* menu, GFxFunctionHandler::Args* args) {
 void PopulateItemCard_Custom(GFxValue* InfoObj, BGSInventoryItem* Item, UInt16 StackID, InvItemStackList CompareList) {
     GFxMovieRoot* root = InfoObj->objectInterface->view->movieRoot;
 
-    GFxValue SWFPath; root->GetVariable(&SWFPath, "root.loaderInfo.url");
+    GFxValue SWFPath;
+    root->GetVariable(&SWFPath, "root.loaderInfo.url");
     bool isExamineMenu = (!_stricmp("Interface/ExamineMenu.swf", SWFPath.GetString()));
 
     if (!Item)
@@ -1328,10 +1286,10 @@ void PopulateItemCard_Custom(GFxValue* InfoObj, BGSInventoryItem* Item, UInt16 S
 
         GFxValue InfoCardEntry;
         root->CreateObject(&InfoCardEntry);
-        SetGFxValue(&InfoCardEntry, root,   "text",     "$CND");
-        SetGFxValue(&InfoCardEntry,         "value",    Value);
-        SetGFxValue(&InfoCardEntry,         "max",      1.0);
-        SetGFxValue(&InfoCardEntry,         "IsMeter",  true);
+        SetGFxValue(&InfoCardEntry, root, "text", "$CND");
+        SetGFxValue(&InfoCardEntry, "value", Value);
+        SetGFxValue(&InfoCardEntry, "max", 1.0);
+        SetGFxValue(&InfoCardEntry, "IsMeter", true);
         InfoObj->PushBack(&InfoCardEntry);
 
         if (isExamineMenu) {
@@ -1339,9 +1297,9 @@ void PopulateItemCard_Custom(GFxValue* InfoObj, BGSInventoryItem* Item, UInt16 S
             if (maximum != -1.0) {
                 GFxValue MaxCondEntry;
                 root->CreateObject(&MaxCondEntry);
-                SetGFxValue(&MaxCondEntry, root,    "text",         "$MAX CND");
-                SetGFxValue(&MaxCondEntry,          "value",        maximum);
-                SetGFxValue(&MaxCondEntry,          "IsMeterMax",   true);
+                SetGFxValue(&MaxCondEntry, root, "text", "$MAX CND");
+                SetGFxValue(&MaxCondEntry, "value", maximum);
+                SetGFxValue(&MaxCondEntry, "IsMeterMax", true);
                 InfoObj->PushBack(&MaxCondEntry);
             }
         }
@@ -1360,8 +1318,7 @@ void PopulateItemCard_Hook(GFxValue* InfoObj, BGSInventoryItem* Item, UInt16 Sta
         GFxValue ItemCardInfoList;
         InfoObj->GetMember("ItemCardInfoList", &ItemCardInfoList);
         PopulateItemCard_Custom(&ItemCardInfoList, Item, StackID, CompareList);
-    }
-    else {
+    } else {
         PopulateItemCard_Custom(InfoObj, Item, StackID, CompareList);
     }
 }
@@ -1394,18 +1351,17 @@ EventResult MenuOpenCloseEventHandler::ReceiveEvent(MenuOpenCloseEvent* evn, voi
 
             GFxValue BGSCodeObj;
             root->GetVariable(&BGSCodeObj, "root.Menu_mc.BGSCodeObj");
-            RegisterFunction<GFX::AddPerks>         (&BGSCodeObj, root, "AddPerks");
-            RegisterFunction<GFX::AllowTextInput>   (&BGSCodeObj, root, "AllowTextInput");
-            RegisterFunction<GFX::FilterSearch>     (&BGSCodeObj, root, "FilterSearch");
-            RegisterFunction<GFX::ModSkills>        (&BGSCodeObj, root, "ModSkills");
-            RegisterFunction<GFX::TagSkills>        (&BGSCodeObj, root, "TagSkills");
+            RegisterFunction<GFX::AddPerks>(&BGSCodeObj, root, "AddPerks");
+            RegisterFunction<GFX::AllowTextInput>(&BGSCodeObj, root, "AllowTextInput");
+            RegisterFunction<GFX::FilterSearch>(&BGSCodeObj, root, "FilterSearch");
+            RegisterFunction<GFX::ModSkills>(&BGSCodeObj, root, "ModSkills");
+            RegisterFunction<GFX::TagSkills>(&BGSCodeObj, root, "TagSkills");
             root->Invoke("root.Menu_mc.onCodeObjUpdate", nullptr, nullptr, 0);
 
             GFxValue Args[5];
             GFxValue* Result = LevelUpObj.BuildEntryList(root, Args);
             root->Invoke("root.Menu_mc.Init", nullptr, Result, 5);
-        }
-        else {
+        } else {
             Menus::BlurMenu::CloseMenu();
             RegisterLevelUpMenuInput(false);
         }
@@ -1423,11 +1379,10 @@ EventResult MenuOpenCloseEventHandler::ReceiveEvent(MenuOpenCloseEvent* evn, voi
 
             GFxValue BGSCodeObj;
             root->GetVariable(&BGSCodeObj, "root.Menu_mc.BGSCodeObj");
-			RegisterFunction<GFX::ForceUnlock>		(&BGSCodeObj, root, "ForceUnlock");
-            RegisterFunction<GFX::LockpickLevel>    (&BGSCodeObj, root, "LockpickLevel");
+            RegisterFunction<GFX::ForceUnlock>(&BGSCodeObj, root, "ForceUnlock");
+            RegisterFunction<GFX::LockpickLevel>(&BGSCodeObj, root, "LockpickLevel");
             root->Invoke("root.Menu_mc.onCodeObjUpdate", nullptr, nullptr, 0);
-        }
-        else {
+        } else {
             RegisterLockpickingMenuInput(false);
         }
     }
@@ -1444,23 +1399,22 @@ EventResult MenuOpenCloseEventHandler::ReceiveEvent(MenuOpenCloseEvent* evn, voi
 
             GFxValue BGSCodeObj;
             root->GetVariable(&BGSCodeObj, "root.Menu_mc.BGSCodeObj");
-			RegisterFunction<GFX::ActiveEffects>	(&BGSCodeObj, root, "ActiveEffects");
-            RegisterFunction<GFX::DoctorBagCount>   (&BGSCodeObj, root, "DoctorBagCount");
-			RegisterFunction<GFX::GetDescription>	(&BGSCodeObj, root, "GetDescription");
-            RegisterFunction<GFX::HardcoreValues>   (&BGSCodeObj, root, "HardcoreValues");
-			RegisterFunction<GFX::InvFilter>		(&BGSCodeObj, root, "InvFilter");
-			RegisterFunction<GFX::InvItems>			(&BGSCodeObj, root, "InvItems");
-            RegisterFunction<GFX::PerksList>        (&BGSCodeObj, root, "PerksList");
-            RegisterFunction<GFX::RadiationValues>  (&BGSCodeObj, root, "RadiationValues");
-            RegisterFunction<GFX::RadXCount>        (&BGSCodeObj, root, "RadXCount");
-            RegisterFunction<GFX::SkillsList>       (&BGSCodeObj, root, "SkillsList");
-            RegisterFunction<GFX::StimpakCount>     (&BGSCodeObj, root, "StimpakCount");
-			RegisterFunction<GFX::UseDoctorBag>		(&BGSCodeObj, root, "UseDoctorBag");
-			RegisterFunction<GFX::UseRadX>			(&BGSCodeObj, root, "UseRadX");
-			RegisterFunction<GFX::UseStimpak>		(&BGSCodeObj, root, "UseStimpak");
+            RegisterFunction<GFX::ActiveEffects>(&BGSCodeObj, root, "ActiveEffects");
+            RegisterFunction<GFX::DoctorBagCount>(&BGSCodeObj, root, "DoctorBagCount");
+            RegisterFunction<GFX::GetDescription>(&BGSCodeObj, root, "GetDescription");
+            RegisterFunction<GFX::HardcoreValues>(&BGSCodeObj, root, "HardcoreValues");
+            RegisterFunction<GFX::InvFilter>(&BGSCodeObj, root, "InvFilter");
+            RegisterFunction<GFX::InvItems>(&BGSCodeObj, root, "InvItems");
+            RegisterFunction<GFX::PerksList>(&BGSCodeObj, root, "PerksList");
+            RegisterFunction<GFX::RadiationValues>(&BGSCodeObj, root, "RadiationValues");
+            RegisterFunction<GFX::RadXCount>(&BGSCodeObj, root, "RadXCount");
+            RegisterFunction<GFX::SkillsList>(&BGSCodeObj, root, "SkillsList");
+            RegisterFunction<GFX::StimpakCount>(&BGSCodeObj, root, "StimpakCount");
+            RegisterFunction<GFX::UseDoctorBag>(&BGSCodeObj, root, "UseDoctorBag");
+            RegisterFunction<GFX::UseRadX>(&BGSCodeObj, root, "UseRadX");
+            RegisterFunction<GFX::UseStimpak>(&BGSCodeObj, root, "UseStimpak");
             root->Invoke("root.Menu_mc.onCodeObjUpdate", nullptr, nullptr, 0);
-        }
-        else {
+        } else {
             RegisterPipboyMenuInput(false);
         }
     }

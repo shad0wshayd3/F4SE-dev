@@ -2,10 +2,10 @@
 #include "Scaleform.h"
 
 void RevertCallback(const F4SESerializationInterface* intfc) {
-    Forms::PlayerTags       = 0;
+    Forms::PlayerTags = 0;
 
-    Forms::PlayerLevelUp    = false;
-    Forms::PlayerLevel      = 1;
+    Forms::PlayerLevelUp = false;
+    Forms::PlayerLevel = 1;
 }
 
 void LoadCallback(const F4SESerializationInterface* intfc) {
@@ -17,7 +17,7 @@ void LoadCallback(const F4SESerializationInterface* intfc) {
             if (length == sizeof(bool))
                 intfc->ReadRecordData(&Forms::PlayerLevelUp, sizeof(bool));
             break;
-        
+
         case 'PLVL':
             if (length == sizeof(UInt16))
                 intfc->ReadRecordData(&Forms::PlayerLevel, sizeof(UInt16));
@@ -37,7 +37,7 @@ void LoadCallback(const F4SESerializationInterface* intfc) {
 void SaveCallback(const F4SESerializationInterface* intfc) {
     if (g_Serialization->OpenRecord('NLVL', 1))
         g_Serialization->WriteRecordData(&Forms::PlayerLevelUp, sizeof(bool));
-    
+
     if (g_Serialization->OpenRecord('PLVL', 1))
         g_Serialization->WriteRecordData(&Forms::PlayerLevel, sizeof(UInt16));
 

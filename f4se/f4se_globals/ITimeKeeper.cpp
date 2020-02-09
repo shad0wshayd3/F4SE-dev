@@ -6,13 +6,13 @@
 // ITimeKeeper
 // ------------------------------------------------------------------------------------------------
 
-ITimeKeeper::ITimeKeeper(bool startTimer) :m_qpcBase(0), m_tickBase(0) {
+ITimeKeeper::ITimeKeeper(bool startTimer): m_qpcBase(0), m_tickBase(0) {
     if (!s_secondsPerCount) {
         UInt64 countsPerSecond;
-        BOOL res = QueryPerformanceFrequency((LARGE_INTEGER*)& countsPerSecond);
+        BOOL res = QueryPerformanceFrequency((LARGE_INTEGER*)&countsPerSecond);
 
         s_secondsPerCount = 1.0 / countsPerSecond;
-        s_qpcWrapMargin = (UInt64)(-((SInt64)(countsPerSecond * 60))); // detect if we've wrapped around by a delta greater than this - also limits max time
+        s_qpcWrapMargin = (UInt64)(-((SInt64)(countsPerSecond * 60)));    // detect if we've wrapped around by a delta greater than this - also limits max time
 
         // init multimedia timer
         timeGetDevCaps(&s_timecaps, sizeof(s_timecaps));
@@ -70,17 +70,17 @@ double ITimeKeeper::GetElapsedTime() {
     UInt64 tickDelta = tickNow - m_tickBase;
 
     double qpcSeconds = ((double)qpcDelta) * s_secondsPerCount;
-    double tickSeconds = ((double)tickDelta) * 0.001; // ticks are in milliseconds
+    double tickSeconds = ((double)tickDelta) * 0.001;    // ticks are in milliseconds
     double qpcTickDelta = qpcSeconds - tickSeconds;
 
-    if (qpcTickDelta < 0) qpcTickDelta = -qpcTickDelta;
+    if (qpcTickDelta < 0)
+        qpcTickDelta = -qpcTickDelta;
 
     // if they differ by more than one second, something's wrong, return
     if (qpcTickDelta > 1) {
         s_qpcInaccurateCount++;
         return tickSeconds;
-    }
-    else {
+    } else {
         return qpcSeconds;
     }
 }
@@ -99,12 +99,10 @@ UInt64 ITimeKeeper::GetQPC() {
             now = s_lastQPC + 1;
 
             s_qpcWrapCount++;
-        }
-        else {
+        } else {
             s_lastQPC = now;
         }
-    }
-    else {
+    } else {
         s_hasLastQPC = true;
         s_lastQPC = now;
     }
@@ -116,11 +114,11 @@ UInt64 ITimeKeeper::GetQPC() {
 // Initialize
 // ------------------------------------------------------------------------------------------------
 
-double      ITimeKeeper::s_secondsPerCount = 0;
-TIMECAPS    ITimeKeeper::s_timecaps = { 0 };
-bool        ITimeKeeper::s_setTime = false;
-UInt64      ITimeKeeper::s_lastQPC = 0;
-UInt64      ITimeKeeper::s_qpcWrapMargin = 0;
-bool        ITimeKeeper::s_hasLastQPC = false;
-UInt32      ITimeKeeper::s_qpcWrapCount = 0;
-UInt32      ITimeKeeper::s_qpcInaccurateCount = 0;
+double ITimeKeeper::s_secondsPerCount = 0;
+TIMECAPS ITimeKeeper::s_timecaps = {0};
+bool ITimeKeeper::s_setTime = false;
+UInt64 ITimeKeeper::s_lastQPC = 0;
+UInt64 ITimeKeeper::s_qpcWrapMargin = 0;
+bool ITimeKeeper::s_hasLastQPC = false;
+UInt32 ITimeKeeper::s_qpcWrapCount = 0;
+UInt32 ITimeKeeper::s_qpcInaccurateCount = 0;

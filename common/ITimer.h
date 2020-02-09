@@ -5,34 +5,33 @@
 /**
  *	A high-resolution timer.
  */
-class ITimer
-{
-	public:
-		ITimer();
-		~ITimer();
+class ITimer {
+public:
+    ITimer();
+    ~ITimer();
 
-		static void	Init(void);
-		static void DeInit(void);
+    static void Init(void);
+    static void DeInit(void);
 
-		void	Start(void);
+    void Start(void);
 
-		double	GetElapsedTime(void);	// seconds
+    double GetElapsedTime(void);    // seconds
 
-	private:
-		UInt64	m_qpcBase;	// QPC
-		UInt32	m_tickBase;	// timeGetTime
+private:
+    UInt64 m_qpcBase;     // QPC
+    UInt32 m_tickBase;    // timeGetTime
 
-		static double	s_secondsPerCount;
-		static TIMECAPS	s_timecaps;
-		static bool		s_setTime;
+    static double s_secondsPerCount;
+    static TIMECAPS s_timecaps;
+    static bool s_setTime;
 
-		// safe QPC stuff
-		static UInt64	GetQPC(void);
+    // safe QPC stuff
+    static UInt64 GetQPC(void);
 
-		static UInt64	s_lastQPC;
-		static UInt64	s_qpcWrapMargin;
-		static bool		s_hasLastQPC;
+    static UInt64 s_lastQPC;
+    static UInt64 s_qpcWrapMargin;
+    static bool s_hasLastQPC;
 
-		static UInt32	s_qpcWrapCount;
-		static UInt32	s_qpcInaccurateCount;
+    static UInt32 s_qpcWrapCount;
+    static UInt32 s_qpcInaccurateCount;
 };

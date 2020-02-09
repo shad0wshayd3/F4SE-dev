@@ -158,7 +158,7 @@
 - Fixed Scaleform SendExternalEvent and CallFunctionNoWait
 - Fixed UI.Invoke when Args > 0
 - Added UI.Load (see UI.psc for example usage)
-- Added Scaleform GetDirectoryListing 
+- Added Scaleform GetDirectoryListing
     - e.g. root.f4se.GetDirectoryListing("Data/Somewhere", "*.ini", recursive=false)
     result: Array=[{"nativePath": "Data/Somewhere/File.ini", "name": "File.ini", "lastModified": Date(), "creationDate": Date(), "isDirectory" : false, "isHidden": false0}]
 - Added Location Functions:

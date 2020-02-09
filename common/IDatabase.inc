@@ -3,7 +3,7 @@ void IDatabase <DataType>::Save(IDataStream * stream)
 {
 	stream->Write32(theDataMap.size());
 	stream->Write64(newKeyHint);
-	
+
 	for(DataMapType::iterator iter = theDataMap.begin(); iter != theDataMap.end(); iter++)
 	{
 		stream->Write64((*iter).first);
@@ -16,9 +16,9 @@ void IDatabase <DataType>::Load(IDataStream * stream)
 {
 	UInt32	numEntries = stream->Read32();
 	newKeyHint = stream->Read64();
-	
+
 	theDataMap.clear();
-	
+
 	for(UInt32 i = 0; i < numEntries; i++)
 	{
 		UInt64	key = stream->Read64();

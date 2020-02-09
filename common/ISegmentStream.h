@@ -6,39 +6,36 @@
 /**
  *	An stream composed of many non-contiguous segments of a larger stream
  */
-class ISegmentStream : public IDataStream
-{
-	public:
-		ISegmentStream();
-		~ISegmentStream();
+class ISegmentStream: public IDataStream {
+public:
+    ISegmentStream();
+    ~ISegmentStream();
 
-		void	AttachStream(IDataStream * inStream);
-		
-		void	AddSegment(UInt64 offset, UInt64 length, UInt64 parentOffset);
+    void AttachStream(IDataStream* inStream);
 
-		virtual void	ReadBuf(void * buf, UInt32 inLength);
-		virtual void	WriteBuf(const void * buf, UInt32 inLength);
-		virtual void	SetOffset(SInt64 inOffset);
+    void AddSegment(UInt64 offset, UInt64 length, UInt64 parentOffset);
 
-	protected:
-		IDataStream	* parent;
+    virtual void ReadBuf(void* buf, UInt32 inLength);
+    virtual void WriteBuf(const void* buf, UInt32 inLength);
+    virtual void SetOffset(SInt64 inOffset);
 
-		struct SegmentInfo
-		{
-			SegmentInfo(UInt64 inOffset, UInt64 inLength, UInt64 inParentOffset)
-			{
-				offset = inOffset;
-				length = inLength;
-				parentOffset = inParentOffset;
-			}
+protected:
+    IDataStream* parent;
 
-			UInt64	offset;
-			UInt64	length;
-			UInt64	parentOffset;
-		};
+    struct SegmentInfo {
+        SegmentInfo(UInt64 inOffset, UInt64 inLength, UInt64 inParentOffset) {
+            offset = inOffset;
+            length = inLength;
+            parentOffset = inParentOffset;
+        }
 
-		typedef std::vector <SegmentInfo>	SegmentInfoListType;
-		SegmentInfoListType					segmentInfo;
+        UInt64 offset;
+        UInt64 length;
+        UInt64 parentOffset;
+    };
 
-		SegmentInfo *	LookupInfo(UInt64 offset);
+    typedef std::vector<SegmentInfo> SegmentInfoListType;
+    SegmentInfoListType segmentInfo;
+
+    SegmentInfo* LookupInfo(UInt64 offset);
 };

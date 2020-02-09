@@ -64,13 +64,11 @@ namespace ObScript {
         if (!thisWorld) {
             if (thisObj->parentCell->flags & thisObj->parentCell->kFlag_IsInterior) {
                 cellName = thisObj->parentCell->GetEditorID();
-            }
-            else {
+            } else {
                 Console_Print("Selected reference is in a worldspace that doesn't exist!");
                 return true;
             }
-        }
-        else {
+        } else {
             cellName = thisWorld->GetEditorID();
         }
 
@@ -102,8 +100,21 @@ namespace ObScript {
 
         // Output
         char comment[MAX_PATH];
-        sprintf_s(comment, sizeof(comment), "%s\t%s\t%s\t%s\t%08X\t%s\t%s\t%08X\t%i\t%i\t%i\t0\t-0\t0\t%s\n", systemTime.str().c_str(), fileName, fileTime.str().c_str(),
-            computerName, thisObj->formID, EDID.c_str(), cellName.c_str(), thisObj->parentCell->formID, (int)thisObj->pos.x, (int)thisObj->pos.y, (int)thisObj->pos.z, s_argString);
+        sprintf_s(comment,
+                  sizeof(comment),
+                  "%s\t%s\t%s\t%s\t%08X\t%s\t%s\t%08X\t%i\t%i\t%i\t0\t-0\t0\t%s\n",
+                  systemTime.str().c_str(),
+                  fileName,
+                  fileTime.str().c_str(),
+                  computerName,
+                  thisObj->formID,
+                  EDID.c_str(),
+                  cellName.c_str(),
+                  thisObj->parentCell->formID,
+                  (int)thisObj->pos.x,
+                  (int)thisObj->pos.y,
+                  (int)thisObj->pos.z,
+                  s_argString);
 
         std::ofstream commentFile;
         commentFile.open(filePath, std::ios::binary | std::ios::app);
@@ -120,4 +131,4 @@ namespace ObScript {
 
         return true;
     }
-}
+}    // namespace ObScript

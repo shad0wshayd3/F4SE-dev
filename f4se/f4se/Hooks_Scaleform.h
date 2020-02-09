@@ -5,5 +5,5 @@
 void Hooks_Scaleform_Init();
 void Hooks_Scaleform_Commit();
 
-bool RegisterScaleformPlugin(const char * name, F4SEScaleformInterface::RegisterCallback callback);
+bool RegisterScaleformPlugin(const char* name, F4SEScaleformInterface::RegisterCallback callback);
 void Hooks_OpenCloseHandler();

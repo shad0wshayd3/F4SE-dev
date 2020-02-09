@@ -7,26 +7,24 @@
 #include <sstream>
 
 struct PerkEntry {
-    std::string     text;
-    std::string     Description;
-    std::string     IconPath;
-    bool            IsValidPerk;
-    bool            IsSelected;
-    bool            IsLocked;
-    int             NumRanks;
-    int             FormID;
-    int             Level;
+    std::string text;
+    std::string Description;
+    std::string IconPath;
+    bool IsValidPerk;
+    bool IsSelected;
+    bool IsLocked;
+    int NumRanks;
+    int FormID;
+    int Level;
 };
 
-typedef std::vector<PerkEntry>					PerkEntryList;
-typedef std::pair<std::string, std::string>		RequirementPair;
-typedef std::vector<RequirementPair>			RequirementPairList;
+typedef std::vector<PerkEntry> PerkEntryList;
+typedef std::pair<std::string, std::string> RequirementPair;
+typedef std::vector<RequirementPair> RequirementPairList;
 
-#define AddErrorTags(str)\
-    str = "<font color=\'#A9A9A9\'>" + str + "</font>"
+#define AddErrorTags(str) str = "<font color=\'#A9A9A9\'>" + str + "</font>"
 
-#define AddRequirement(str, separator)\
-    Reqs.emplace_back(RequirementPair{ str, separator });
+#define AddRequirement(str, separator) Reqs.emplace_back(RequirementPair{str, separator});
 
 // ------------------------------------------------------------------------------------------------
 // Level Up Menu Points
@@ -86,40 +84,42 @@ bool SortRanks(BGSPerk* Perk1, BGSPerk* Perk2) {
 }
 
 int SortRequirement(RequirementPairList::iterator Req, std::string Query, std::string& Result, int Size) {
-	int Count = 0;
-	if (Req->first.find(Query) != std::string::npos) {
-		Result.append(Req->first);
+    int Count = 0;
+    if (Req->first.find(Query) != std::string::npos) {
+        Result.append(Req->first);
 
-		if (Size > 1) {
-			Result.append(Req->second);
+        if (Size > 1) {
+            Result.append(Req->second);
 
-			if (Req->second.find("or") != std::string::npos) {
-				Req++; Size--;
-				Count += SortRequirement(Req, "", Result, Size);
-			}
-		}
+            if (Req->second.find("or") != std::string::npos) {
+                Req++;
+                Size--;
+                Count += SortRequirement(Req, "", Result, Size);
+            }
+        }
 
-		Count++;
-	}
+        Count++;
+    }
 
-	return Count;
+    return Count;
 }
 
 std::string SortRequirements(RequirementPairList Requirements) {
     std::string Result = "";
     bool AddedItem = false;
 
-	for (auto iterSortList : Forms::ListSortOrder) {
-		for (auto iterSort : iterSortList) {
-			for (auto iterReq = Requirements.begin(); iterReq != Requirements.end();) {
-				int Count = SortRequirement(iterReq, iterSort, Result, Requirements.size());
-				if (Count > 0)
-					for (Count; Count > 0; Count--)
-						iterReq = Requirements.erase(iterReq);
-				else iterReq++;
-			}
-		}
-	}
+    for (auto iterSortList: Forms::ListSortOrder) {
+        for (auto iterSort: iterSortList) {
+            for (auto iterReq = Requirements.begin(); iterReq != Requirements.end();) {
+                int Count = SortRequirement(iterReq, iterSort, Result, Requirements.size());
+                if (Count > 0)
+                    for (Count; Count > 0; Count--)
+                        iterReq = Requirements.erase(iterReq);
+                else
+                    iterReq++;
+            }
+        }
+    }
 
     if ((Result == "Level 1") || (Result == "Level 2") || Result.empty())
         Result = "--";
@@ -133,31 +133,31 @@ std::string SortRequirements(RequirementPairList Requirements) {
 
 std::string GetPerkIconPath(BGSPerk* Perk) {
     std::string Result = Perk->swfPath.c_str();
-	std::string Path = "Interface/" + Result;
-	
-	BSResourceNiBinaryStream PerkPathStream(Path.c_str());
-	if (PerkPathStream.IsValid())
-		return Result;
+    std::string Path = "Interface/" + Result;
+
+    BSResourceNiBinaryStream PerkPathStream(Path.c_str());
+    if (PerkPathStream.IsValid())
+        return Result;
 
     if (Perk->numRanks > 1) {
         BGSPerk* firstRank = GetRankList(Perk)[0];
-		if (firstRank)
-			Result = firstRank->swfPath.c_str();
+        if (firstRank)
+            Result = firstRank->swfPath.c_str();
 
-		Path = "Interface/" + Result;
-		BSResourceNiBinaryStream RankPathStream(Path.c_str());
-		if (RankPathStream.IsValid())
-			return Result;
+        Path = "Interface/" + Result;
+        BSResourceNiBinaryStream RankPathStream(Path.c_str());
+        if (RankPathStream.IsValid())
+            return Result;
     }
 
     std::stringstream ss;
     ss << "Components/VaultBoys/Perks/PerkClip_" << std::hex << std::setw(8) << std::setfill('0') << Perk->formID << ".swf";
     Result = ss.str();
 
-	Path = "Interface/" + Result;
-	BSResourceNiBinaryStream FormPathStream(Path.c_str());
-	if (FormPathStream.IsValid())
-		return Result;
+    Path = "Interface/" + Result;
+    BSResourceNiBinaryStream FormPathStream(Path.c_str());
+    if (FormPathStream.IsValid())
+        return Result;
 
     return "Components/VaultBoys/Perks/PerkClip_Default.swf";
 }
@@ -166,13 +166,13 @@ std::string GetSkillIconPath(ActorValueInfo* avif) {
     std::stringstream ss;
     ss << "Components/VaultBoys/Skills/" << avif->GetEditorID() << ".swf";
 
-	std::string Result = ss.str();
-	std::string Path = "Interface/" + Result;
-	BSResourceNiBinaryStream IconPathStream(Path.c_str());
-	if (IconPathStream.IsValid())
-		return Result;
+    std::string Result = ss.str();
+    std::string Path = "Interface/" + Result;
+    BSResourceNiBinaryStream IconPathStream(Path.c_str());
+    if (IconPathStream.IsValid())
+        return Result;
 
-	return "Components/VaultBoys/Perks/PerkClip_Default.swf";
+    return "Components/VaultBoys/Perks/PerkClip_Default.swf";
 }
 
 PerkVector GetRankList(BGSPerk* Perk) {
@@ -183,8 +183,8 @@ PerkVector GetRankList(BGSPerk* Perk) {
     for (int i = 0; ((i < Perk->numRanks) && iter->nextPerk); i++) {
         if (iter->sound || (strlen(iter->swfPath) > 0) || FoundFirstRank) {
             if (!FoundFirstRank) {
-                FoundFirstRank  = true;
-                i               = 0;
+                FoundFirstRank = true;
+                i = 0;
             }
             Result.emplace_back(iter);
         }
@@ -199,15 +199,15 @@ PerkVector GetRankList(BGSPerk* Perk) {
 }
 
 int GetPlayerRank(BGSPerk* Perk) {
-	int Result = 0;
+    int Result = 0;
 
-	auto RankList = GetRankList(Perk);
-	for (auto iter : RankList) {
-		if (HasPerk((*g_player), iter))
-			Result++;
-	}
+    auto RankList = GetRankList(Perk);
+    for (auto iter: RankList) {
+        if (HasPerk((*g_player), iter))
+            Result++;
+    }
 
-	return Result;
+    return Result;
 }
 
 bool IsFirstRank(BGSPerk* Perk) {
@@ -218,7 +218,7 @@ bool IsFirstRank(BGSPerk* Perk) {
 bool IsFirstValidRank(BGSPerk* Perk) {
     PerkVector PerkRanks = GetRankList(Perk);
 
-    for (auto iter : PerkRanks)
+    for (auto iter: PerkRanks)
         if (!HasPerk((*g_player), iter)) {
             if (Perk->formID == iter->formID)
                 return true;
@@ -232,15 +232,15 @@ bool IsFirstValidRank(BGSPerk* Perk) {
 // EntryList
 // ------------------------------------------------------------------------
 
-EntryList::EntryList() { 
+EntryList::EntryList() {
     //
 }
 
 EntryList::EntryList(int ID, int Level, int PointsBase, int PointsUsed) {
-    m_ID            = ID;
-    m_Level         = Level;
-    m_PointsBase    = PointsBase;
-    m_PointsUsed    = PointsUsed;
+    m_ID = ID;
+    m_Level = Level;
+    m_PointsBase = PointsBase;
+    m_PointsUsed = PointsUsed;
 }
 
 GFxValue* EntryList::BuildEntryList(GFxMovieRoot* root, GFxValue* Result) {
@@ -256,21 +256,21 @@ GFxValue* EntryList::BuildEntryList(GFxMovieRoot* root, GFxValue* Result) {
     switch (m_ID) {
     case kMenuID_Skills:
     case kMenuID_Tags: {
-        for (auto iter : Forms::ListSkills) {
+        for (auto iter: Forms::ListSkills) {
             float ValueBase = GetPermValue(Player, iter);
-            float Value     = ValueBase;
+            float Value = ValueBase;
 
             bool IsSelected = false;
-            bool IsLocked   = false;
+            bool IsLocked = false;
 
             if (m_ID == kMenuID_Tags) {
                 UInt16 Flag = 1 << FlagBase;
                 FlagBase++;
 
                 if (Forms::PlayerTags & Flag) {
-                    m_PointsUsed    += 1;
-                    ValueBase       -= 15;
-                    IsSelected      = true;
+                    m_PointsUsed += 1;
+                    ValueBase -= 15;
+                    IsSelected = true;
                     //IsLocked        = true;
                 }
             }
@@ -283,15 +283,15 @@ GFxValue* EntryList::BuildEntryList(GFxMovieRoot* root, GFxValue* Result) {
 
             GFxValue Skill;
             root->CreateObject(&Skill);
-            SetGFxValue(&Skill, root,   "text",         iter->GetFullName());
-            SetGFxValue(&Skill, root,   "Description",  DescriptionText.Get());
-            SetGFxValue(&Skill, root,   "IconPath",     GetSkillIconPath(iter));
-            SetGFxValue(&Skill,         "ShowArrows",   ShowArrows);
-            SetGFxValue(&Skill,         "IsSelected",   IsSelected);
-            SetGFxValue(&Skill,         "IsLocked",     IsLocked);
-            SetGFxValue(&Skill,         "FormID",       iter->formID);
-            SetGFxValue(&Skill,         "ValueBase",    (int)ValueBase);
-            SetGFxValue(&Skill,         "Value",        (int)Value);
+            SetGFxValue(&Skill, root, "text", iter->GetFullName());
+            SetGFxValue(&Skill, root, "Description", DescriptionText.Get());
+            SetGFxValue(&Skill, root, "IconPath", GetSkillIconPath(iter));
+            SetGFxValue(&Skill, "ShowArrows", ShowArrows);
+            SetGFxValue(&Skill, "IsSelected", IsSelected);
+            SetGFxValue(&Skill, "IsLocked", IsLocked);
+            SetGFxValue(&Skill, "FormID", iter->formID);
+            SetGFxValue(&Skill, "ValueBase", (int)ValueBase);
+            SetGFxValue(&Skill, "Value", (int)Value);
             Result[4].PushBack(&Skill);
         }
 
@@ -304,9 +304,9 @@ GFxValue* EntryList::BuildEntryList(GFxMovieRoot* root, GFxValue* Result) {
         PerkVector List = (m_ID == kMenuID_Traits) ? Forms::ListTraits : Forms::ListPerks;
         PerkEntryList PerksV, PerksI;
 
-        for (auto iter : List) {
-			if (!iter->playable)
-				continue;
+        for (auto iter: List) {
+            if (!iter->playable)
+                continue;
 
             if (HasPerk(Player, iter))
                 continue;
@@ -420,8 +420,7 @@ GFxValue* EntryList::BuildEntryList(GFxMovieRoot* root, GFxValue* Result) {
                                 SkipPerk = true;
                                 continue;
                             }
-                        }
-                        else {
+                        } else {
                             if (PlayerSex == Conditions->param1.u32) {
                                 SkipPerk = true;
                                 continue;
@@ -435,8 +434,7 @@ GFxValue* EntryList::BuildEntryList(GFxMovieRoot* root, GFxValue* Result) {
                                 SkipPerk = true;
                                 continue;
                             }
-                        }
-                        else {
+                        } else {
                             if (PlayerSex != Conditions->param1.u32) {
                                 SkipPerk = true;
                                 continue;
@@ -543,47 +541,49 @@ GFxValue* EntryList::BuildEntryList(GFxMovieRoot* root, GFxValue* Result) {
             if (SkipPerk)
                 continue;
 
-			std::string Requirements = SortRequirements(Reqs);
+            std::string Requirements = SortRequirements(Reqs);
 
-			bool IsValidPerk = EvaluationConditions(&iter->condition, (*g_player), (*g_player)) && (m_Level >= LevelRequirement);
-			if (!IsValidPerk)
-				AddErrorTags(Requirements);
+            bool IsValidPerk = EvaluationConditions(&iter->condition, (*g_player), (*g_player)) && (m_Level >= LevelRequirement);
+            if (!IsValidPerk)
+                AddErrorTags(Requirements);
 
             std::stringstream Description;
-            Description << "Req: " << Requirements << "<br>" << "$Ranks_cl " << std::to_string(iter->numRanks) << "<br><br>" << DescriptionText.Get();
-            
+            Description << "Req: " << Requirements << "<br>"
+                        << "$Ranks_cl " << std::to_string(iter->numRanks) << "<br><br>" << DescriptionText.Get();
+
             PerkEntry Entry;
-            Entry.text          = Name;
-            Entry.Description   = Description.str();
-            Entry.IconPath      = GetPerkIconPath(iter);
-            Entry.IsValidPerk   = IsValidPerk;
-            Entry.IsSelected    = false;
-            Entry.IsLocked      = false;
-            Entry.NumRanks      = iter->numRanks;
-            Entry.FormID        = iter->formID;
-            Entry.Level         = LevelRequirement;
+            Entry.text = Name;
+            Entry.Description = Description.str();
+            Entry.IconPath = GetPerkIconPath(iter);
+            Entry.IsValidPerk = IsValidPerk;
+            Entry.IsSelected = false;
+            Entry.IsLocked = false;
+            Entry.NumRanks = iter->numRanks;
+            Entry.FormID = iter->formID;
+            Entry.Level = LevelRequirement;
 
             if (IsValidPerk)
                 PerksV.emplace_back(Entry);
-            else PerksI.emplace_back(Entry);
+            else
+                PerksI.emplace_back(Entry);
         }
 
         std::sort(PerksV.begin(), PerksV.end(), &SortPerkEntries);
         std::sort(PerksI.begin(), PerksI.end(), &SortPerkEntries);
         PerksV.insert(PerksV.end(), PerksI.begin(), PerksI.end());
-        
-        for (auto iter : PerksV) {
+
+        for (auto iter: PerksV) {
             GFxValue Perk;
             root->CreateObject(&Perk);
-            SetGFxValue(&Perk, root,    "text",         iter.text);
-            SetGFxValue(&Perk, root,    "Description",  iter.Description);
-            SetGFxValue(&Perk, root,    "IconPath",     iter.IconPath);
-            SetGFxValue(&Perk,          "IsValidPerk",  iter.IsValidPerk);
-            SetGFxValue(&Perk,          "IsSelected",   iter.IsSelected);
-            SetGFxValue(&Perk,          "IsLocked",     iter.IsLocked);
-            SetGFxValue(&Perk,          "NumRanks",     iter.NumRanks);
-            SetGFxValue(&Perk,          "FormID",       iter.FormID);
-            SetGFxValue(&Perk,          "Level",        iter.Level);
+            SetGFxValue(&Perk, root, "text", iter.text);
+            SetGFxValue(&Perk, root, "Description", iter.Description);
+            SetGFxValue(&Perk, root, "IconPath", iter.IconPath);
+            SetGFxValue(&Perk, "IsValidPerk", iter.IsValidPerk);
+            SetGFxValue(&Perk, "IsSelected", iter.IsSelected);
+            SetGFxValue(&Perk, "IsLocked", iter.IsLocked);
+            SetGFxValue(&Perk, "NumRanks", iter.NumRanks);
+            SetGFxValue(&Perk, "FormID", iter.FormID);
+            SetGFxValue(&Perk, "Level", iter.Level);
             Result[4].PushBack(&Perk);
         }
 
