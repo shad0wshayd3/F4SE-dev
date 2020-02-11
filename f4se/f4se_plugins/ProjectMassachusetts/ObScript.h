@@ -2,8 +2,8 @@
 #include "Forms.h"
 
 static ObScriptParam kParams_ShowLevelUpMenu[2] = {
-  {"menuID", kType_Integer, 0},
-  {"points", kType_Integer, 1},
+    {   "menuID",   kType_Integer,  0 },
+    {   "points",   kType_Integer,  1 },
 };
 
 DEFINE_CMD_FULL(GetWeaponHealth, gwh, , 0, NULL);

@@ -16,11 +16,11 @@ ExtraObjectHealth* ExtraObjectHealth::Create(float value) {
 }
 
 UInt32 TESObjectBOOK::Data::GetSanitizedType() {
-    if (flags & kType_Perk)
-        return kType_Perk;
-    if (flags & kType_Spell)
-        return kType_Spell;
-    if (flags & kType_Skill)
-        return kType_Skill;
-    return kType_None;
+	if (flags & kType_Perk)
+		return kType_Perk;
+	if (flags & kType_Spell)
+		return kType_Spell;
+	if (flags & kType_Skill)
+		return kType_Skill;
+	return kType_None;
 }

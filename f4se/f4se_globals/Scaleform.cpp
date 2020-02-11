@@ -41,5 +41,5 @@ void SetGFxValue(GFxValue* dst, const char* name, GFxValue value) {
 }
 
 void SetGFxValue(GFxValue* dst, const char* name, GFxValue* value) {
-    dst->SetMember(name, value);
+	dst->SetMember(name, value);
 }

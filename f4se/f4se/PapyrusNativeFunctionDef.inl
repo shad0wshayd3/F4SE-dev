@@ -12,7 +12,7 @@
 
 // Latent native
 
-#define CLASS_NAME  __MACRO_JOIN__(LatentNativeFunction, NUM_PARAMS)
+#define CLASS_NAME __MACRO_JOIN__(LatentNativeFunction, NUM_PARAMS)
 #define LATENT_SPEC 1
 
 #define VOID_SPEC 0

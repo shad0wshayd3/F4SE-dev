@@ -4,6 +4,7 @@
 
 class VirtualMachine;
 
-namespace papyrusDefaultObject {
-    void RegisterFuncs(VirtualMachine* vm);
+namespace papyrusDefaultObject
+{
+	void RegisterFuncs(VirtualMachine* vm);
 };

@@ -1,4 +1,4 @@
-#pragma once
+  #pragma once
 #include "Forms.h"
 
 int GetSkillPoints(int Level);
@@ -18,19 +18,19 @@ std::string GetSkillIconPath(ActorValueInfo* avif);
 class EntryList {
 public:
     enum MenuID {
-        kMenuID_Skills = 0x10,
-        kMenuID_Tags = 0x11,
-        kMenuID_Perks = 0x20,
-        kMenuID_Traits = 0x21,
+        kMenuID_Skills  = 0x10,
+        kMenuID_Tags    = 0x11,
+        kMenuID_Perks   = 0x20,
+        kMenuID_Traits  = 0x21,
     };
 
-    EntryList();
-    EntryList(int ID, int Level, int PointsBase, int PointsUsed);
-    GFxValue* BuildEntryList(GFxMovieRoot* root, GFxValue* Result);
+                    EntryList();
+                    EntryList(int ID, int Level, int PointsBase, int PointsUsed);
+    GFxValue*       BuildEntryList(GFxMovieRoot* root, GFxValue* Result);
 
 private:
-    int m_ID;
-    int m_Level;
-    int m_PointsBase;
-    int m_PointsUsed;
+    int             m_ID;
+    int             m_Level;
+    int             m_PointsBase;
+    int             m_PointsUsed;
 };

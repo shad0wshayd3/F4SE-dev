@@ -21,13 +21,13 @@ struct BGSActorCellEvent {
 
 struct BGSInventoryItemEvent {
     struct Event {
-        UInt32 ownerRefHandle;
-        UInt32 itemHandleID;
+        UInt32                      ownerRefHandle;
+        UInt32                      itemHandleID;
     };
 };
 
 struct CurrentRadiationSourceCount {
-    UInt32 count;
+    UInt32                          count;
 };
 
 struct CustomMarkerUpdate {
@@ -38,8 +38,8 @@ struct CustomMarkerUpdate {
 
 struct FavoriteMgr_Events {
     struct ComponentFavoriteEvent {
-        BGSComponent* component;
-        UInt8 taggedForSearch;
+        BGSComponent*               component;
+        UInt8                       taggedForSearch;
     };
 };
 
@@ -61,18 +61,18 @@ struct InvInterfaceStateChangeEvent {
 
 struct LevelIncrease {
     struct Event {
-        UInt32 gainedLevel;
-        UInt32 pad04;
-        Actor* actor;
-        UInt32 unk10;
-        UInt32 unk14;
-        float gainedExp;
-        UInt32 unk1C[3];
-        Actor* actor1;
-        void* unk30;
-        Actor* actor2;
-        UInt32 fromLevel;
-        UInt32 pad44;
+        UInt32                      gainedLevel;
+        UInt32                      pad04;
+        Actor*                      actor;
+        UInt32                      unk10;
+        UInt32                      unk14;
+        float                       gainedExp;
+        UInt32                      unk1C[3];
+        Actor*                      actor1;
+        void*                       unk30;
+        Actor*                      actor2;
+        UInt32                      fromLevel;
+        UInt32                      pad44;
     };
 };
 
@@ -95,7 +95,7 @@ struct LocationMarkerArrayUpdate {
 };
 
 struct PipboyLightEvent {
-    UInt8 enabled;
+    UInt8                           enabled;
 };
 
 struct PerkPointIncreaseEvent {
@@ -119,11 +119,11 @@ struct PlayerActiveEffectChanged {
 };
 
 struct PlayerAmmoCountEvent {
-    UInt32 ammoCount;
-    UInt32 ammoReserves;
-    UInt64 unk08;
-    TESObjectWEAP* weapon;
-    TESObjectWEAP::InstanceData* weaponData;
+    UInt32                          ammoCount;
+    UInt32                          ammoReserves;
+    UInt64                          unk08;
+    TESObjectWEAP*                  weapon;
+    TESObjectWEAP::InstanceData*    weaponData;
 };
 
 struct PlayerCharacterQuestEvent {
@@ -134,8 +134,8 @@ struct PlayerCharacterQuestEvent {
 
 struct PlayerDifficultySettingChanged {
     struct Event {
-        UInt32 From;
-        UInt32 To;
+        UInt32                      From;
+        UInt32                      To;
     };
 };
 
@@ -192,12 +192,12 @@ struct TESCellFullyLoadedEvent {
 };
 
 struct TESContainerChangedEvent {
-    UInt32 sourceID;
-    UInt32 targetID;
-    UInt32 formID;
-    UInt32 count;
-    UInt32 refID;
-    void* unk14;
+    UInt32          sourceID;
+    UInt32          targetID;
+    UInt32          formID;
+    UInt32          count;
+    UInt32          refID;
+    void*           unk14;
 };
 
 struct TESEnterSneakingEvent {
@@ -238,22 +238,22 @@ struct TESQuestEvent {
 };
 
 struct TESSleepStartEvent {
-    float startTime;
-    float desiredStopTime;
-    TESObjectREFR* furnitureRef;
+    float                           startTime;
+    float                           desiredStopTime;
+    TESObjectREFR*                  furnitureRef;
 };
 
 struct TESSleepStopEvent {
-    bool interrupted;
+    bool                            interrupted;
 };
 
 struct TESWaitStartEvent {
-    float startTime;
-    float desiredStopTime;
+    float                           startTime;
+    float                           desiredStopTime;
 };
 
 struct TESWaitStopEvent {
-    bool interrupted;
+    bool                            interrupted;
 };
 
 struct TravelMarkerStateChange {
@@ -269,109 +269,107 @@ struct VATSEvents {
 };
 
 struct WeaponFiredEvent {
-    void* unk00;
-    TESObjectREFR* refr;
-    void* unk10;
+    void*                           unk00;
+    TESObjectREFR*                  refr;
+    void*                           unk10;
 };
 
 struct Workshop {
     struct WorkshopModeEvent {
-        TESObjectREFR* WorkshopRef;
-        bool start;
+        TESObjectREFR*              WorkshopRef;
+        bool                        start;
     };
 
     struct PowerOnEvent {
-        TESObjectREFR* ref;
+        TESObjectREFR*              ref;
     };
 
     struct PowerOffEvent {
-        TESObjectREFR* ref;
+        TESObjectREFR*              ref;
     };
 
     struct ItemGrabbedEvent {
-        TESObjectREFR* workshopRef;
-        TESObjectREFR* objectRef;
+        TESObjectREFR*              workshopRef;
+        TESObjectREFR*              objectRef;
     };
 
     struct ItemRepairedEvent {
-        TESObjectREFR* workshopRef;
-        TESObjectREFR* objectRef;
+        TESObjectREFR*              workshopRef;
+        TESObjectREFR*              objectRef;
     };
 
     struct ItemPlacedEvent {
-        TESObjectREFR* workshopRef;
-        TESObjectREFR* objectRef;
-        NiTransform transform;
+        TESObjectREFR*              workshopRef;
+        TESObjectREFR*              objectRef;
+        NiTransform                 transform;
     };
 
     struct ItemMovedEvent {
-        TESObjectREFR* workshopRef;
-        TESObjectREFR* objectRef;
-        UInt32 unk10[(0x50 - 0x10) / 4];
-        NiPoint3 position;
+        TESObjectREFR*              workshopRef;
+        TESObjectREFR*              objectRef;
+        UInt32                      unk10[(0x50 - 0x10) / 4];
+        NiPoint3                    position;
     };
 
     struct ItemDestroyedEvent {
-        TESObjectREFR* workshopRef;
-        TESObjectREFR* objectRef;
+        TESObjectREFR*              workshopRef;
+        TESObjectREFR*              objectRef;
     };
 
     struct BuildableAreaEvent {
-        UInt8 leaveArea;
+        UInt8                       leaveArea;
     };
 
     struct ItemScrappedEvent {
-        void* unk00;
+        void*                       unk00;
 
         struct Component {
-            TESObjectMISC* component;
-            UInt32 count;
-            UInt32 pad0C;
+            TESObjectMISC*          component;
+            UInt32                  count;
+            UInt32                  pad0C;
         };
-        tArray<Component>* components;
+        tArray<Component>*          components;
     };
 
     struct PlacementStatusEvent {
-        UInt32 flags;
-        float unk04;
-        bhkWorldM* _bhkWorldM;
-        float unk10[8];
-        TESObjectREFR* objectRef;
-        UInt64 unk40;
-        TESObjectREFR* workshopRef;
-        float unk50[10];
-        NiTransform transform;
+        UInt32                      flags;
+        float                       unk04;
+        bhkWorldM*                  _bhkWorldM;
+        float                       unk10[8];
+        TESObjectREFR*              objectRef;
+        UInt64                      unk40;
+        TESObjectREFR*              workshopRef;
+        float                       unk50[10];
+        NiTransform                 transform;
     };
 };
 
 template<typename EventT>
-BSTEventDispatcher<EventT> GetGlobalEventDispatcher(){};
+BSTEventDispatcher<EventT> GetGlobalEventDispatcher() { };
 
 template<typename EventT>
-BSTEventDispatcher<EventT>* GetSingletonEventDispatcher_Internal(){};
+BSTEventDispatcher<EventT>* GetSingletonEventDispatcher_Internal() { };
 
-#define DECLARE_GLOBAL_EVENT_DISPATCHER(Event, address)                                                                                                                                                \
-    template<>                                                                                                                                                                                         \
-    inline BSTEventDispatcher<Event> GetGlobalEventDispatcher() {                                                                                                                                      \
-        typedef BSTGlobalEvent::EventSource<Event>*(_GetGlobalEventDispatcher);                                                                                                                        \
-        RelocPtr<_GetGlobalEventDispatcher> GetDispatcher(address);                                                                                                                                    \
-        return (*GetDispatcher)->eventDispatcher;                                                                                                                                                      \
-    }
+#define DECLARE_GLOBAL_EVENT_DISPATCHER(Event, address)\
+template<> inline BSTEventDispatcher<Event> GetGlobalEventDispatcher() {\
+    typedef BSTGlobalEvent::EventSource<Event>* (_GetGlobalEventDispatcher);\
+    RelocPtr <_GetGlobalEventDispatcher> GetDispatcher(address);\
+    return (*GetDispatcher)->eventDispatcher;\
+}
 
-#define DECLARE_SINGLETON_EVENT_DISPATCHER(Event, address)                                                                                                                                             \
-    template<>                                                                                                                                                                                         \
-    inline BSTEventDispatcher<Event>* GetSingletonEventDispatcher_Internal() {                                                                                                                         \
-        typedef BSTEventDispatcher<Event>*(_GetSingletonEventDispatcher_Internal);                                                                                                                     \
-        RelocAddr<_GetSingletonEventDispatcher_Internal> GetDispatcher(address);                                                                                                                       \
-        return GetDispatcher;                                                                                                                                                                          \
-    }
+#define DECLARE_SINGLETON_EVENT_DISPATCHER(Event, address)\
+template<> inline BSTEventDispatcher<Event>* GetSingletonEventDispatcher_Internal() {\
+    typedef BSTEventDispatcher<Event>* (_GetSingletonEventDispatcher_Internal);\
+    RelocAddr <_GetSingletonEventDispatcher_Internal> GetDispatcher(address);\
+    return GetDispatcher;\
+}
 
-#define DECLARE_EVENT_CLASS(Event)                                                                                                                                                                     \
-    class Event##Handler: public BSTEventSink<Event> {                                                                                                                                                 \
-    public:                                                                                                                                                                                            \
-        virtual ~Event##Handler(){};                                                                                                                                                                   \
-        virtual EventResult ReceiveEvent(Event* evn, void* dispatcher) override;                                                                                                                       \
-    };                                                                                                                                                                                                 \
-    extern Event##Handler g_##Event##Handler
+#define DECLARE_EVENT_CLASS(Event)\
+class Event##Handler : public BSTEventSink<Event> {\
+public:\
+    virtual ~Event##Handler() { };\
+    virtual	EventResult	ReceiveEvent(Event* evn, void* dispatcher) override;\
+};\
+extern Event##Handler g_##Event##Handler
 
 #define GetSingletonEventDispatcher(Event) (*GetSingletonEventDispatcher_Internal<Event>())

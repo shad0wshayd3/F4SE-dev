@@ -1,3 +1,3 @@
 #pragma once
 
-void PrintLoaderError(const char* fmt, ...);
+void PrintLoaderError(const char * fmt, ...);

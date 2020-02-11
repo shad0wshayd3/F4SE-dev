@@ -4,89 +4,103 @@
 
 // remote thread creation
 
-static bool DoInjectDLLThread(PROCESS_INFORMATION* info, const char* dllPath, bool sync, bool noTimeout);
+static bool DoInjectDLLThread(PROCESS_INFORMATION * info, const char * dllPath, bool sync, bool noTimeout);
 
-bool InjectDLLThread(PROCESS_INFORMATION* info, const char* dllPath, bool sync, bool noTimeout) {
-    bool result = false;
+bool InjectDLLThread(PROCESS_INFORMATION * info, const char * dllPath, bool sync, bool noTimeout)
+{
+	bool	result = false;
 
-    // wrap DLL injection in SEH, if it crashes print a message
-    __try {
-        result = DoInjectDLLThread(info, dllPath, sync, noTimeout);
-    } __except (EXCEPTION_EXECUTE_HANDLER) {
-        PrintLoaderError("DLL injection failed. In most cases, this is caused by an overly paranoid software firewall or antivirus package. Disabling either of these may solve the problem.");
-        result = false;
-    }
+	// wrap DLL injection in SEH, if it crashes print a message
+	__try {
+		result = DoInjectDLLThread(info, dllPath, sync, noTimeout);
+	}
+	__except(EXCEPTION_EXECUTE_HANDLER)
+	{
+		PrintLoaderError("DLL injection failed. In most cases, this is caused by an overly paranoid software firewall or antivirus package. Disabling either of these may solve the problem.");
+		result = false;
+	}
 
-    return result;
+	return result;
 }
 
-static bool DoInjectDLLThread(PROCESS_INFORMATION* info, const char* dllPath, bool sync, bool noTimeout) {
-    bool result = false;
+static bool DoInjectDLLThread(PROCESS_INFORMATION * info, const char * dllPath, bool sync, bool noTimeout)
+{
+	bool	result = false;
 
-    // make sure the dll exists
-    IFileStream fileCheck;
-    if (!fileCheck.Open(dllPath)) {
-        PrintLoaderError("Couldn't find %s.", dllPath);
-        return false;
-    }
+	// make sure the dll exists
+	IFileStream	fileCheck;
+	if(!fileCheck.Open(dllPath))
+	{
+		PrintLoaderError("Couldn't find %s.", dllPath);
+		return false;
+	}
 
-    fileCheck.Close();
+	fileCheck.Close();
 
-    HANDLE process = OpenProcess(PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION | PROCESS_VM_OPERATION | PROCESS_VM_WRITE | PROCESS_VM_READ, FALSE, info->dwProcessId);
-    if (process) {
-        uintptr_t hookBase = (uintptr_t)VirtualAllocEx(process, NULL, 8192, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-        if (hookBase) {
-            // safe because kernel32 is loaded at the same address in all processes
-            // (can change across restarts)
-            uintptr_t loadLibraryAAddr = (uintptr_t)GetProcAddress(GetModuleHandle("kernel32.dll"), "LoadLibraryA");
+	HANDLE	process = OpenProcess(
+		PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION | PROCESS_VM_OPERATION | PROCESS_VM_WRITE | PROCESS_VM_READ, FALSE, info->dwProcessId);
+	if(process)
+	{
+		uintptr_t	hookBase = (uintptr_t)VirtualAllocEx(process, NULL, 8192, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+		if(hookBase)
+		{
+			// safe because kernel32 is loaded at the same address in all processes
+			// (can change across restarts)
+			uintptr_t	loadLibraryAAddr = (uintptr_t)GetProcAddress(GetModuleHandle("kernel32.dll"), "LoadLibraryA");
 
-            _MESSAGE("hookBase = %016I64X", hookBase);
-            _MESSAGE("loadLibraryAAddr = %016I64X", loadLibraryAAddr);
+			_MESSAGE("hookBase = %016I64X", hookBase);
+			_MESSAGE("loadLibraryAAddr = %016I64X", loadLibraryAAddr);
 
-            size_t bytesWritten;
-            WriteProcessMemory(process, (LPVOID)hookBase, dllPath, strlen(dllPath) + 1, &bytesWritten);
+			size_t	bytesWritten;
+			WriteProcessMemory(process, (LPVOID)hookBase, dllPath, strlen(dllPath) + 1, &bytesWritten);
 
-            HANDLE thread = CreateRemoteThread(process, NULL, 0, (LPTHREAD_START_ROUTINE)loadLibraryAAddr, (void*)hookBase, 0, NULL);
-            if (thread) {
-                if (sync) {
-                    switch (WaitForSingleObject(thread, noTimeout ? INFINITE : 1000 * 60))    // timeout = one minute
-                    {
-                    case WAIT_OBJECT_0:
-                        _MESSAGE("hook thread complete");
-                        result = true;
-                        break;
+			HANDLE	thread = CreateRemoteThread(process, NULL, 0, (LPTHREAD_START_ROUTINE)loadLibraryAAddr, (void *)hookBase, 0, NULL);
+			if(thread)
+			{
+				if(sync)
+				{
+					switch(WaitForSingleObject(thread, noTimeout ? INFINITE : 1000 * 60))	// timeout = one minute
+					{
+					case WAIT_OBJECT_0:
+						_MESSAGE("hook thread complete");
+						result = true;
+						break;
 
-                    case WAIT_ABANDONED:
-                        _ERROR("Process::InstallHook: waiting for thread = WAIT_ABANDONED");
-                        break;
+					case WAIT_ABANDONED:
+						_ERROR("Process::InstallHook: waiting for thread = WAIT_ABANDONED");
+						break;
 
-                    case WAIT_TIMEOUT:
-                        _ERROR("Process::InstallHook: waiting for thread = WAIT_TIMEOUT");
-                        break;
-                    }
-                } else
-                    result = true;
+					case WAIT_TIMEOUT:
+						_ERROR("Process::InstallHook: waiting for thread = WAIT_TIMEOUT");
+						break;
+					}
+				}
+				else
+					result = true;
 
-                CloseHandle(thread);
-            } else
-                _ERROR("CreateRemoteThread failed (%d)", GetLastError());
+				CloseHandle(thread);
+			}
+			else
+				_ERROR("CreateRemoteThread failed (%d)", GetLastError());
 
-            VirtualFreeEx(process, (LPVOID)hookBase, 0, MEM_RELEASE);
-        } else
-            _ERROR("Process::InstallHook: couldn't allocate memory in target process");
+			VirtualFreeEx(process, (LPVOID)hookBase, 0, MEM_RELEASE);
+		}
+		else
+			_ERROR("Process::InstallHook: couldn't allocate memory in target process");
 
-        CloseHandle(process);
-    } else
-        _ERROR("Process::InstallHook: couldn't get process handle");
+		CloseHandle(process);
+	}
+	else
+		_ERROR("Process::InstallHook: couldn't get process handle");
 
-    return result;
+	return result;
 }
 
 // main hook
 
 #if 0
 
-#pragma pack(push, 1)
+#pragma pack (push, 1)
 
 struct HookLayout
 {
@@ -159,7 +173,7 @@ struct HookLayout
 	}
 };
 
-#pragma pack(pop, 1)
+#pragma pack (pop, 1)
 
 struct HookSetup
 {
@@ -261,10 +275,10 @@ struct HookSetup
 			char						* strDst = &m_data.libNames[m_strOffset];
 			m_libIdx++;
 
-#pragma warning(push)
-#pragma warning(disable : 4996)
+#pragma warning (push)
+#pragma warning (disable : 4996)
 			strcpy(strDst, dllPath);
-#pragma warning(pop)
+#pragma warning (pop)
 
 			m_strOffset += strlen(dllPath) + 1;
 
@@ -338,10 +352,11 @@ bool InjectDLL(PROCESS_INFORMATION * info, const char * dllPath, ProcHookInfo * 
 
 #else
 
-bool InjectDLL(PROCESS_INFORMATION* info, const char* dllPath, ProcHookInfo* hookInfo) {
-    // ### this needs to be updated for x64
+bool InjectDLL(PROCESS_INFORMATION * info, const char * dllPath, ProcHookInfo * hookInfo)
+{
+	// ### this needs to be updated for x64
 
-    return false;
+	return false;
 }
 
 #endif

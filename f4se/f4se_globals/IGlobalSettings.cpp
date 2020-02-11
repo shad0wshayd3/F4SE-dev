@@ -12,7 +12,7 @@ void IGlobalSettings::Open(std::string settingPrefix) {
 
     for (int i = 0; i < Globals.count; i++) {
         std::string settingName = Globals[i]->GetEditorID();
-
+            
         auto index = settingName.find(settingPrefix);
         if (index != std::string::npos)
             m_SettingMap.emplace(settingName.substr(settingPrefix.size(), std::string::npos), Globals[i]->formID);

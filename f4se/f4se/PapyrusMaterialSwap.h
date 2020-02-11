@@ -3,6 +3,7 @@
 struct StaticFunctionTag;
 class VirtualMachine;
 
-namespace papyrusMaterialSwap {
-    void RegisterFuncs(VirtualMachine* vm);
+namespace papyrusMaterialSwap
+{
+	void RegisterFuncs(VirtualMachine* vm);
 }

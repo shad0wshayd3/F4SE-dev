@@ -8,10 +8,10 @@
 // 4288 - disable warning for crap microsoft extension screwing up the scope of variables defined in for loops
 // 4311 - pointer truncation
 // 4312 - pointer extension
-#pragma warning(disable : 4018 4200 4244 4267 4305 4288 4312 4311)
+#pragma warning(disable: 4018 4200 4244 4267 4305 4288 4312 4311)
 
 // The game doesn't actually support Windows XP, so let's set this to Win7.
-#define _WIN32_WINNT 0x0601
+#define _WIN32_WINNT	0x0601
 
 #include <cstdlib>
 #include <cstdio>

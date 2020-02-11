@@ -6,4 +6,4 @@ void Hooks_Papyrus_Init();
 void Hooks_Papyrus_Commit();
 
 bool RegisterPapyrusPlugin(F4SEPapyrusInterface::RegisterFunctions);
-void GetExternalEventRegistrations(const char* eventName, void* data, F4SEPapyrusInterface::RegistrantFunctor functor);
+void GetExternalEventRegistrations(const char * eventName, void * data, F4SEPapyrusInterface::RegistrantFunctor functor);

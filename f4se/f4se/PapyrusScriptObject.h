@@ -3,6 +3,7 @@
 struct StaticFunctionTag;
 class VirtualMachine;
 
-namespace papyrusScriptObject {
-    void RegisterFuncs(VirtualMachine* vm);
+namespace papyrusScriptObject
+{
+	void RegisterFuncs(VirtualMachine* vm);
 }

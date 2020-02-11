@@ -1,6 +1,6 @@
 #pragma once
 
-void SafeWriteBuf(uintptr_t addr, void* data, size_t len);
+void SafeWriteBuf(uintptr_t addr, void * data, size_t len);
 void SafeWrite8(uintptr_t addr, UInt8 data);
 void SafeWrite16(uintptr_t addr, UInt16 data);
 void SafeWrite32(uintptr_t addr, UInt32 data);
