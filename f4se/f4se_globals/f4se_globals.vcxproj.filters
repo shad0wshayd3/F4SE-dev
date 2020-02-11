@@ -29,6 +29,9 @@
     <ClCompile Include="Definitions.cpp">
       <Filter>Definitions</Filter>
     </ClCompile>
+    <ClCompile Include="FormLoader.cpp">
+      <Filter>Forms</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Globals.h" />
@@ -68,6 +71,9 @@
     <ClInclude Include="IObScriptParams.h">
       <Filter>ObScript</Filter>
     </ClInclude>
+    <ClInclude Include="FormLoader.h">
+      <Filter>Forms</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Utilities">
@@ -93,6 +99,9 @@
     </Filter>
     <Filter Include="Log">
       <UniqueIdentifier>{a230c68b-3edc-4d8e-8242-886cd7415d3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Forms">
+      <UniqueIdentifier>{503048b1-a203-4432-9604-cadd32c95366}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -16,7 +16,7 @@ extern F4SESerializationInterface*  g_Serialization;
 
 typedef std::vector<ActorValueInfo*>                AVVector;
 typedef std::vector<BGSPerk*>                       PerkVector;
-typedef std::vector<UInt32>							UInt32Vector;
+typedef std::vector<UInt32>                         UInt32Vector;
 typedef std::vector<UInt32Vector>                   UInt32VectorVector;
 typedef std::vector<std::string>                    StringVector;
 typedef std::vector<StringVector>                   StringVectorVector;
@@ -30,8 +30,6 @@ class Forms {
 public:
     static bool                     Load();
     static void                     Unload();
-
-    static TESForm*                 Lookup(UInt32 FormID);
 
     static void                     AddDependent(ActorValueInfo* Parent, ActorValueInfo* Child);
     static ActorValueInfo*          GetDependent(ActorValueInfo* Child);
@@ -96,11 +94,8 @@ public:
     static ActorValueInfo*          Unarmed_Secondary;
 
     static ActorValueInfo*          ActionPointsMult;
-	static ActorValueInfo*			InventoryWeight;
-	static ActorValueInfo*			PipboyLightEnabled;
-	static ActorValueInfo*			RadiationSourceCount;
-	static ActorValueInfo*			SkillPointBonus;
-    
+    static ActorValueInfo*          SkillPointBonus;
+
     static ActorValueInfo*          Dehydration;
     static ActorValueInfo*          Starvation;
     static ActorValueInfo*          SleepDeprivation;
@@ -137,9 +132,9 @@ public:
     static PerkVector               ListMaster;
 
     static StringVectorVector       ListSortOrder;
-	static UInt32VectorVector		EffectSortOrder;
+	static UInt32VectorVector       EffectSortOrder;
 
-	static KeywordMap				ObjectTypes;
+	static KeywordMap               ObjectTypes;
 
     static ActorValueMap            RegisteredDependents;
     static PerkRankMap              RegisteredActors;
@@ -165,10 +160,6 @@ public:
     static UInt16                   PlayerLevel;
 
 private:
-    static bool                     CheckForPlugin();
     static bool                     CheckLoadedForms();
     static void                     ClearMaps();
-
-    static std::string              m_PluginName;
-    static const ModInfo*           m_PluginInfo;
 };

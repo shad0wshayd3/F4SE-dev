@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Definitions.cpp" />
+    <ClCompile Include="FormLoader.cpp" />
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="IGlobalSettings.cpp" />
     <ClCompile Include="ILog.cpp" />
@@ -153,6 +154,7 @@
   <ItemGroup>
     <ClInclude Include="Definitions.h" />
     <ClInclude Include="EventDefinitions.h" />
+    <ClInclude Include="FormLoader.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="IGlobalSettings.h" />
     <ClInclude Include="ILog.h" />

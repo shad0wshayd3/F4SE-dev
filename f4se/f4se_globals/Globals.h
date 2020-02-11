@@ -7,6 +7,7 @@
 #include "ITimeKeeper.h"
 
 #include "Definitions.h"
+#include "FormLoader.h"
 #include "Native.h"
 #include "Scaleform.h"
 #include "Utilities.h"

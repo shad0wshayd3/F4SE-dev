@@ -28,7 +28,7 @@ bool strifind(const std::string& str, const std::string& search) {
 
     auto it = std::search(str.begin(), str.end(), search.begin(), search.end(), [](char c1, char c2) {
         return std::toupper(c1) == std::toupper(c2);
-        });
+    });
 
     return (it != str.end());
 }
@@ -73,7 +73,7 @@ float GetTempValue(Actor* actor, ActorValueInfo* avif) {
 }
 
 float GetTempMod(Actor* actor, ActorValueInfo* avif) {
-	return actor->actorValueOwner.GetMod(0, avif);
+    return actor->actorValueOwner.GetMod(0, avif);
 }
 
 float GetValue(TESObjectREFR* refr, ActorValueInfo* avif) {
@@ -93,7 +93,7 @@ float GetTempValue(TESObjectREFR* refr, ActorValueInfo* avif) {
 }
 
 float GetTempMod(TESObjectREFR* refr, ActorValueInfo* avif) {
-	return refr->actorValueOwner.GetMod(0, avif);
+    return refr->actorValueOwner.GetMod(0, avif);
 }
 
 int GetValueInt(Actor* actor, ActorValueInfo* avif) {
@@ -123,11 +123,6 @@ void SetValue(Actor* actor, ActorValueInfo* avif, float value) {
 // ------------------------------------------------------------------------------------------------
 //  Lookup
 // ------------------------------------------------------------------------------------------------
-
-TESForm* LookupFormFromMod(const ModInfo* modInfo, UInt32 FormID) {
-    FormID |= (modInfo->modIndex) << 24;
-    return LookupFormByID(FormID);
-}
 
 UInt32 GetHandleIDByIndex(UInt32 index) {
     return GetTableValue(UInt32, index, "HandleID");
@@ -221,13 +216,13 @@ void GFxLogMembers::Visit(const char* member, GFxValue* value) {
         _LogMessageNT("%s: %s", member, Member.GetString());
         break;
 
-	case GFxValue::kType_Array: {
-		_LogMessageNT("%s: %i Elements", member, Member.GetArraySize());
+    case GFxValue::kType_Array: {
+        _LogMessageNT("%s: %i Elements", member, Member.GetArraySize());
 
-		_LogIndent(); GFxLogElements LE(&Member);
-		Member.VisitElements(&LE, 0, Member.GetArraySize()); _LogOutdent();
-		break;
-	}
+        _LogIndent(); GFxLogElements LE(&Member);
+        Member.VisitElements(&LE, 0, Member.GetArraySize()); _LogOutdent();
+        break;
+    }
 
     default:
         _LogMessageNT("%s: Type %i", member, Member.GetType());
@@ -236,8 +231,8 @@ void GFxLogMembers::Visit(const char* member, GFxValue* value) {
 }
 
 void GFxLogElements::Visit(UInt32 idx, GFxValue* value) {
-	_LogMessageNT("Array Index: %i", idx);
+    _LogMessageNT("Array Index: %i", idx);
 
-	_LogIndent(); GFxLogMembers LM(value);
-	value->VisitMembers(&LM); _LogOutdent();
+    _LogIndent(); GFxLogMembers LM(value);
+    value->VisitMembers(&LM); _LogOutdent();
 }

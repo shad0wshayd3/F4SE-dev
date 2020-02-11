@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="Config.h" />
+    <ClInclude Include="Events.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Forms.h">
+      <Filter>Forms</Filter>
+    </ClInclude>
+    <ClInclude Include="ObScript.h">
+      <Filter>ObScript</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Events.cpp">
+      <Filter>Events</Filter>
+    </ClCompile>
+    <ClCompile Include="Forms.cpp">
+      <Filter>Forms</Filter>
+    </ClCompile>
+    <ClCompile Include="ObScript.cpp">
+      <Filter>ObScript</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="exports.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Events">
+      <UniqueIdentifier>{3e0db341-8703-4766-9242-46a4a34141e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Forms">
+      <UniqueIdentifier>{4677ee3c-dd77-4921-b5ff-9e00d9500129}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ObScript">
+      <UniqueIdentifier>{10ec54c6-a70f-4995-a2b5-c6e1bbcb98d8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

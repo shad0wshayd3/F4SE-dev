@@ -15,10 +15,12 @@ EventResult TESContainerChangedEventHandler::ReceiveEvent(TESContainerChangedEve
         case kFormType_ACHR:
         case kFormType_CONT:
         case kFormType_NPC_:
-        case kFormType_REFR: {
+        case kFormType_REFR:
+        {
             TESForm* Form = LookupFormByID(evn->formID);
             switch (Form->formType) {
-            case kFormType_ARMO: {
+            case kFormType_ARMO:
+            {
                 break;
             }
 
@@ -135,24 +137,6 @@ EventResult TESWaitStopEventHandler::ReceiveEvent(TESWaitStopEvent* evn, void* d
     return kEvent_Continue;
 }
 TESWaitStopEventHandler g_TESWaitStopEventHandler;
-
-EventResult CurrentRadiationSourceCountHandler::ReceiveEvent(CurrentRadiationSourceCount* evn, void* dispatcher) {
-    if (evn) {
-		SetValue((*g_player), Forms::RadiationSourceCount, evn->count);
-    }
-
-    return kEvent_Continue;
-}
-CurrentRadiationSourceCountHandler g_CurrentRadiationSourceCountHandler;
-
-EventResult PipboyLightEventHandler::ReceiveEvent(PipboyLightEvent* evn, void* dispatcher) {
-    if (evn) {
-        SetValue((*g_player), Forms::PipboyLightEnabled, evn->enabled);
-    }
-
-    return kEvent_Continue;
-}
-PipboyLightEventHandler g_PipboyLightEventHandler;
 
 EventResult WeaponFiredEventHandler::ReceiveEvent(WeaponFiredEvent* evn, void* dispatcher) {
     if (evn) {

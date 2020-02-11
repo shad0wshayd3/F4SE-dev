@@ -30,18 +30,18 @@
     (##Type*) Runtime_DynamicCast((void*)(LookupFormByID(FormID)), RTTI_TESForm, RTTI_##Type)
 
 #define GetExtraDataByType(ExtraData, Type)\
-	((Extra##Type##*)ExtraData->GetByType(kExtraData_##Type##))
+    ((Extra##Type##*)ExtraData->GetByType(kExtraData_##Type##))
 
 #define GetExtraDataValue(ExtraData, Type, name)\
     (GetExtraDataByType(ExtraData, Type)->##name##)
 
 #define SortGeneric(Entry1, Entry2, Member)\
-	if (Entry1.##Member## != Entry2.##Member##)\
-		return (Entry1.##Member## < Entry2.##Member##)
+    if (Entry1.##Member## != Entry2.##Member##)\
+        return (Entry1.##Member## < Entry2.##Member##)
 
 #define SortStrings(Entry1, Entry2, Member)\
-	const char* Name1 = Entry1.##Member##.c_str();\
-	const char* Name2 = Entry2.##Member##.c_str();\
+    const char* Name1 = Entry1.##Member##.c_str();\
+    const char* Name2 = Entry2.##Member##.c_str();\
     int Length = max(strlen(Name1), strlen(Name2));\
     for (int z = 0; z < Length; z++)\
         if (Name1[z] != Name2[z])\
@@ -50,8 +50,8 @@
         return (Name1 < Name2)
 
 #define StringToUpper(Str)\
-	for (auto& chr : Str)\
-		chr = toupper(chr)
+    for (auto& chr : Str)\
+        chr = toupper(chr)
 
 void                        Notification(const char* Message, ...);
 void                        NotificationSound(const char* Message, const char* Sound, ...);
@@ -79,8 +79,6 @@ void                        ModValue(Actor* actor, ActorValueInfo* avif, float v
 void                        ModPermValue(Actor* actor, ActorValueInfo* avif, float value);
 void                        SetValue(Actor* actor, ActorValueInfo* avif, float value);
 
-TESForm*                    LookupFormFromMod(const ModInfo* modInfo, UInt32 FormID);
-
 UInt32                      GetHandleIDByIndex(UInt32 index);
 UInt32                      GetStackIDByIndex(UInt32 index);
 TESForm*                    GetInventoryFormByHandleID(UInt32 HandleID);
@@ -91,17 +89,21 @@ BGSInventoryItem::Stack*    GetStackByStackID(BGSInventoryItem* Item, int StackI
 ExtraDataList*              GetExtraDataListByStackID(BGSInventoryItem* Item, int StackID);
 ExtraDataList*              GetExtraDataListByIndex(UInt32 index);
 
-class GFxLogMembers : public GFxValue::ObjectInterface::ObjVisitor {
+class GFxLogMembers: public GFxValue::ObjectInterface::ObjVisitor {
 public:
-    GFxLogMembers(GFxValue* value) : m_value(value) { }
-    virtual bool            ShowDisplayMembers(void) override { return true; }
-    virtual void            Visit(const char* member, GFxValue* value) override;
-    GFxValue*               m_value;
+    GFxLogMembers(GFxValue* value): m_value(value) {
+    }
+    virtual bool ShowDisplayMembers(void) override {
+        return true;
+    }
+    virtual void Visit(const char* member, GFxValue* value) override;
+    GFxValue* m_value;
 };
 
-class GFxLogElements : public GFxValue::ObjectInterface::ArrayVisitor {
+class GFxLogElements: public GFxValue::ObjectInterface::ArrayVisitor {
 public:
-	GFxLogElements(GFxValue* value) : m_value(value) { }
-	virtual void			Visit(UInt32 idx, GFxValue* val);
-	GFxValue*				m_value;
+    GFxLogElements(GFxValue* value): m_value(value) {
+    }
+    virtual void Visit(UInt32 idx, GFxValue* val);
+    GFxValue* m_value;
 };

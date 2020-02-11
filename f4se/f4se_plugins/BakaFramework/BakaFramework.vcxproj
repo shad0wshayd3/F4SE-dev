@@ -20,8 +20,8 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
-    <ProjectGuid>{464cfa55-3bc8-411a-8891-f80f305065b9}</ProjectGuid>
-    <RootNamespace>BetaCommentEnabler</RootNamespace>
+    <ProjectGuid>{e12320bc-e28e-46b8-855a-003b662d8d94}</ProjectGuid>
+    <RootNamespace>BakaFramework</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -86,7 +86,6 @@
       <ForcedIncludeFiles>common/IPrefix.h</ForcedIncludeFiles>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -95,8 +94,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetPath)" "$(Fallout4Path)\Data\F4SE\plugins\$(TargetFileName)"
-copy "$(ProjectDir)\BetaCommentEnabler.ini" "$(Fallout4Path)\Data\F4SE\plugins\BetaCommentEnabler.ini"</Command>
+      <Command>copy "$(TargetPath)" "$(Fallout4Path)\Data\F4SE\plugins\$(TargetFileName)"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Installing Plugin DLL...</Message>
@@ -142,7 +140,6 @@ copy "$(ProjectDir)\BetaCommentEnabler.ini" "$(Fallout4Path)\Data\F4SE\plugins\B
       <ForcedIncludeFiles>common/IPrefix.h</ForcedIncludeFiles>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -152,8 +149,7 @@ copy "$(ProjectDir)\BetaCommentEnabler.ini" "$(Fallout4Path)\Data\F4SE\plugins\B
       <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetPath)" "$(Fallout4Path)\Data\F4SE\plugins\$(TargetFileName)"
-copy "$(ProjectDir)\BetaCommentEnabler.ini" "$(Fallout4Path)\Data\F4SE\plugins\BetaCommentEnabler.ini"</Command>
+      <Command>copy "$(TargetPath)" "$(Fallout4Path)\Data\F4SE\plugins\$(TargetFileName)"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Installing Plugin DLL...</Message>
@@ -161,9 +157,13 @@ copy "$(ProjectDir)\BetaCommentEnabler.ini" "$(Fallout4Path)\Data\F4SE\plugins\B
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Config.h" />
+    <ClInclude Include="Events.h" />
+    <ClInclude Include="Forms.h" />
     <ClInclude Include="ObScript.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Events.cpp" />
+    <ClCompile Include="Forms.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ObScript.cpp" />
   </ItemGroup>

@@ -42,43 +42,41 @@ float DamageResistFormula(ActorValueInfo* AVIF, float Damage, float DamageResist
 //
 
 void ActorValueUpdateThread(Actor* actor) {
-	float BarterValue           = GetValue(actor, Forms::Barter);
-	SetValue(actor, Forms::Barter_BuyMod,           (155 - (0.45 * BarterValue)));
-	SetValue(actor, Forms::Barter_SellMod,          (45 + (0.45 * BarterValue)));
+    float BarterValue           = GetValue(actor, Forms::Barter);
+    SetValue(actor, Forms::Barter_BuyMod,           (155 - (0.45 * BarterValue)));
+    SetValue(actor, Forms::Barter_SellMod,          (45 + (0.45 * BarterValue)));
 
-	float EnergyWeaponsValue    = GetValue(actor, Forms::EnergyWeapons);
-	SetValue(actor, Forms::EnergyWeapons_Accuracy,  WEAPON_ACC(EnergyWeaponsValue));
-	SetValue(actor, Forms::EnergyWeapons_Damage,    WEAPON_DAM(EnergyWeaponsValue));
+    float EnergyWeaponsValue    = GetValue(actor, Forms::EnergyWeapons);
+    SetValue(actor, Forms::EnergyWeapons_Accuracy,  WEAPON_ACC(EnergyWeaponsValue));
+    SetValue(actor, Forms::EnergyWeapons_Damage,    WEAPON_DAM(EnergyWeaponsValue));
 
-	float ExplosivesValue       = GetValue(actor, Forms::Explosives);
-	SetValue(actor, Forms::Explosives_Accuracy,     WEAPON_ACC(ExplosivesValue));
-	SetValue(actor, Forms::Explosives_Damage,       WEAPON_DAM(ExplosivesValue));
+    float ExplosivesValue       = GetValue(actor, Forms::Explosives);
+    SetValue(actor, Forms::Explosives_Accuracy,     WEAPON_ACC(ExplosivesValue));
+    SetValue(actor, Forms::Explosives_Damage,       WEAPON_DAM(ExplosivesValue));
 
-	float GunsValue             = GetValue(actor, Forms::Guns);
-	SetValue(actor, Forms::Guns_Accuracy,           WEAPON_ACC(GunsValue));
-	SetValue(actor, Forms::Guns_Damage,             WEAPON_DAM(GunsValue));
+    float GunsValue             = GetValue(actor, Forms::Guns);
+    SetValue(actor, Forms::Guns_Accuracy,           WEAPON_ACC(GunsValue));
+    SetValue(actor, Forms::Guns_Damage,             WEAPON_DAM(GunsValue));
 
-	float MedicineValue         = GetValue(actor, Forms::Medicine);
-	SetValue(actor, Forms::Medicine_UsageMod,       USAGE_MOD(MedicineValue));
+    float MedicineValue         = GetValue(actor, Forms::Medicine);
+    SetValue(actor, Forms::Medicine_UsageMod,       USAGE_MOD(MedicineValue));
 
-	float MeleeWeaponsValue     = GetValue(actor, Forms::MeleeWeapons);
-	SetValue(actor, Forms::MeleeWeapons_Secondary,  WEAPON_SEC(MeleeWeaponsValue));
-	SetValue(actor, Forms::MeleeWeapons_Damage,     WEAPON_DAM(MeleeWeaponsValue));
+    float MeleeWeaponsValue     = GetValue(actor, Forms::MeleeWeapons);
+    SetValue(actor, Forms::MeleeWeapons_Secondary,  WEAPON_SEC(MeleeWeaponsValue));
+    SetValue(actor, Forms::MeleeWeapons_Damage,     WEAPON_DAM(MeleeWeaponsValue));
 
-	float SneakValue            = GetValue(actor, Forms::Sneak);
-	SetValue(actor, Forms::Sneak_SkillMod,          (SneakValue / 1.8));
-	SetValue(actor, Forms::Sneak_PickpocketMod,     (SneakValue * 0.8));
-	SetValue(actor, Forms::Sneak_DetectionMod,      ((SneakValue - 50) / -150.0) + 0.5);
+    float SneakValue            = GetValue(actor, Forms::Sneak);
+    SetValue(actor, Forms::Sneak_SkillMod,          (SneakValue / 1.8));
+    SetValue(actor, Forms::Sneak_PickpocketMod,     (SneakValue * 0.8));
+    SetValue(actor, Forms::Sneak_DetectionMod,      ((SneakValue - 50) / -150.0) + 0.5);
 
-	float SurvivalValue         = GetValue(actor, Forms::Survival);
-	SetValue(actor, Forms::Survival_UsageMod,       USAGE_MOD(SurvivalValue));
+    float SurvivalValue         = GetValue(actor, Forms::Survival);
+    SetValue(actor, Forms::Survival_UsageMod,       USAGE_MOD(SurvivalValue));
 
-	float UnarmedValue          = GetValue(actor, Forms::Unarmed);
-	SetValue(actor, Forms::Unarmed_Secondary,       WEAPON_SEC(UnarmedValue));
-	SetValue(actor, Forms::Unarmed_Damage,          ceilf((UnarmedValue / 20.0) + 0.5));
+    float UnarmedValue          = GetValue(actor, Forms::Unarmed);
+    SetValue(actor, Forms::Unarmed_Secondary,       WEAPON_SEC(UnarmedValue));
+    SetValue(actor, Forms::Unarmed_Damage,          ceilf((UnarmedValue / 20.0) + 0.5));
 
-	float WeightValue           = CALL_MEMBER_FN(actor, GetInventoryWeight)();
-	SetValue(actor, Forms::InventoryWeight,         WeightValue);
 }
 
 void ActorValueUpdateThread(TESObjectREFR* refr) {
@@ -154,11 +152,8 @@ void Values::RegisterValues() {
         for (auto iter : Forms::ListSkillMods)
             RaceList[i]->propertySheet.sheet->Push({ iter, 0 });
 
-		RaceList[i]->propertySheet.sheet->Push({ Forms::ActionPointsMult,		1.0 });
-        RaceList[i]->propertySheet.sheet->Push({ Forms::InventoryWeight,		0.0 });
-		RaceList[i]->propertySheet.sheet->Push({ Forms::PipboyLightEnabled,		0.0 });
-		RaceList[i]->propertySheet.sheet->Push({ Forms::RadiationSourceCount,	0.0 });
-		RaceList[i]->propertySheet.sheet->Push({ Forms::SkillPointBonus,		0.0 });
+        RaceList[i]->propertySheet.sheet->Push({ Forms::ActionPointsMult,       1.0 });
+        RaceList[i]->propertySheet.sheet->Push({ Forms::SkillPointBonus,        0.0 });
     }
 
     // Add Perks to NPCs

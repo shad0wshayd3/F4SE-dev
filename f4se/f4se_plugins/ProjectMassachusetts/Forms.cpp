@@ -1,24 +1,6 @@
 #include "Forms.h"
 #include "Values.h"
 
-#define CheckForm(Form, FormType, Name)\
-    if (##Form##) {\
-        _LogMessageNT("Variable: %s", #Form);\
-        _DebugIndent();\
-        _DebugMessageNT("%s is FormType: %i. Should be %i.", #Form, ##Form##->formType, FormType);\
-        if (##Form##->formType == ##FormType##) {\
-            _DebugMessageNT("%s reporting name as: %s", #Form, ##Form##->##Name##);\
-        }\
-        _DebugOutdent();\
-        _DebugMessageNT("");\
-    }\
-    else {\
-        return false;\
-    }\
-
-#define LookupType(FormID, SettingName, Type)\
-    (##Type*) Runtime_DynamicCast((void*)(Lookup(ISettings::GetInteger(##SettingName##, ##FormID##))), RTTI_TESForm, RTTI_##Type)
-
 // ------------------------------------------------------------------------------------------------
 // Public
 // ------------------------------------------------------------------------------------------------
@@ -58,14 +40,14 @@ bool Forms::Load() {
     RightLegCondition       = LookupTypeByID(0x000371,                                  ActorValueInfo);
     RadX                    = LookupTypeByID(0x024057,                                  AlchemyItem);
 
-	ObjectTypes.push_back(	{ LookupTypeByID(0x055ECC,									BGSKeyword),		56 });
-	ObjectTypes.push_back(	{ LookupTypeByID(0x0F4AED,									BGSKeyword),		53 });
-	ObjectTypes.push_back(	{ LookupTypeByID(0x10C416,									BGSKeyword),		57 });
-	ObjectTypes.push_back(	{ LookupTypeByID(0x249F30,									BGSKeyword),		39 });
-	ObjectTypes.push_back(	{ LookupTypeByID(0x0F4AE7,									BGSKeyword),		54 });
-	ObjectTypes.push_back(	{ LookupTypeByID(0x0842A1,									BGSKeyword),		58 });
-	ObjectTypes.push_back(	{ LookupTypeByID(0x0F4AEB,									BGSKeyword),		55 });
-	ObjectTypes.push_back(	{ LookupTypeByID(0x1D4A70,									BGSKeyword),		46 });
+	ObjectTypes.push_back(  { LookupTypeByID(0x055ECC,                                  BGSKeyword),        56 });
+	ObjectTypes.push_back(  { LookupTypeByID(0x0F4AED,                                  BGSKeyword),        53 });
+	ObjectTypes.push_back(  { LookupTypeByID(0x10C416,                                  BGSKeyword),        57 });
+	ObjectTypes.push_back(  { LookupTypeByID(0x249F30,                                  BGSKeyword),        39 });
+	ObjectTypes.push_back(  { LookupTypeByID(0x0F4AE7,                                  BGSKeyword),        54 });
+	ObjectTypes.push_back(  { LookupTypeByID(0x0842A1,                                  BGSKeyword),        58 });
+	ObjectTypes.push_back(  { LookupTypeByID(0x0F4AEB,                                  BGSKeyword),        55 });
+	ObjectTypes.push_back(  { LookupTypeByID(0x1D4A70,                                  BGSKeyword),        46 });
 
     // ------------------------------------------------------------------------
     // ProjectMassachusetts.esm Forms
@@ -106,13 +88,10 @@ bool Forms::Load() {
     Starvation              = LookupType(0x000901,  "Hardcore:Starvation",              ActorValueInfo);
     SleepDeprivation        = LookupType(0x000902,  "Hardcore:SleepDeprivation",        ActorValueInfo);
 
-	ActionPointsMult        = LookupType(0x000B00,  "MiscAV:ActionPointsMult",          ActorValueInfo);
-    InventoryWeight         = LookupType(0x000B01,  "MiscAV:InventoryWeight",           ActorValueInfo);
-	PipboyLightEnabled		= LookupType(0x000000,	"MiscAV:PipboyLightEnabled",		ActorValueInfo);
-	RadiationSourceCount	= LookupType(0x000000,	"MiscAV:RadiationSourceCount",		ActorValueInfo);
-	SkillPointBonus         = LookupType(0x000B02,  "MiscAV:SkillPointBonus",           ActorValueInfo);
+    ActionPointsMult        = LookupType(0x000B00,  "MiscAV:ActionPointsMult",          ActorValueInfo);
+    SkillPointBonus         = LookupType(0x000B02,  "MiscAV:SkillPointBonus",           ActorValueInfo);
 
-	ItemCondMaxHealth       = LookupType(0x000C00,  "Condition:ConditionMax",           ActorValueInfo);
+    ItemCondMaxHealth       = LookupType(0x000C00,  "Condition:ConditionMax",           ActorValueInfo);
     ItemCondMinHealth       = LookupType(0x000C01,  "Condition:ConditionMin",           ActorValueInfo);
     ItemCondStartCond       = LookupType(0x000C02,  "Condition:ConditionInitial",       ActorValueInfo);
 
@@ -203,43 +182,43 @@ bool Forms::Load() {
     // ------------------------------------------------------------------------
     // Create Perk Sorting Order
     // ------------------------------------------------------------------------
-    ListSortOrder.emplace_back(StringVector{}); // Level
+    ListSortOrder.emplace_back(StringVector{});    // Level
     ListSortOrder[0].emplace_back("Level");
 
-    ListSortOrder.emplace_back(StringVector{}); // SPECIAL
+    ListSortOrder.emplace_back(StringVector{});    // SPECIAL
     for (auto iter : ListSpecial)
         ListSortOrder[1].emplace_back(iter->GetFullName());
 
-    ListSortOrder.emplace_back(StringVector{}); // Skills
+    ListSortOrder.emplace_back(StringVector{});    // Skills
     for (auto iter : ListSkills)
         ListSortOrder[2].emplace_back(iter->GetFullName());
 
-    ListSortOrder.emplace_back(StringVector{}); // Perks
+    ListSortOrder.emplace_back(StringVector{});    // Perks
     ListSortOrder[3].emplace_back("Perk");
 
-    ListSortOrder.emplace_back(StringVector{}); // Anything Else
-	ListSortOrder[4].emplace_back(std::string{});
+    ListSortOrder.emplace_back(StringVector{});    // Anything Else
+    ListSortOrder[4].emplace_back(std::string{});
 
-	// ------------------------------------------------------------------------
-	// Create Effect Sorting Order
-	// ------------------------------------------------------------------------
-	EffectSortOrder.emplace_back(UInt32Vector{});
-	for (auto iter : ListSpecial)
-		EffectSortOrder[0].emplace_back(iter->formID);
+    // ------------------------------------------------------------------------
+    // Create Effect Sorting Order
+    // ------------------------------------------------------------------------
+    EffectSortOrder.emplace_back(UInt32Vector{});
+    for (auto iter : ListSpecial)
+        EffectSortOrder[0].emplace_back(iter->formID);
 
-	EffectSortOrder.emplace_back(UInt32Vector{});
-	for (auto iter : ListSkills)
-		EffectSortOrder[1].emplace_back(iter->formID);
+    EffectSortOrder.emplace_back(UInt32Vector{});
+    for (auto iter : ListSkills)
+        EffectSortOrder[1].emplace_back(iter->formID);
 
-	EffectSortOrder.emplace_back(UInt32Vector{});
-	EffectSortOrder[2].emplace_back(Health->formID);
-	EffectSortOrder[2].emplace_back(0x2D7);					// HealRate
-	EffectSortOrder[2].emplace_back(ActionPoints->formID);	
-	EffectSortOrder[2].emplace_back(0x2D8);					// ActionPointsRate
-	EffectSortOrder[2].emplace_back(0x2DC);					// CarryWeight
+    EffectSortOrder.emplace_back(UInt32Vector{});
+    EffectSortOrder[2].emplace_back(Health->formID);
+    EffectSortOrder[2].emplace_back(0x2D7);    // HealRate
+    EffectSortOrder[2].emplace_back(ActionPoints->formID);
+    EffectSortOrder[2].emplace_back(0x2D8);    // ActionPointsRate
+    EffectSortOrder[2].emplace_back(0x2DC);    // CarryWeight
 
-	EffectSortOrder.emplace_back(UInt32Vector{});
-	EffectSortOrder[3].emplace_back(0);
+    EffectSortOrder.emplace_back(UInt32Vector{});
+    EffectSortOrder[3].emplace_back(0);
 
     // ------------------------------------------------------------------------
     // Check Forms
@@ -269,7 +248,7 @@ void Forms::Unload() {
 
     ClearMaps();
 
-    Strength                = nullptr;
+Strength                = nullptr;
     Perception              = nullptr;
     Endurance               = nullptr;
     Charisma                = nullptr;
@@ -326,11 +305,8 @@ void Forms::Unload() {
     Unarmed_Secondary       = nullptr;
 
     ActionPointsMult        = nullptr;
-	InventoryWeight         = nullptr;
-	PipboyLightEnabled		= nullptr;
-	RadiationSourceCount	= nullptr;
     SkillPointBonus         = nullptr;
-    
+
     Dehydration             = nullptr;
     Starvation              = nullptr;
     SleepDeprivation        = nullptr;
@@ -359,10 +335,6 @@ void Forms::Unload() {
     PlayerLevel             = 1;
 
     _LogMessage("Forms::Unload - Finished.");
-}
-
-TESForm* Forms::Lookup(UInt32 FormID) {
-    return LookupFormFromMod(m_PluginInfo, FormID);
 }
 
 void Forms::AddDependent(ActorValueInfo* Parent, ActorValueInfo* Child) {
@@ -394,11 +366,6 @@ ActorValueInfo* Forms::GetSkillByName(const char* name) {
 // ------------------------------------------------------------------------------------------------
 // Private
 // ------------------------------------------------------------------------------------------------
-
-bool Forms::CheckForPlugin() {
-    m_PluginInfo = (*g_dataHandler)->LookupLoadedModByName(m_PluginName.c_str());
-    return (m_PluginInfo != nullptr);
-}
 
 bool Forms::CheckLoadedForms() {
     _LogMessage("Forms::CheckLoadedForms() - Starting.");
@@ -438,10 +405,7 @@ bool Forms::CheckLoadedForms() {
     CheckForm(Unarmed_Damage,           kFormType_AVIF, avName);
     CheckForm(Unarmed_Secondary,        kFormType_AVIF, avName);
     CheckForm(ActionPointsMult,         kFormType_AVIF, avName);
-    CheckForm(InventoryWeight,          kFormType_AVIF, avName);
-	CheckForm(PipboyLightEnabled,       kFormType_AVIF, avName);
-	CheckForm(RadiationSourceCount,     kFormType_AVIF, avName);
-	CheckForm(SkillPointBonus,          kFormType_AVIF, avName);
+    CheckForm(SkillPointBonus,          kFormType_AVIF, avName);
     CheckForm(Dehydration,              kFormType_AVIF, avName);
     CheckForm(Starvation,               kFormType_AVIF, avName);
     CheckForm(SleepDeprivation,         kFormType_AVIF, avName);
@@ -454,17 +418,17 @@ bool Forms::CheckLoadedForms() {
 }
 
 void Forms::ClearMaps() {
-    ListPerks.              clear();
-    ListTraits.             clear();
-    ListMaster.             clear();
-    ListSkills.             clear();
-    ListSpecial.            clear();
-    ListSkillMods.          clear();
-    ListSortOrder.          clear();
-    ListSkillPerks.         clear();
-	EffectSortOrder.		clear();
-	ObjectTypes.			clear();
-    RegisteredDependents.   clear();
+    ListPerks.clear();
+    ListTraits.clear();
+    ListMaster.clear();
+    ListSkills.clear();
+    ListSpecial.clear();
+    ListSkillMods.clear();
+    ListSortOrder.clear();
+    ListSkillPerks.clear();
+    EffectSortOrder.clear();
+    ObjectTypes.clear();
+    RegisteredDependents.clear();
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -524,9 +488,6 @@ ActorValueInfo*     Forms::Survival_UsageMod            = nullptr;
 ActorValueInfo*     Forms::Unarmed_Damage               = nullptr;
 ActorValueInfo*     Forms::Unarmed_Secondary            = nullptr;
 ActorValueInfo*     Forms::ActionPointsMult             = nullptr;
-ActorValueInfo*     Forms::PipboyLightEnabled           = nullptr;
-ActorValueInfo*     Forms::RadiationSourceCount         = nullptr;
-ActorValueInfo*     Forms::InventoryWeight              = nullptr;
 ActorValueInfo*     Forms::SkillPointBonus              = nullptr;
 ActorValueInfo*     Forms::Dehydration                  = nullptr;
 ActorValueInfo*     Forms::Starvation                   = nullptr;
@@ -562,9 +523,9 @@ PerkVector          Forms::ListSkillPerks;
 PerkVector          Forms::ListMaster;
 
 StringVectorVector  Forms::ListSortOrder;
-UInt32VectorVector	Forms::EffectSortOrder;
+UInt32VectorVector  Forms::EffectSortOrder;
 
-KeywordMap			Forms::ObjectTypes;
+KeywordMap          Forms::ObjectTypes;
 
 ActorValueMap       Forms::RegisteredDependents;
 PerkRankMap         Forms::RegisteredActors;
@@ -573,6 +534,3 @@ UInt16              Forms::PlayerTags;
 
 bool                Forms::PlayerLevelUp                = false;
 UInt16              Forms::PlayerLevel                  = 1;
-
-std::string         Forms::m_PluginName;
-const ModInfo*      Forms::m_PluginInfo;
