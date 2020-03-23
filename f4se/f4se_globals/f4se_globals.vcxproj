@@ -147,9 +147,12 @@
     <ClCompile Include="ITimeKeeper.cpp" />
     <ClCompile Include="ISettings.cpp" />
     <ClCompile Include="IObScript.cpp" />
+    <ClCompile Include="ITranslation.cpp" />
+    <ClCompile Include="Messaging.cpp" />
     <ClCompile Include="Native.cpp" />
     <ClCompile Include="Scaleform.cpp" />
     <ClCompile Include="Utilities.cpp" />
+    <ClCompile Include="Virtual.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Definitions.h" />
@@ -160,12 +163,15 @@
     <ClInclude Include="ILog.h" />
     <ClInclude Include="IObScriptParams.h" />
     <ClInclude Include="ITimeKeeper.h" />
+    <ClInclude Include="ITranslation.h" />
     <ClInclude Include="MenuDefinitions.h" />
+    <ClInclude Include="Messaging.h" />
     <ClInclude Include="Native.h" />
     <ClInclude Include="ISettings.h" />
     <ClInclude Include="IObScript.h" />
     <ClInclude Include="Scaleform.h" />
     <ClInclude Include="Utilities.h" />
+    <ClInclude Include="Virtual.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\common\common_vc14.vcxproj">

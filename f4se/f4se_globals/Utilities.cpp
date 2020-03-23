@@ -4,10 +4,131 @@
 
 #include <algorithm>
 
+// ------------------------------------------------------------------------------------------------
+//  GameTime
+// ------------------------------------------------------------------------------------------------
+
+CurrentTime::CurrentTime(float currentTime) {
+    Day     = truncf(currentTime);
+    Hour    = truncf((currentTime - Day) * 24.0);
+    Minute  = truncf((((currentTime - Day) * 24.0) - Hour) * 60.0);
+}
+
+// ------------------------------------------------------------------------------------------------
+//  Scaleform Logging
+// ------------------------------------------------------------------------------------------------
+
+void GFxLogMembers::Visit(const char* memberName, GFxValue* value) {
+    std::string displayName(m_prefix);
+    displayName.append(".").append(memberName);
+    const char* displayChar = displayName.c_str();
+
+    switch (value->GetType()) {
+    case GFxValue::kType_Undefined:
+    case GFxValue::kType_Null:
+        _LogMessageNT("%s (Null)", displayChar);
+        break;
+
+    case GFxValue::kType_Bool:
+        _LogMessageNT("%s (Bool):", displayChar);
+        _LogMessageNT("    %s", value->GetBool() ? "True" : "False");
+        break;
+
+    case GFxValue::kType_Int:
+    case GFxValue::kType_UInt:
+        _LogMessageNT("%s (%s):", displayChar,
+            (value->GetType() == GFxValue::kType_Int) ? "Int" : "UInt");
+        _LogMessageNT((!_stricmp(memberName, "FormID")) ? "    %08X" : "    %i",
+            (value->GetType() == GFxValue::kType_Int) ? value->GetInt() : value->GetUInt());
+        break;
+
+    case GFxValue::kType_Number:
+        _LogMessageNT("%s (Number):", displayChar);
+        _LogMessageNT("    %f", value->GetNumber());
+        break;
+
+    case GFxValue::kType_String:
+        _LogMessageNT("%s (String):", displayChar);
+        _LogMessageNT("    %s", value->GetString());
+        break;
+
+    case GFxValue::kType_Unknown7:
+        _LogMessageNT("%s (Unknown7)", displayChar);
+        break;
+
+    case GFxValue::kType_Object:
+    case GFxValue::kType_DisplayObject: {
+        _LogMessageNT("%s (%s):", displayChar,
+            (value->GetType() == GFxValue::kType_Object) ? "Object" : "DisplayObject");
+
+        _LogIndent(); m_depth++;
+
+        if (m_depth >= m_maxDepth) {
+            _LogMessageNT("We're in too deep!");
+        }
+        else if (std::string(memberName).find("instance") != std::string::npos) {
+            _LogMessageNT("This isn't useful.");
+        }
+        // todo: toggle these with flags or something
+        else if ((!_stricmp(memberName, "content")) || (!_stricmp(memberName, "parent")) || (!_stricmp(memberName, "root")) || (!_stricmp(memberName, "stage"))) {
+            _LogMessageNT("This isn't useful.");
+        }
+        else {
+            GFxLogMembers LM(displayChar, m_maxDepth, m_depth);
+            LM.SetShowDisplayMembers(m_showDM);
+            value->VisitMembers(&LM);
+        }
+
+        _LogOutdent(); m_depth--;
+        break;
+    }
+
+    case GFxValue::kType_Array: {
+        int arraySize = value->GetArraySize();
+        _LogMessageNT("%s (Array):", displayChar);
+        _LogMessageNT((arraySize > 0) ? "    %i Elements:" : "    %i Elements", arraySize);
+        _LogIndent();
+
+        // GFxLogElements LE(&Member);
+        // Member.VisitElements(&LE, 0, arraySize);
+        _LogOutdent();
+        break;
+    }
+
+    case GFxValue::kType_Function:
+        _LogMessageNT("%s (Function)", displayChar);
+        break;
+
+    default:
+        _LogMessageNT("%s (Unknown Type: %i)", displayChar, value->GetType());
+        break;
+    }
+}
+
+void GFxLogElements::Visit(UInt32 idx, GFxValue* value) {
+    _LogMessageNT("Index: %i", idx);
+    _LogIndent();
+
+    GFxLogMembers LM("", 10);
+    value->VisitMembers(&LM);
+
+    _LogOutdent();
+}
+
+void VisitGFxMembers(GFxValue value, std::string prefix, int maxDepth, bool displayMembers) {
+    GFxLogMembers LM(prefix, maxDepth);
+    LM.SetShowDisplayMembers(displayMembers);
+    value.VisitMembers(&LM);
+}
+
+// ------------------------------------------------------------------------------------------------
+//  Internal Function Handlers
+// ------------------------------------------------------------------------------------------------
+
 void NotificationInternal(const char* Message, va_list args, const char* Sound) {
-    char formatBuf[8192];
-    vsprintf_s(formatBuf, sizeof(formatBuf), Message, args);
-    Notification_internal(Message, Sound, 0, 1, 1);
+    char messageBuf[8192];
+    vsprintf_s(messageBuf, sizeof(messageBuf), Message, args);
+    Notification_internal(messageBuf, Sound, 0, 1, 1);
 }
 
 void NotificationSound(const char* Message, const char* Sound, ...) {
@@ -33,6 +154,23 @@ bool strifind(const std::string& str, const std::string& search) {
     return (it != str.end());
 }
 
+ModInfo* GetFile(TESForm* form) {
+    if (!form->unk08)
+        return nullptr;
+
+    if (form->unk08->size <= 0)
+        return nullptr;
+
+    int index = form->unk08->size - 1;
+    return form->unk08->entries[index];
+}
+
+void GetFileModifiedTime(ModInfo* file, _SYSTEMTIME& systemFileTime) {
+    _FILETIME localFileTime;
+    FileTimeToLocalFileTime(&file->fileTime.modified, &localFileTime);
+    FileTimeToSystemTime(&localFileTime, &systemFileTime);
+}
+
 UInt16 GetLevel(Actor* actor) {
     TESActorBaseData* base = DYNAMIC_CAST(actor->baseForm, TESForm, TESActorBaseData);
     return CALL_MEMBER_FN(base, GetLevel)();
@@ -43,81 +181,13 @@ void PlayIdle(Actor* actor, TESIdleForm* idle) {
 }
 
 void EquipItem(Actor* actor, TESForm* Form, bool PreventUnequip) {
-    ObjectInstanceData Data(Form);
+    BGSObjectInstance Data(Form, nullptr);
     EquipItem_Internal((*g_EquipManager), actor, &Data, 0, 1, nullptr, 1, PreventUnequip, 1, 0, nullptr);
 }
 
 void UnequipItem(Actor* actor, TESForm* Form, bool PreventReequip) {
-    ObjectInstanceData Data(Form);
+    BGSObjectInstance Data(Form, nullptr);
     UnequipItem_Internal((*g_EquipManager), actor, &Data, 1, nullptr, -1, 1, PreventReequip, 1, 0, nullptr);
-}
-
-// ------------------------------------------------------------------------------------------------
-// Value Functions
-// ------------------------------------------------------------------------------------------------
-
-float GetValue(Actor* actor, ActorValueInfo* avif) {
-    return actor->actorValueOwner.GetValue(avif);
-}
-
-float GetBaseValue(Actor* actor, ActorValueInfo* avif) {
-    return actor->actorValueOwner.GetBase(avif);
-}
-
-float GetPermValue(Actor* actor, ActorValueInfo* avif) {
-    return actor->actorValueOwner.GetBase(avif) + actor->actorValueOwner.GetMod(1, avif);
-}
-
-float GetTempValue(Actor* actor, ActorValueInfo* avif) {
-    return actor->actorValueOwner.GetBase(avif) + actor->actorValueOwner.GetMod(0, avif);
-}
-
-float GetTempMod(Actor* actor, ActorValueInfo* avif) {
-    return actor->actorValueOwner.GetMod(0, avif);
-}
-
-float GetValue(TESObjectREFR* refr, ActorValueInfo* avif) {
-    return refr->actorValueOwner.GetValue(avif);
-}
-
-float GetBaseValue(TESObjectREFR* refr, ActorValueInfo* avif) {
-    return refr->actorValueOwner.GetBase(avif);
-}
-
-float GetPermValue(TESObjectREFR* refr, ActorValueInfo* avif) {
-    return refr->actorValueOwner.GetBase(avif) + refr->actorValueOwner.GetMod(1, avif);
-}
-
-float GetTempValue(TESObjectREFR* refr, ActorValueInfo* avif) {
-    return refr->actorValueOwner.GetBase(avif) + refr->actorValueOwner.GetMod(0, avif);
-}
-
-float GetTempMod(TESObjectREFR* refr, ActorValueInfo* avif) {
-    return refr->actorValueOwner.GetMod(0, avif);
-}
-
-int GetValueInt(Actor* actor, ActorValueInfo* avif) {
-    return (int)GetValue(actor, avif);
-}
-
-int GetBaseValueInt(Actor* actor, ActorValueInfo* avif) {
-    return (int)GetBaseValue(actor, avif);
-}
-
-int GetPermValueInt(Actor* actor, ActorValueInfo* avif) {
-    return (int)GetPermValue(actor, avif);
-}
-
-void ModValue(Actor* actor, ActorValueInfo* avif, float value, UInt32 type) {
-    actor->actorValueOwner.Mod(type, avif, value);
-}
-
-void ModPermValue(Actor* actor, ActorValueInfo* avif, float value) {
-    ModValue(actor, avif, value, 1);
-}
-
-void SetValue(Actor* actor, ActorValueInfo* avif, float value) {
-    actor->actorValueOwner.SetBase(avif, value);
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -189,50 +259,4 @@ ExtraDataList* GetExtraDataListByIndex(UInt32 index) {
 
     BGSInventoryItem::Stack* stack = GetStackByStackID(Item, StackID);
     return (stack) ? stack->extraData : nullptr;
-}
-
-void GFxLogMembers::Visit(const char* member, GFxValue* value) {
-    GFxValue Member;
-    m_value->GetMember(member, &Member);
-
-    switch (Member.GetType()) {
-    case GFxValue::kType_Bool:
-        _LogMessageNT("%s: %s", member, Member.GetBool() ? "True" : "False");
-        break;
-
-    case GFxValue::kType_Int:
-    case GFxValue::kType_UInt:
-        if (!_stricmp(member, "FormID"))
-            _LogMessageNT("%s: %08X: %i", member, Member.GetInt(), LookupFormByID(Member.GetInt())->formType);
-        else
-            _LogMessageNT("%s: %i", member, Member.GetInt());
-        break;
-
-    case GFxValue::kType_Number:
-        _LogMessageNT("%s: %f", member, Member.GetNumber());
-        break;
-
-    case GFxValue::kType_String:
-        _LogMessageNT("%s: %s", member, Member.GetString());
-        break;
-
-    case GFxValue::kType_Array: {
-        _LogMessageNT("%s: %i Elements", member, Member.GetArraySize());
-
-        _LogIndent(); GFxLogElements LE(&Member);
-        Member.VisitElements(&LE, 0, Member.GetArraySize()); _LogOutdent();
-        break;
-    }
-
-    default:
-        _LogMessageNT("%s: Type %i", member, Member.GetType());
-        break;
-    }
-}
-
-void GFxLogElements::Visit(UInt32 idx, GFxValue* value) {
-    _LogMessageNT("Array Index: %i", idx);
-
-    _LogIndent(); GFxLogMembers LM(value);
-    value->VisitMembers(&LM); _LogOutdent();
 }

@@ -32,6 +32,15 @@
     <ClCompile Include="FormLoader.cpp">
       <Filter>Forms</Filter>
     </ClCompile>
+    <ClCompile Include="Messaging.cpp">
+      <Filter>Messaging</Filter>
+    </ClCompile>
+    <ClCompile Include="Virtual.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="ITranslation.cpp">
+      <Filter>Translation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Globals.h" />
@@ -74,6 +83,15 @@
     <ClInclude Include="FormLoader.h">
       <Filter>Forms</Filter>
     </ClInclude>
+    <ClInclude Include="Messaging.h">
+      <Filter>Messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="Virtual.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="ITranslation.h">
+      <Filter>Translation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Utilities">
@@ -102,6 +120,12 @@
     </Filter>
     <Filter Include="Forms">
       <UniqueIdentifier>{503048b1-a203-4432-9604-cadd32c95366}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Messaging">
+      <UniqueIdentifier>{80811503-d794-47ee-b34c-ad79221a4060}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Translation">
+      <UniqueIdentifier>{4a08995b-0fa1-40d1-a9d6-093c9539293f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -21,9 +21,6 @@ typedef std::vector<ObScriptCommand*> ObScriptCommandList;
 typedef bool (*Cmd_Execute)(EXECUTE_ARGS);
 bool Cmd_Default_Execute(EXECUTE_ARGS);
 
-typedef bool (*Cmd_Parse)(PARSE_ARGS);
-bool Cmd_Default_Parse(PARSE_ARGS);
-
 typedef bool (*Cmd_Eval)(EVAL_ARGS);
 bool Cmd_Default_Eval(EVAL_ARGS);
 
@@ -41,7 +38,7 @@ bool Cmd_Default_Eval(EVAL_ARGS);
         0,\
         paramInfo,\
         Cmd_ ## longName ## _Execute,\
-        Cmd_Default_Parse,\
+        NULL,\
         NULL,\
         0,\
         0\
@@ -62,7 +59,7 @@ bool Cmd_Default_Eval(EVAL_ARGS);
         0,\
         paramInfo,\
         Cmd_ ## longName ## _Execute,\
-        Cmd_Default_Parse,\
+        NULL,\
         Cmd_ ## longName ## _Eval,\
         1,\
         0\

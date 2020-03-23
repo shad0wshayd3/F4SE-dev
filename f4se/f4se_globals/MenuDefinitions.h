@@ -39,15 +39,7 @@ public:
     tArray<Entry>                               inventoryItems;
 };
 
-struct ObjectInstanceData {
-    ObjectInstanceData(): Form(nullptr), InstanceData(nullptr) {
-    }
-    ObjectInstanceData(TESForm* Form): Form(Form), InstanceData(nullptr) {
-    }
-
-    TESForm* Form;
-    TBO_InstanceData* InstanceData;
-};
+typedef SimpleCollector<InvItemStack>* InvItemStackList;
 
 // ------------------------------------------------------------------------------------------------
 // Base Menu Classes
@@ -193,39 +185,41 @@ public:
     };
 
     enum Tabs {
-        kTab_Stats_Status = 0,
-        kTab_Stats_SPECIAL = 1,
-        kTab_Stats_Skills = 2,
-        kTab_Stats_Perks = 3,
+        kTab_Stats_Status,
+        kTab_Stats_SPECIAL,
+        kTab_Stats_Skills,
+        kTab_Stats_Perks,
 
         kTab_Inv_Weapons = 0,
-        kTab_Inv_Apparel = 1,
-        kTab_Inv_Aid = 2,
-        kTab_Inv_Misc = 3,
-        kTab_Inv_Junk = 4,
-        kTab_Inv_Mods = 5,
-        kTab_Inv_Ammo = 6,
-        kTab_Inv_Keys = 7,
+        kTab_Inv_Apparel,
+        kTab_Inv_Aid,
+        kTab_Inv_Misc,
+        kTab_Inv_Junk,
+        kTab_Inv_Mods,
+        kTab_Inv_Ammo,
+        kTab_Inv_Holo,
+        kTab_Inv_Keys,
 
         kTab_Data_Quests = 0,
-        kTab_Data_Notes = 1,
-        kTab_Data_Workshops = 2,
-        kTab_Data_Stats = 3,
+        kTab_Data_Notes,
+        kTab_Data_Workshops,
+        kTab_Data_Stats,
     };
 
-    enum Filters {
+    enum Filters : UInt32 {
         kFilter_Weapons = 0x00000002,	// kFormType_WEAP
         kFilter_Apparel = 0x00000004,   // kFormType_ARMO
-        kFilter_Aid = 0x00000008,   // kFormType_ALCH || kFormType_INGR
-        kFilter_Misc = 0x00000200,   // kFormType_MISC && components->count = 0 || kFormType_KEYM
-        kFilter_BOOK = 0x00000280,   // kFormType_BOOK
-        kFilter_Junk = 0x00000400,   // kFormType_MISC && components->count > 0
-        kFilter_Mods = 0x00000800,   // kFormType_MISC && Referenced by OMOD?
-        kFilter_Ammo = 0x00001000,   // kFormType_AMMO
-        kFilter_NOTE = 0x00002200,   // kFormType_NOTE
+        kFilter_Aid     = 0x00000008,   // kFormType_ALCH || kFormType_INGR
+        kFilter_Misc    = 0x00000200,   // kFormType_MISC && components->count = 0 || kFormType_KEYM
+        kFilter_BOOK    = 0x00000280,   // kFormType_BOOK
+        kFilter_Junk    = 0x00000400,   // kFormType_MISC && components->count > 0
+        kFilter_Mods    = 0x00000800,   // kFormType_MISC && Referenced by OMOD?
+        kFilter_Ammo    = 0x00001000,   // kFormType_AMMO
+        kFilter_NOTE    = 0x00002200,   // kFormType_NOTE
 
-        kFilter_Keys = 0x00008000,	// PM Keys Tab
-        kFilter_Notes = 0x00016000,	// PM Notes Tab
+        kFilter_Keys    = 0x00008000,   // PM Keys Tab
+        kFilter_Notes   = 0x00016000,   // PM Notes Tab
+        kFilter_Holo    = 0x00100000,   // PM Holotapes Tab
     };
 };
 

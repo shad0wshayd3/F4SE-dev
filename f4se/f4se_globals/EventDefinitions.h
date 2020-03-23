@@ -26,10 +26,6 @@ struct BGSInventoryItemEvent {
     };
 };
 
-struct CurrentRadiationSourceCount {
-    UInt32                          count;
-};
-
 struct CustomMarkerUpdate {
     struct Event {
         //
@@ -62,17 +58,17 @@ struct InvInterfaceStateChangeEvent {
 struct LevelIncrease {
     struct Event {
         UInt32                      gainedLevel;
-        UInt32                      pad04;
-        Actor*                      actor;
-        UInt32                      unk10;
-        UInt32                      unk14;
-        float                       gainedExp;
-        UInt32                      unk1C[3];
-        Actor*                      actor1;
-        void*                       unk30;
-        Actor*                      actor2;
-        UInt32                      fromLevel;
-        UInt32                      pad44;
+        // UInt32                      pad04;
+        // Actor*                      actor;
+        // UInt32                      unk10;
+        // UInt32                      unk14;
+        // float                       gainedExp;
+        // UInt32                      unk1C[3];
+        // Actor*                      actor1;
+        // void*                       unk30;
+        // Actor*                      actor2;
+        // UInt32                      fromLevel;
+        // UInt32                      pad44;
     };
 };
 
@@ -121,9 +117,6 @@ struct PlayerActiveEffectChanged {
 struct PlayerAmmoCountEvent {
     UInt32                          ammoCount;
     UInt32                          ammoReserves;
-    UInt64                          unk08;
-    TESObjectWEAP*                  weapon;
-    TESObjectWEAP::InstanceData*    weaponData;
 };
 
 struct PlayerCharacterQuestEvent {
@@ -157,6 +150,10 @@ struct PlayerWeaponReloadEvent {
 
 struct PlayerUpdateEvent {
     //
+};
+
+struct RadiationSourceCount {
+    UInt32                          count;
 };
 
 struct RadioManager {
@@ -197,8 +194,9 @@ struct TESContainerChangedEvent {
     UInt32          formID;
     UInt32          count;
     UInt32          refID;
-    void*           unk14;
+    UInt8           uniqueID;
 };
+STATIC_ASSERT(sizeof(TESContainerChangedEvent) == 0x18);
 
 struct TESEnterSneakingEvent {
     //
@@ -269,10 +267,12 @@ struct VATSEvents {
 };
 
 struct WeaponFiredEvent {
-    void*                           unk00;
-    TESObjectREFR*                  refr;
-    void*                           unk10;
+    // BGSObjectInstanceT<TESObjectWEAP*>*     weapon;
+    void*                                   weapon;
+    TESObjectREFR*                          source;
+    void*                                   unk10; // Projectile?
 };
+// STATIC_ASSERT(sizeof(WeaponFiredEvent) == 0x18);
 
 struct Workshop {
     struct WorkshopModeEvent {
