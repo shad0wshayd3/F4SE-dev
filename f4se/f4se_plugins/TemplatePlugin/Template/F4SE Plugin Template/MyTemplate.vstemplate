@@ -1,13 +1,13 @@
 <VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
   <TemplateData>
-    <Name>F4SE Plugin Template</Name>
-    <Description>Template for 1.10.162</Description>
+    <Name>F4SE Template Plugin</Name>
+    <Description>Fallout 4 runtime 1.10.163 - F4SE build: 0.6.20</Description>
     <ProjectType>VC</ProjectType>
     <ProjectSubType>
     </ProjectSubType>
     <SortOrder>1000</SortOrder>
     <CreateNewFolder>true</CreateNewFolder>
-    <DefaultName>F4SE Plugin Template</DefaultName>
+    <DefaultName>F4SE Template Plugin</DefaultName>
     <ProvideDefaultName>true</ProvideDefaultName>
     <LocationField>Enabled</LocationField>
     <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
@@ -19,6 +19,14 @@
       <ProjectItem ReplaceParameters="true" TargetFileName="main.cpp">main.cpp</ProjectItem>
       <ProjectItem ReplaceParameters="true" TargetFileName="Config.h">Config.h</ProjectItem>
       <ProjectItem ReplaceParameters="true" TargetFileName="exports.def">exports.def</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="Forms.h">Forms.h</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="Forms.cpp">Forms.cpp</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="Serialize.cpp">Serialize.cpp</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="Serialize.h">Serialize.h</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="ObScript.cpp">ObScript.cpp</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="ObScript.h">ObScript.h</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="Papyrus.cpp">Papyrus.cpp</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="Papyrus.h">Papyrus.h</ProjectItem>
     </Project>
   </TemplateContent>
 </VSTemplate>

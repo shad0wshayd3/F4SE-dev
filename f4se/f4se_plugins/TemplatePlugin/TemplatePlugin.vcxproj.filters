@@ -2,11 +2,46 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClInclude Include="Config.h" />
+    <ClInclude Include="Forms.h">
+      <Filter>Forms</Filter>
+    </ClInclude>
+    <ClInclude Include="Serialize.h">
+      <Filter>Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="ObScript.h">
+      <Filter>Scripts</Filter>
+    </ClInclude>
+    <ClInclude Include="Papyrus.h">
+      <Filter>Scripts</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Forms.cpp">
+      <Filter>Forms</Filter>
+    </ClCompile>
+    <ClCompile Include="Serialize.cpp">
+      <Filter>Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="ObScript.cpp">
+      <Filter>Scripts</Filter>
+    </ClCompile>
+    <ClCompile Include="Papyrus.cpp">
+      <Filter>Scripts</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Forms">
+      <UniqueIdentifier>{3a72d076-11b7-4d1c-9518-07974882efd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Serialization">
+      <UniqueIdentifier>{acad53d2-a549-4453-8052-0df47046eac5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts">
+      <UniqueIdentifier>{67c08bd7-3715-4da3-9034-51fcf320fcb2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

@@ -157,9 +157,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Config.h" />
+    <ClInclude Include="Forms.h" />
+    <ClInclude Include="ObScript.h" />
+    <ClInclude Include="Papyrus.h" />
+    <ClInclude Include="Serialize.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Forms.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ObScript.cpp" />
+    <ClCompile Include="Papyrus.cpp" />
+    <ClCompile Include="Serialize.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />
