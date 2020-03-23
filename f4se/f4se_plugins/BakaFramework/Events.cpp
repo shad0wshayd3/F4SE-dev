@@ -1,27 +1,41 @@
 #include "Events.h"
 
-#include <thread>
-
 #include "f4se/GameReferences.h"
-#include "f4se_globals/Utilities.h"
 
-void UpdateWeight() {
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));    // Delay for dropped items
-    SetValue((*g_player), Forms::InventoryWeight, CALL_MEMBER_FN((*g_player), GetInventoryWeight)());
+void WeightUpdate::Run() {
+    SetBaseValue(m_refr, Forms::InventoryWeight, CALL_MEMBER_FN(m_refr, GetInventoryWeight)());
 }
 
-EventResult CurrentRadiationSourceCountHandler::ReceiveEvent(CurrentRadiationSourceCount* evn, void* dispatcher) {
-    if (evn) {
-        SetValue((*g_player), Forms::RadiationSourceCount, evn->count);
+EventResult MenuOpenCloseEventHandler::ReceiveEvent(MenuOpenCloseEvent* evn, void* dispatcher) {
+    if (!evn)
+        return kEvent_Continue;
+
+    if (evn->menuName == BSFixedString("HUDMenu")) {
+        if (evn->isOpen) {
+            IMenu* menu = (*g_ui)->GetMenu(evn->menuName);
+            if (!menu)
+                return kEvent_Continue;
+
+            GameLoadedCallback();
+        }
     }
 
     return kEvent_Continue;
 }
-CurrentRadiationSourceCountHandler g_CurrentRadiationSourceCountHandler;
+MenuOpenCloseEventHandler g_MenuOpenCloseEventHandler;
+
+EventResult RadiationSourceCountHandler::ReceiveEvent(RadiationSourceCount* evn, void* dispatcher) {
+    if (evn) {
+        SetBaseValue((*g_player), Forms::RadiationSourceCount, evn->count);
+    }
+
+    return kEvent_Continue;
+}
+RadiationSourceCountHandler g_RadiationSourceCountHandler;
 
 EventResult PipboyLightEventHandler::ReceiveEvent(PipboyLightEvent* evn, void* dispatcher) {
     if (evn) {
-        SetValue((*g_player), Forms::PipboyLightActive, evn->enabled);
+        SetBaseValue((*g_player), Forms::PipboyLightActive, evn->enabled);
     }
 
     return kEvent_Continue;
@@ -30,27 +44,18 @@ PipboyLightEventHandler g_PipboyLightEventHandler;
 
 EventResult TESContainerChangedEventHandler::ReceiveEvent(TESContainerChangedEvent* evn, void* dispatcher) {
     if (evn) {
-        if ((evn->sourceID == 0x14) || (evn->targetID == 0x14)) {
-            std::thread UpdateInventoryWeightThread(UpdateWeight);
-            UpdateInventoryWeightThread.detach();
+        if (g_Tasks) {
+            Actor* source = ToType(LookupFormByID(evn->sourceID), Actor);
+            Actor* target = ToType(LookupFormByID(evn->targetID), Actor);
+
+            if (source && source->formType == kFormType_ACHR)
+                g_Tasks->AddTask(new WeightUpdate(source));
+
+            if (target && target->formType == kFormType_ACHR)
+                g_Tasks->AddTask(new WeightUpdate(target));
         }
     }
 
     return kEvent_Continue;
 }
 TESContainerChangedEventHandler g_TESContainerChangedEventHandler;
-
-EventResult MenuOpenCloseEventHandler::ReceiveEvent(MenuOpenCloseEvent* evn, void* dispatcher) {
-    if (!evn)
-        return kEvent_Continue;
-
-    if (evn->menuName == BSFixedString("HUDMenu")) {
-        if (evn->isOpen) {
-            GetGlobalEventDispatcher<CurrentRadiationSourceCount>().AddEventSink(&g_CurrentRadiationSourceCountHandler);
-            GetGlobalEventDispatcher<PipboyLightEvent>().AddEventSink(&g_PipboyLightEventHandler);
-        }
-    }
-
-    return kEvent_Continue;
-}
-MenuOpenCloseEventHandler g_MenuOpenCloseEventHandler;

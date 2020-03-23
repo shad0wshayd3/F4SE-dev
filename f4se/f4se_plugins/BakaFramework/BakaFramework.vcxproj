@@ -87,6 +87,7 @@
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>NotSet</SubSystem>
@@ -141,6 +142,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>NotSet</SubSystem>
@@ -160,12 +162,14 @@
     <ClInclude Include="Events.h" />
     <ClInclude Include="Forms.h" />
     <ClInclude Include="ObScript.h" />
+    <ClInclude Include="Papyrus.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Events.cpp" />
     <ClCompile Include="Forms.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ObScript.cpp" />
+    <ClCompile Include="Papyrus.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />

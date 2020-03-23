@@ -70,6 +70,6 @@ bool Forms::CheckLoadedForms() {
 // Initialize Statics
 // ------------------------------------------------------------------------------------------------
 
-ActorValueInfo* Forms::PipboyLightActive        = nullptr;
-ActorValueInfo* Forms::RadiationSourceCount     = nullptr;
-ActorValueInfo* Forms::InventoryWeight          = nullptr;
+ActorValueInfo*     Forms::PipboyLightActive        = nullptr;
+ActorValueInfo*     Forms::RadiationSourceCount     = nullptr;
+ActorValueInfo*     Forms::InventoryWeight          = nullptr;

@@ -9,7 +9,10 @@
       <Filter>Forms</Filter>
     </ClInclude>
     <ClInclude Include="ObScript.h">
-      <Filter>ObScript</Filter>
+      <Filter>Scripts</Filter>
+    </ClInclude>
+    <ClInclude Include="Papyrus.h">
+      <Filter>Scripts</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -21,7 +24,10 @@
       <Filter>Forms</Filter>
     </ClCompile>
     <ClCompile Include="ObScript.cpp">
-      <Filter>ObScript</Filter>
+      <Filter>Scripts</Filter>
+    </ClCompile>
+    <ClCompile Include="Papyrus.cpp">
+      <Filter>Scripts</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -34,7 +40,7 @@
     <Filter Include="Forms">
       <UniqueIdentifier>{4677ee3c-dd77-4921-b5ff-9e00d9500129}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ObScript">
+    <Filter Include="Scripts">
       <UniqueIdentifier>{10ec54c6-a70f-4995-a2b5-c6e1bbcb98d8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
