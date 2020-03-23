@@ -466,7 +466,7 @@ public:
 	struct Data
 	{
 		ModInfo ** entries;     // array of ModInfo* - mods that change this form.
-		UInt64  size;
+		UInt32  size;
 	};
 
 	Data	* unk08;	// 08
@@ -751,6 +751,7 @@ public:
 	UInt32			avFlags;                // 16C
 	enum AVFlags
 	{
+		kFlag_CannotBeModified          = (1 << 3),     // 03 | "Cannot be Modified in Scripts or the Console"
 		kFlag_DefaultBase_0             = (1 << 10),    // 10 | Default Base: 0
 		kFlag_DefaultBase_1             = (1 << 11),    // 11 | Default Base: 1
 		kFlag_DefaultBase_100           = (1 << 12),    // 12 | Default Base: 100
@@ -1427,14 +1428,13 @@ public:
 		public:
 			enum { kTypeID = kFormType_OMOD };
 
-			TESFullName									fullName;	// 20
-			TESDescription								description; // 30
-			BGSModelMaterialSwap						materialSwap; // 48
-			BGSMod::Container							modContainer; // 88
-			BGSAttachParentArray						unk98;			// 98
-			UInt64										unkB0;			// B0
-			UInt64										unkB8;			// B8
-			UInt16										unkC0;			// C0
+			TESFullName									fullName;		// 20
+			TESDescription								description;	// 30
+			BGSModelMaterialSwap						materialSwap;	// 48
+			BGSMod::Container							modContainer;	// 88
+			BGSAttachParentArray						attachParents;	// 98
+			BGSTypedKeywordValueArray					filterKeywords;	// B0
+			BGSTypedKeywordValue						attachPoint;	// C0
 
 			enum
 			{
@@ -1455,6 +1455,7 @@ public:
 	};
 };
 STATIC_ASSERT(offsetof(BGSMod::Attachment::Mod, modContainer) == 0x88);
+STATIC_ASSERT(offsetof(BGSMod::Attachment::Mod, attachPoint) == 0xC0);
 STATIC_ASSERT(sizeof(BGSMod::Attachment::Mod) == 0xC8);
 
 // 48

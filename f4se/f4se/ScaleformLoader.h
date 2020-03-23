@@ -15,6 +15,7 @@ public:
 	virtual GImageInfoBase*	LoadImage(const char * url) = 0;
 };
 
+#ifndef _SKIP_IMAGE_LOADER
 class BSScaleformImageLoader : public GFxImageLoader
 {
 public:
@@ -29,6 +30,7 @@ public:
 	DEFINE_MEMBER_FN_1(MountImage, bool, 0x022E5AD0, NiTexture **);
 	DEFINE_MEMBER_FN_1(UnmountImage, bool, 0x022E5DE0, NiTexture **);
 };
+#endif
 
 class BSScaleformManager
 {
@@ -40,7 +42,11 @@ public:
 	GFxStateBag				* stateBag;		// 10
 	void					* unk18;		// 18
 	void					* unk20;		// 20
+#ifndef _SKIP_IMAGE_LOADER
 	BSScaleformImageLoader	* imageLoader;	// 28
+#else
+	void					* imageLoader;
+#endif
 
 	MEMBER_FN_PREFIX(BSScaleformManager);
 	DEFINE_MEMBER_FN(LoadMovie, bool, 0x02110AD0, IMenu * menu, GFxMovieView *&, const char * name, const char * stagePath, UInt32 flags);

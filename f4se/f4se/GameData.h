@@ -31,19 +31,28 @@ struct ModInfo		// referred to by game as TESFile
 	ModInfo();
 	~ModInfo();
 
-	UInt64								unk00[10];			// 000
-	BSFile*								file;				// 050
-	UInt64								unk58;				// 058
-	UInt64								unk60;				// 060
-	void								* unk68;			// 068
-	char								name[MAX_PATH];		// 070
+	UInt64								unk00[10];				// 000
+	BSFile*								file;					// 050
+	UInt64								unk58;					// 058
+	UInt64								unk60;					// 060
+	void								* unk68;				// 068
+	char								name[MAX_PATH];			// 070
 	char								directory[MAX_PATH];	// 174
-	UInt64								unk278[0xB8/8];		// 278
+	UInt64								unk278[(0x98)/8];		// 278
+
 	struct Dependency
 	{
 		void		* unk00;	// 00
 		const char	* name;		// 08
 		Dependency	* next;		// 10
+	};
+
+	struct FileTimes
+	{
+		_FILETIME	accessed;
+		_FILETIME	modified;
+		_FILETIME	created;
+		UInt64		fileSize;
 	};
 
 	enum RecordFlag
@@ -55,8 +64,9 @@ struct ModInfo		// referred to by game as TESFile
 		kRecordFlags_ESL = 1 << 9
 	};
 
+	FileTimes							fileTime;			// 310
 	UInt32								flags;				// 330
-	UInt32							recordFlags;		// 334
+	UInt32								recordFlags;		// 334
 	UInt64								unk338;				// 338
 	UInt64								unk340;				// 340
 	UInt64								unk348;				// 348
@@ -71,7 +81,7 @@ struct ModInfo		// referred to by game as TESFile
 	UInt8								pad[4];				// 371
 	BSString							author;				// 378
 	BSString							description;		// 388
-	// ...
+	UInt64								unk398[6];			// 398
 
 	// Checks if a particular formID is part of the mod
 	bool IsFormInMod(UInt32 formID) const
@@ -98,7 +108,7 @@ struct ModInfo		// referred to by game as TESFile
 	bool IsActive() const { return modIndex != 0xFF; }
 	bool IsLight() const { return (recordFlags & kRecordFlags_ESL) == kRecordFlags_ESL; }
 };
-
+STATIC_ASSERT(sizeof(ModInfo) == 0x3C8);
 STATIC_ASSERT(offsetof(ModInfo, recordFlags) == 0x334);
 STATIC_ASSERT(offsetof(ModInfo, author) == 0x378);
 

@@ -511,28 +511,46 @@ public:
 STATIC_ASSERT(offsetof(MagicItem, unk0B0) == 0x0B0);
 STATIC_ASSERT(sizeof(MagicItem) == 0x0D0);
 
+
+
 // 1E0
 class AlchemyItem : public MagicItem
 {
 public:
 	enum { kTypeID = kFormType_ALCH };
 
-	BGSModelMaterialSwap	materialSwap; // 0D0
-	TESIcon					icon;			// 110
-	BGSMessageIcon			msgIcon;		// 120
-	TESWeightForm			weightForm;		// 138
-	BGSEquipType			equipType;		// 148
-	BGSDestructibleObjectForm destructible;	// 158
-	BGSPickupPutdownSounds	pickupPutdown;	// 168
-	BGSCraftingUseSound		craftingSounds;	// 180
-	TESDescription			description;	// 190
-	UInt32					unk1A8;			// 1A8
-	UInt32					unk1AC;			// 1AC
-	UInt64					unk1B0[4];		// 1B0
-	TESIcon					icon1D0;		// 1D0
+	enum AlchemyFlags {
+		kFlag_NoAutoCalc	= 1 << 0,
+		kFlag_Food			= 1 << 1,
+		kFlag_Medicine		= 1 << 16,
+	};
+
+	BGSModelMaterialSwap			materialSwap;	// 0D0
+	TESIcon							icon;			// 110
+	BGSMessageIcon					msgIcon;		// 120
+	TESWeightForm					weightForm;		// 138
+	BGSEquipType					equipType;		// 148
+	BGSDestructibleObjectForm		destructible;	// 158
+	BGSPickupPutdownSounds			pickupPutdown;	// 168
+	BGSCraftingUseSound				craftingSounds;	// 180
+	TESDescription					description;	// 190
+
+	struct Data {
+		UInt32						costOverride;
+		UInt32						flags;
+		SpellItem*					addictionItem;
+		float						addictionChance;
+		UInt32						unk00;			// padding?
+		BGSSoundDescriptorForm*		consumptionSound;
+		BSFixedString				addictionName;
+	};
+
+	Data							data;			// 1B0
+	TESIcon							icon1D0;		// 1D0
 };
 STATIC_ASSERT(offsetof(AlchemyItem, icon1D0) == 0x1D0);
 STATIC_ASSERT(sizeof(AlchemyItem) == 0x1E0);
+STATIC_ASSERT(sizeof(AlchemyItem::Data) == 0x28);
 
 // 100
 class EnchantmentItem : public MagicItem
@@ -807,8 +825,42 @@ public:
 	BGSPreloadable				preloadable;		// A8
 	BGSDestructibleObjectForm	destructible;		// B0
 
-	UInt64 unkC0[(0x188 - 0xC0) >> 3];
+	struct ProjectileData {
+		UInt32					flags;
+		float					gravity;
+		float					speed;
+		float					range;
+		void					* light;
+		void					* muzzleFlashLight;
+		float					explosionProximity;
+		float					explosionTimer;
+		BGSExplosion			* explosion;
+		BGSSoundDescriptorForm	* sound;
+		float					muzzleFlashDuration;
+		float					fadeOutTime;
+		float					force;
+		UInt32					pad01;
+		BGSSoundDescriptorForm	* countdownSound;
+		BGSSoundDescriptorForm	* deactivateSound;
+		TESObjectWEAP			* defaultWeaponSource;
+		float					coneSpread;
+		float					collisionRadius;
+		float					lifetime;
+		float					relaunchInterval;
+		void					* decalLayer;
+		void					* collisionLayer;
+		BGSProjectile			* vatsProjectile;
+		UInt32					tracerFrequency;
+		UInt32					pad02;
+	};
+	ProjectileData				projectileData;		// C0
+
+	TESModel					muzzleFlashModel;	// 150
+	UInt32						soundLevel;			// 180
+	UInt32						pad;				// 184
 };
+STATIC_ASSERT(sizeof(BGSProjectile) == 0x188);
+STATIC_ASSERT(sizeof(BGSProjectile::ProjectileData) == 0x90);
 
 // D8
 class TESLevCharacter : public TESBoundAnimObject

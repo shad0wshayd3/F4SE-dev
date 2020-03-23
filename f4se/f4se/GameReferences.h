@@ -467,7 +467,9 @@ public:
 		kIsInKillMove = 1 << 14,
 	};
 
-	UInt64			unk440[(0x490 - 0x440) / 8];
+	UInt64			unk440[(0x474 - 0x440) / 8];
+	float			lastUpdateTime;		// 474
+	UInt64			unk478[(0x490 - 0x478) / 8];
 
 	bool IsPlayerTeammate()
 	{
@@ -480,6 +482,7 @@ public:
 	DEFINE_MEMBER_FN(IsHostileToActor, bool, 0x00D91080, Actor * actor);
 	DEFINE_MEMBER_FN(UpdateEquipment, void, 0x00408270);
 };
+STATIC_ASSERT(sizeof(Actor) == 0x490);
 STATIC_ASSERT(offsetof(Actor, equipData) == 0x428);
 STATIC_ASSERT(offsetof(Actor, actorFlags2) == 0x43C);
 STATIC_ASSERT(offsetof(Actor::MiddleProcess::Data08, equipData) == 0x288);

@@ -1,6 +1,9 @@
 #include "f4se/GameExtraData.h"
 #include "f4se/GameObjects.h"
 
+//
+RelocAddr <uintptr_t> s_BGSObjectInstanceExtra(0x02C4BE10);
+
 // ??_7ExtraPowerLinks@@6B@
 RelocAddr <uintptr_t> s_ExtraPowerLinksVtbl(0x02C52388);
 
@@ -13,87 +16,87 @@ RelocAddr <uintptr_t> s_ExtraHealthVtbl(0x02C521E8);
 // ??_7ExtraMaterialSwap@@6B@
 RelocAddr <uintptr_t> s_ExtraMaterialSwapVtbl(0x02C528E8);
 
-bool ExtraDataList::PresenceBitfield::HasType(UInt32 type) const
+bool BaseExtraList::HasType(UInt32 type) const
 {
-	UInt32 index = (type >> 3);
-	UInt8 bitMask = 1 << (type % 8);
-	return (bits[index] & bitMask) != 0;
+    UInt32 index = (type >> 3);
+    UInt8 bitMask = 1 << (type % 8);
+    return (flags[index] & bitMask) != 0;
 }
 
 bool ExtraDataList::HasType(UInt32 type)
 {
-	BSReadLocker locker(&m_lock);
-	return (m_presence) ? m_presence->HasType(type) : false;
+    BSReadLocker locker(&m_lock);
+    return (m_data.flags) ? m_data.HasType(type) : false;
 }
 
 void ExtraDataList::MarkType(UInt32 type, bool bCleared)
 {
-	if (!m_presence) {
-		m_presence = (PresenceBitfield*)Heap_Allocate(sizeof(PresenceBitfield));
-		memset(m_presence, 0, sizeof(PresenceBitfield));
-	}
+    if (!m_data.flags) {
+        m_data.flags = (UInt8*)Heap_Allocate(sizeof(UInt8));
+        memset(m_data.flags, 0, sizeof(UInt8));
+    }
 
-	UInt32 index = (type >> 3);
-	UInt8 bitMask = 1 << (type % 8);
-	UInt8& flag = m_presence->bits[index];
-	if (bCleared) {
-		flag &= ~bitMask;
-	} else {
-		flag |= bitMask;
-	}
+    UInt32 index = (type >> 3);
+    UInt8 bitMask = 1 << (type % 8);
+    UInt8& flag = m_data.flags[index];
+    if (bCleared) {
+        flag &= ~bitMask;
+    } else {
+        flag |= bitMask;
+    }
 }
 
 bool ExtraDataList::Remove(UInt8 type, BSExtraData* toRemove)
 {
-	if (!toRemove) return false;
+    if (!toRemove) return false;
 
-	BSReadAndWriteLocker locker(&m_lock);
-	if (HasType(type)) {
-		bool bRemoved = false;
-		if (m_data == toRemove) {
-			m_data = m_data->next;
-			bRemoved = true;
-		}
+    BSReadAndWriteLocker locker(&m_lock);
+    if (HasType(type)) {
+        bool bRemoved = false;
+        if (m_data.head == toRemove) {
+            m_data.head = m_data.head->next;
+            bRemoved = true;
+        }
 
-		for (BSExtraData* traverse = m_data; traverse; traverse = traverse->next) {
-			if (traverse->next == toRemove) {
-				traverse->next = toRemove->next;
-				bRemoved = true;
-				break;
-			}
-		}
-		if (bRemoved) {
-			MarkType(type, true);
-		}
-		return true;
-	}
+        for (BSExtraData* traverse = m_data.head; traverse; traverse = traverse->next) {
+            if (traverse->next == toRemove) {
+                traverse->next = toRemove->next;
+                bRemoved = true;
+                break;
+            }
+        }
+        if (bRemoved) {
+            MarkType(type, true);
+        }
+        return true;
+    }
 
-	return false;
+    return false;
 }
 
 bool ExtraDataList::Add(UInt8 type, BSExtraData* toAdd)
 {
-	if (!toAdd || HasType(type)) return false;
+    if (!toAdd || HasType(type)) return false;
 
-	BSReadAndWriteLocker locker(&m_lock);
-	BSExtraData* next = m_data;
-	m_data = toAdd;
-	toAdd->next = next;
-	MarkType(type, false);
-	return true;
+    BSReadAndWriteLocker locker(&m_lock);
+    BSExtraData* next = m_data.head;
+    m_data.head = toAdd;
+    toAdd->next = next;
+    MarkType(type, false);
+    return true;
 }
 
 BSExtraData* ExtraDataList::GetByType(UInt32 type)
 {
-	if (!HasType(type))
-		return NULL;
+    if (!HasType(type))
+        return NULL;
 
-	BSReadLocker locker(&m_lock);
-	for(BSExtraData * traverse = m_data; traverse; traverse = traverse->next) {
-		if(traverse->type == type)
-			return traverse;
-	}
-	return NULL;
+    BSReadLocker locker(&m_lock);
+    for(BSExtraData * traverse = m_data.head; traverse; traverse = traverse->next) {
+        if(traverse->type == type)
+            return traverse;
+    }
+    return NULL;
 }
 
 #ifdef _DEBUG
@@ -101,60 +104,67 @@ BSExtraData* ExtraDataList::GetByType(UInt32 type)
 
 void ExtraDataList::Dump()
 {
-	for(BSExtraData * traverse = m_data; traverse; traverse = traverse->next)
-	{
-		gLog.Indent();
-		_MESSAGE("%016I64X %s", traverse, GetObjectClassName(traverse));
-		gLog.Outdent();
-	}
+    for(BSExtraData * traverse = m_data; traverse; traverse = traverse->next)
+    {
+        gLog.Indent();
+        _MESSAGE("%016I64X %s", traverse, GetObjectClassName(traverse));
+        gLog.Outdent();
+    }
 }
 #endif
 
 BSExtraData* BSExtraData::Create(UInt32 size, UInt64 vtbl)
 {
-	void* memory = Heap_Allocate(size);
-	memset(memory, 0, size);
-	((UInt64*)memory)[0] = vtbl;
-	BSExtraData* xData = (BSExtraData*)memory;
-	xData->unk10 = 0;
-	xData->unk13 = 0;
-	xData->unk14 = 0;
-	xData->next = NULL;
-	return xData;
+    void* memory = Heap_Allocate(size);
+    memset(memory, 0, size);
+    ((UInt64*)memory)[0] = vtbl;
+    BSExtraData* xData = (BSExtraData*)memory;
+    xData->unk10 = 0;
+    xData->unk13 = 0;
+    xData->unk14 = 0;
+    xData->next = NULL;
+    return xData;
+}
+
+BGSObjectInstanceExtra* BGSObjectInstanceExtra::Create()
+{
+    BGSObjectInstanceExtra* pObjectInstance = (BGSObjectInstanceExtra*)BSExtraData::Create(sizeof(BGSObjectInstanceExtra), s_BGSObjectInstanceExtra.GetUIntPtr());
+    pObjectInstance->type = kExtraData_ObjectInstance;
+    return pObjectInstance;
 }
 
 ExtraPowerLinks* ExtraPowerLinks::Create()
 {
-	ExtraPowerLinks* pPowerLinks = (ExtraPowerLinks*)BSExtraData::Create(sizeof(ExtraPowerLinks), s_ExtraPowerLinksVtbl.GetUIntPtr());
-	pPowerLinks->type = kExtraData_PowerLinks;
-	pPowerLinks->connections.entries = NULL;
-	pPowerLinks->connections.count = 0;
-	pPowerLinks->connections.capacity = 0;
-	return pPowerLinks;
+    ExtraPowerLinks* pPowerLinks = (ExtraPowerLinks*)BSExtraData::Create(sizeof(ExtraPowerLinks), s_ExtraPowerLinksVtbl.GetUIntPtr());
+    pPowerLinks->type = kExtraData_PowerLinks;
+    pPowerLinks->connections.entries = NULL;
+    pPowerLinks->connections.count = 0;
+    pPowerLinks->connections.capacity = 0;
+    return pPowerLinks;
 }
 
 ExtraInstanceData* ExtraInstanceData::Create(TESForm * baseForm, TBO_InstanceData * instanceData)
 {
-	ExtraInstanceData* pInstanceData = (ExtraInstanceData*)BSExtraData::Create(sizeof(ExtraInstanceData), s_ExtraInstanceDataVtbl.GetUIntPtr());
-	pInstanceData->type = kExtraData_InstanceData;
-	pInstanceData->baseForm = baseForm;
-	pInstanceData->instanceData = instanceData;
-	InterlockedIncrement(&instanceData->m_refCount);
-	return pInstanceData;
+    ExtraInstanceData* pInstanceData = (ExtraInstanceData*)BSExtraData::Create(sizeof(ExtraInstanceData), s_ExtraInstanceDataVtbl.GetUIntPtr());
+    pInstanceData->type = kExtraData_InstanceData;
+    pInstanceData->baseForm = baseForm;
+    pInstanceData->instanceData = instanceData;
+    InterlockedIncrement(&instanceData->m_refCount);
+    return pInstanceData;
 }
 
 ExtraHealth* ExtraHealth::Create(float value)
 {
-	ExtraHealth* pHeath = (ExtraHealth*)BSExtraData::Create(sizeof(ExtraHealth), s_ExtraHealthVtbl.GetUIntPtr());
-	pHeath->type = kExtraData_Health;
-	pHeath->health = value;
-	return pHeath;
+    ExtraHealth* pHeath = (ExtraHealth*)BSExtraData::Create(sizeof(ExtraHealth), s_ExtraHealthVtbl.GetUIntPtr());
+    pHeath->type = kExtraData_Health;
+    pHeath->health = value;
+    return pHeath;
 }
 
 ExtraMaterialSwap* ExtraMaterialSwap::Create(BGSMaterialSwap * matSwap)
 {
-	ExtraMaterialSwap* pMatSwap = (ExtraMaterialSwap*)BSExtraData::Create(sizeof(ExtraMaterialSwap), s_ExtraMaterialSwapVtbl.GetUIntPtr());
-	pMatSwap->type = kExtraData_MaterialSwap;
-	pMatSwap->materialSwap = matSwap;
-	return pMatSwap;
+    ExtraMaterialSwap* pMatSwap = (ExtraMaterialSwap*)BSExtraData::Create(sizeof(ExtraMaterialSwap), s_ExtraMaterialSwapVtbl.GetUIntPtr());
+    pMatSwap->type = kExtraData_MaterialSwap;
+    pMatSwap->materialSwap = matSwap;
+    return pMatSwap;
 }

@@ -253,6 +253,10 @@ namespace papyrusObjectReference {
 				}
 			}
 
+			TESObjectREFR* refr = thisObj->GetObjectReference();
+			if (refr)
+				return CALL_MEMBER_FN(refr, GetReferenceName)();
+
 			TESFullName* pFullName = DYNAMIC_CAST(baseForm, TESForm, TESFullName);
 			if (pFullName)
 				return pFullName->name;

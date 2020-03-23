@@ -447,13 +447,21 @@ public:
 	BGSInstanceNamingRules	* rules;	// 08
 };
 
+class BGSTypedKeywordValue
+{
+public:
+	UInt16	index;
+};
+STATIC_ASSERT(sizeof(BGSTypedKeywordValue) == 0x02);
+
 // 10
 class BGSTypedKeywordValueArray
 {
 public:
-	void	* unk00;	// 00
-	void	* unk08;	// 08
+	BGSTypedKeywordValue	* keywords;	// 00
+	UInt64					size;		// 08
 };
+STATIC_ASSERT(sizeof(BGSTypedKeywordValueArray) == 0x10);
 
 // 18
 class BGSAttachParentArray : public BaseFormComponent
@@ -461,6 +469,7 @@ class BGSAttachParentArray : public BaseFormComponent
 public:
 	BGSTypedKeywordValueArray	unk08;
 };
+STATIC_ASSERT(sizeof(BGSAttachParentArray) == 0x18);
 
 // 10
 class BGSAttackDataForm : public BaseFormComponent
@@ -1520,6 +1529,7 @@ struct BGSInventoryItem
 
 	Stack * stack;	// 08
 };
+STATIC_ASSERT(sizeof(BGSInventoryItem) == 0x10);
 
 // ??
 class BGSInventoryList
